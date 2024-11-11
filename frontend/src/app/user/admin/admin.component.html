@@ -1,0 +1,212 @@
+<div class="container-fluid mt-4">
+  <h2 class="mb-4">Manage Admins</h2>
+
+  <div class="card">
+    <div
+      class="card-header bg-primary text-white d-flex justify-content-between align-items-center"
+    >
+      <div><i class="fas fa-user-shield"></i> Admin Information</div>
+      <button
+        type="button"
+        class="btn btn-light"
+        (click)="openAddModal()"
+        aria-label="Add Admin"
+        data-toggle="modal"
+        data-target="#addAdminModal"
+      >
+        <i class="fas fa-plus fa-sm"></i> Add
+      </button>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table id="adminsTable" class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th class="col-id">ID</th>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Password</th>
+              <th class="col-action">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let adminItem of adminArray; trackBy: trackById">
+              <td>{{ adminItem.id }}</td>
+              <td>{{ adminItem.username }}</td>
+              <td>{{ adminItem.email }}</td>
+              <td>******</td>
+              <td class="col-action">
+                <button
+                  type="button"
+                  class="btn btn-success btn-sm"
+                  (click)="openEditModal(adminItem)"
+                  aria-label="Edit Admin"
+                  data-toggle="modal"
+                  data-target="#editAdminModal"
+                >
+                  <i class="fas fa-edit fa-sm text-white"></i>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-danger btn-sm"
+                  (click)="setDelete(adminItem)"
+                  aria-label="Delete Admin"
+                >
+                  <i class="fas fa-trash fa-sm text-white"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Admin Modal -->
+<div
+  class="modal fade"
+  id="addAdminModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="addAdminModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addAdminModalLabel">Add Admin</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="addAdminUsername">Username</label>
+          <input
+            type="text"
+            class="form-control"
+            id="addAdminUsername"
+            placeholder="Enter Username"
+            [(ngModel)]="currentAdmin.username"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="addAdminEmail">Email</label>
+          <input
+            type="email"
+            class="form-control"
+            id="addAdminEmail"
+            placeholder="Enter Email"
+            [(ngModel)]="currentAdmin.email"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="addAdminPassword">Password</label>
+          <input
+            type="password"
+            class="form-control"
+            id="addAdminPassword"
+            placeholder="Enter Password"
+            [(ngModel)]="currentAdmin.password"
+            required
+          />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Close
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="save()"
+          data-dismiss="modal"
+        >
+          Add
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Admin Modal -->
+<div
+  class="modal fade"
+  id="editAdminModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="editAdminModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editAdminModalLabel">Edit Admin</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="editAdminUsername">Username</label>
+          <input
+            type="text"
+            class="form-control"
+            id="editAdminUsername"
+            placeholder="Enter Username"
+            [(ngModel)]="currentAdmin.username"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="editAdminEmail">Email</label>
+          <input
+            type="email"
+            class="form-control"
+            id="editAdminEmail"
+            placeholder="Enter Email"
+            [(ngModel)]="currentAdmin.email"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="editAdminPassword">Password</label>
+          <input
+            type="password"
+            class="form-control"
+            id="editAdminPassword"
+            placeholder="Enter Password"
+            [(ngModel)]="currentAdmin.password"
+            required
+          />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Close
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="save()"
+          data-dismiss="modal"
+        >
+          Update
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

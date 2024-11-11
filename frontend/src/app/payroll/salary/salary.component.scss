@@ -1,0 +1,90 @@
+.container-fluid {
+  margin-top: 2rem;
+
+  h2 {
+    margin-bottom: 1.5rem;
+    font-size: 2rem;
+    color: #333;
+  }
+
+  .card {
+    border: none;
+
+    .card-header {
+      font-size: 1.5rem;
+      background-color: #007bff;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      i {
+        margin-right: 0.5rem;
+      }
+
+      .btn {
+        background-color: #f8f9fa;
+        color: #007bff;
+        border: none;
+        transition: background-color 0.3s;
+
+        &:hover {
+          background-color: #e2e6ea;
+        }
+
+        i {
+          margin-right: 0.25rem;
+        }
+      }
+    }
+
+    .card-body {
+      .table {
+        thead {
+          background-color: #6c757d;
+
+          th {
+            color: rgb(0, 0, 0);
+            font-weight: bold;
+            padding: 0.5rem;
+            font-size: 0.875rem;
+          }
+
+          // Center align the Action header
+          th.col-action {
+            text-align: center;
+          }
+        }
+
+        tbody {
+          tr {
+            &:hover {
+              background-color: #f2f2f2;
+            }
+          }
+
+          td {
+            padding: 0.25rem;
+            font-size: 1rem;
+
+            &.col-action {
+              max-width: 50px; // Set fixed width for action column
+              text-align: center;
+              white-space: nowrap;
+
+              button {
+                padding: 0.15rem 0.3rem; // Reduce padding for compact look
+                font-size: 1rem;
+                margin: 0 0.1rem; // Smaller margin between buttons
+
+                i {
+                  color: white;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

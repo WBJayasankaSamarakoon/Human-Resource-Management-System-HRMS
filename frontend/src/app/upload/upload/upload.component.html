@@ -1,0 +1,45 @@
+<div class="container-fluid mt-4">
+  <h2 class="mb-4">Upload Attendance Data</h2>
+
+  <div class="card">
+    <div
+      class="card-header bg-primary text-white d-flex justify-content-between align-items-center"
+    >
+      <div><i class="fas fa-file-upload"></i> Attendance Information</div>
+      <label for="fileUpload" class="btn btn-light">
+        <i class="fas fa-upload fa-sm"></i> Upload Excel File
+      </label>
+      <input
+        type="file"
+        id="fileUpload"
+        class="d-none"
+        (change)="ReadExcel($event)"
+      />
+    </div>
+    <div class="card-body p-2">
+      <div
+        *ngIf="ExcelData && ExcelData.length > 0"
+        class="table-responsive mt-4"
+      >
+        <table id="attendanceTable" class="table table-bordered table-striped">
+          <thead>
+            <tr></tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of ExcelData">
+              <td *ngFor="let cell of row | keyvalue">{{ cell.value }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <button
+        class="btn btn-primary mt-3"
+        (click)="uploadDataToBackend()"
+        [disabled]="!ExcelData || ExcelData.length === 0"
+      >
+        Upload Data to Backend
+      </button>
+    </div>
+  </div>
+</div>

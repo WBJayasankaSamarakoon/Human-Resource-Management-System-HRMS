@@ -1,0 +1,680 @@
+<div class="container-fluid mt-4">
+  <h2 class="mb-4">Manage Employees</h2>
+
+  <div class="card">
+    <div
+      class="card-header bg-primary text-white d-flex justify-content-between align-items-center"
+    >
+      <div><i class="fas fa-users"></i> Employees Information</div>
+      <button
+        type="button"
+        class="btn btn-light"
+        (click)="openAddModal()"
+        aria-label="Add Employee"
+        data-toggle="modal"
+        data-target="#addEmployeeModal"
+      >
+        <i class="fas fa-plus fa-sm"></i> Add
+      </button>
+    </div>
+    <div class="card-body p-2">
+      <div class="table-responsive">
+        <table id="employeesTable" class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>Sr No</th>
+              <th>Emp Id</th>
+              <th>Name</th>
+              <th>EPF</th>
+              <th>Phone</th>
+              <th>Current Address</th>
+              <th>Permanent Address</th>
+              <th>Personal Email</th>
+              <th>Company Email</th>
+              <th>Date of Joining</th>
+              <th>Status</th>
+              <th>Salutation</th>
+              <th>Designation</th>
+              <th>Branch</th>
+              <th>Company</th>
+              <th>Reports To</th>
+              <th>Employment Type</th>
+              <th>Emergency Con. Name</th>
+              <th>Emergency Phone</th>
+              <th>Relation</th>
+              <th>Shift</th>
+              <th class="col-action">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let EmployeeItem of EmployeeArray; trackBy: trackById">
+              <td>{{ EmployeeItem.id }}</td>
+              <td>{{ EmployeeItem.EmpId }}</td>
+              <td>{{ EmployeeItem.NameWithInitials }}</td>
+              <td>{{ EmployeeItem.EPFNumber }}</td>
+              <td>{{ EmployeeItem.Phone }}</td>
+              <td>{{ EmployeeItem.CurrentAddress }}</td>
+              <td>{{ EmployeeItem.PermanentAddress }}</td>
+              <td>{{ EmployeeItem.PersonalEmail }}</td>
+              <td>{{ EmployeeItem.CompanyEmail }}</td>
+              <td>{{ EmployeeItem.DateOfJoining | date }}</td>
+              <td>{{ EmployeeItem.Status }}</td>
+              <td>{{ EmployeeItem.Salutation }}</td>
+              <td>{{ EmployeeItem.Designation }}</td>
+              <td>{{ EmployeeItem.Branch }}</td>
+              <td>{{ EmployeeItem.Company }}</td>
+              <td>{{ EmployeeItem.ReportsTo }}</td>
+              <td>{{ EmployeeItem.EmploymentType }}</td>
+              <td>{{ EmployeeItem.EmergencyContactName }}</td>
+              <td>{{ EmployeeItem.EmergencyPhone }}</td>
+              <td>{{ EmployeeItem.Relation }}</td>
+              <td>{{ EmployeeItem.Shift }}</td>
+              <td class="col-action">
+                <button
+                  type="button"
+                  class="btn btn-success btn-sm"
+                  (click)="openEditModal(EmployeeItem)"
+                  aria-label="Edit Employee"
+                  data-toggle="modal"
+                  data-target="#editEmployeeModal"
+                >
+                  <i class="fas fa-edit fa-sm text-white"></i>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-danger btn-sm"
+                  (click)="setDelete(EmployeeItem)"
+                  aria-label="Delete Employee"
+                >
+                  <i class="fas fa-trash fa-sm text-white"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for Add Employee -->
+<div
+  class="modal fade"
+  id="addEmployeeModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="addEmployeeModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addEmployeeModalLabel">Add Employee</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">
+          <div class="row g-3">
+            <!-- Column 1 -->
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="EmpId">Employee ID</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="EmpId"
+                  [(ngModel)]="currentEmployee.EmpId"
+                  name="EmpId"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="NameWithInitials">Name with Initials</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="NameWithInitials"
+                  [(ngModel)]="currentEmployee.NameWithInitials"
+                  name="NameWithInitials"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="EPFNumber">EPF Number</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="EPFNumber"
+                  [(ngModel)]="currentEmployee.EPFNumber"
+                  name="EPFNumber"
+                />
+              </div>
+              <div class="form-group">
+                <label for="Phone">Phone Number</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="Phone"
+                  [(ngModel)]="currentEmployee.Phone"
+                  name="Phone"
+                />
+              </div>
+            </div>
+
+            <!-- Column 2 -->
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="CurrentAddress">Current Address</label>
+                <textarea
+                  class="form-control"
+                  id="CurrentAddress"
+                  [(ngModel)]="currentEmployee.CurrentAddress"
+                  name="CurrentAddress"
+                ></textarea>
+              </div>
+              <div class="form-group">
+                <label for="PersonalEmail">Personal Email</label>
+                <input
+                  type="email"
+                  class="form-control"
+                  id="PersonalEmail"
+                  [(ngModel)]="currentEmployee.PersonalEmail"
+                  name="PersonalEmail"
+                />
+              </div>
+              <div class="form-group">
+                <label for="DateOfJoining">Date of Joining</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  id="DateOfJoining"
+                  [(ngModel)]="currentEmployee.DateOfJoining"
+                  name="DateOfJoining"
+                />
+              </div>
+              <div class="form-group">
+                <label for="Salutation">Salutation</label>
+                <select
+                  class="form-select"
+                  id="Salutation"
+                  [(ngModel)]="currentEmployee.Salutation"
+                  name="Salutation"
+                >
+                  <option value="Mr">Mr</option>
+                  <option value="Ms">Ms</option>
+                  <option value="Mrs">Mrs</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Column 3 -->
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="PermanentAddress">Permanent Address</label>
+                <textarea
+                  class="form-control"
+                  id="PermanentAddress"
+                  [(ngModel)]="currentEmployee.PermanentAddress"
+                  name="PermanentAddress"
+                ></textarea>
+              </div>
+              <div class="form-group">
+                <label for="CompanyEmail">Company Email</label>
+                <input
+                  type="email"
+                  class="form-control"
+                  id="CompanyEmail"
+                  [(ngModel)]="currentEmployee.CompanyEmail"
+                  name="CompanyEmail"
+                />
+              </div>
+              <div class="form-group">
+                <label for="Status">Status</label>
+                <select
+                  class="form-select"
+                  id="Status"
+                  [(ngModel)]="currentEmployee.Status"
+                  name="Status"
+                >
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                  <option value="Suspended">Suspended</option>
+                  <option value="Left">Left</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="Designation">Designation</label>
+                <select
+                  class="form-select"
+                  id="Designation"
+                  [(ngModel)]="currentEmployee.Designation"
+                  name="Designation"
+                >
+                  <option value="Director">Director</option>
+                  <option value="Project Manager">Project Manager</option>
+                  <option value="General Manager">General Manager</option>
+                  <option value="HR Manager">HR Manager</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Column 4 -->
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="Branch">Branch</label>
+                <select
+                  class="form-select"
+                  id="Branch"
+                  [(ngModel)]="currentEmployee.Branch"
+                  name="Branch"
+                >
+                  <option value="Branch 01">Branch 01</option>
+                  <option value="Branch 02">Branch 02</option>
+                  <option value="Branch 03">Branch 03</option>
+                  <option value="Branch 04">Branch 04</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="Company">Company</label>
+                <select
+                  class="form-select"
+                  id="Company"
+                  [(ngModel)]="currentEmployee.Company"
+                  name="Company"
+                >
+                  <option value="Company 01">Company 01</option>
+                  <option value="Company 02">Company 02</option>
+                  <option value="Company 03">Company 03</option>
+                  <option value="Company 04">Company 04</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="ReportsTo">Reports To</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="ReportsTo"
+                  [(ngModel)]="currentEmployee.ReportsTo"
+                  name="ReportsTo"
+                />
+              </div>
+              <div class="form-group">
+                <label for="EmploymentType">Employment Type</label>
+                <select
+                  class="form-select"
+                  id="EmploymentType"
+                  [(ngModel)]="currentEmployee.EmploymentType"
+                  name="EmploymentType"
+                >
+                  <option value="Intern">Intern</option>
+                  <option value="Full-time">Full-time</option>
+                  <option value="Part-time">Part-time</option>
+                  <option value="Contract">Contract</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Column 5 -->
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="DefaultShift">Default Shift</label>
+                <select
+                  class="form-select"
+                  id="DefaultShift"
+                  [(ngModel)]="currentEmployee.DefaultShift"
+                  name="DefaultShift"
+                >
+                  <option value="WeekDay">WeekDay</option>
+                  <option value="WeekEnd">WeekEnd</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="EmergencyContactName">Emergency Contact Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="EmergencyContactName"
+                  [(ngModel)]="currentEmployee.EmergencyContactName"
+                  name="EmergencyContactName"
+                />
+              </div>
+              <div class="form-group">
+                <label for="EmergencyPhone">Emergency Phone</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="EmergencyPhone"
+                  [(ngModel)]="currentEmployee.EmergencyPhone"
+                  name="EmergencyPhone"
+                />
+              </div>
+              <div class="form-group">
+                <label for="Relation">Relation</label>
+                <select
+                  class="form-select"
+                  id="Relation"
+                  [(ngModel)]="currentEmployee.Relation"
+                  name="Relation"
+                >
+                  <option value="Married">Married</option>
+                  <option value="Unmarried">Unmarried</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Close
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="save()"
+          data-dismiss="modal"
+        >
+          Add
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for Edit Employee -->
+<div
+  class="modal fade"
+  id="editEmployeeModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="editEmployeeModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editEmployeeModalLabel">Edit Employee</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">
+          <div class="row g-3">
+            <!-- Column 1 -->
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="EmpId">Employee ID</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="EmpId"
+                  [(ngModel)]="currentEmployee.EmpId"
+                  name="EmpId"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="NameWithInitials">Name with Initials</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="NameWithInitials"
+                  [(ngModel)]="currentEmployee.NameWithInitials"
+                  name="NameWithInitials"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="EPFNumber">EPF Number</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="EPFNumber"
+                  [(ngModel)]="currentEmployee.EPFNumber"
+                  name="EPFNumber"
+                />
+              </div>
+              <div class="form-group">
+                <label for="Phone">Phone Number</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="Phone"
+                  [(ngModel)]="currentEmployee.Phone"
+                  name="Phone"
+                />
+              </div>
+            </div>
+
+            <!-- Column 2 -->
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="CurrentAddress">Current Address</label>
+                <textarea
+                  class="form-control"
+                  id="CurrentAddress"
+                  [(ngModel)]="currentEmployee.CurrentAddress"
+                  name="CurrentAddress"
+                ></textarea>
+              </div>
+              <div class="form-group">
+                <label for="PersonalEmail">Personal Email</label>
+                <input
+                  type="email"
+                  class="form-control"
+                  id="PersonalEmail"
+                  [(ngModel)]="currentEmployee.PersonalEmail"
+                  name="PersonalEmail"
+                />
+              </div>
+              <div class="form-group">
+                <label for="DateOfJoining">Date of Joining</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  id="DateOfJoining"
+                  [(ngModel)]="currentEmployee.DateOfJoining"
+                  name="DateOfJoining"
+                />
+              </div>
+              <div class="form-group">
+                <label for="Salutation">Salutation</label>
+                <select
+                  class="form-select"
+                  id="Salutation"
+                  [(ngModel)]="currentEmployee.Salutation"
+                  name="Salutation"
+                >
+                  <option value="Mr">Mr</option>
+                  <option value="Ms">Ms</option>
+                  <option value="Mrs">Mrs</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Column 3 -->
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="PermanentAddress">Permanent Address</label>
+                <textarea
+                  class="form-control"
+                  id="PermanentAddress"
+                  [(ngModel)]="currentEmployee.PermanentAddress"
+                  name="PermanentAddress"
+                ></textarea>
+              </div>
+              <div class="form-group">
+                <label for="CompanyEmail">Company Email</label>
+                <input
+                  type="email"
+                  class="form-control"
+                  id="CompanyEmail"
+                  [(ngModel)]="currentEmployee.CompanyEmail"
+                  name="CompanyEmail"
+                />
+              </div>
+              <div class="form-group">
+                <label for="Status">Status</label>
+                <select
+                  class="form-select"
+                  id="Status"
+                  [(ngModel)]="currentEmployee.Status"
+                  name="Status"
+                >
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                  <option value="Suspended">Suspended</option>
+                  <option value="Left">Left</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="Designation">Designation</label>
+                <select
+                  class="form-select"
+                  id="Designation"
+                  [(ngModel)]="currentEmployee.Designation"
+                  name="Designation"
+                >
+                  <option value="Director">Director</option>
+                  <option value="Project Manager">Project Manager</option>
+                  <option value="General Manager">General Manager</option>
+                  <option value="HR Manager">HR Manager</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Column 4 -->
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="Branch">Branch</label>
+                <select
+                  class="form-select"
+                  id="Branch"
+                  [(ngModel)]="currentEmployee.Branch"
+                  name="Branch"
+                >
+                  <option value="Branch 01">Branch 01</option>
+                  <option value="Branch 02">Branch 02</option>
+                  <option value="Branch 03">Branch 03</option>
+                  <option value="Branch 04">Branch 04</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="Company">Company</label>
+                <select
+                  class="form-select"
+                  id="Company"
+                  [(ngModel)]="currentEmployee.Company"
+                  name="Company"
+                >
+                  <option value="Company 01">Company 01</option>
+                  <option value="Company 02">Company 02</option>
+                  <option value="Company 03">Company 03</option>
+                  <option value="Company 04">Company 04</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="ReportsTo">Reports To</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="ReportsTo"
+                  [(ngModel)]="currentEmployee.ReportsTo"
+                  name="ReportsTo"
+                />
+              </div>
+              <div class="form-group">
+                <label for="EmploymentType">Employment Type</label>
+                <select
+                  class="form-select"
+                  id="EmploymentType"
+                  [(ngModel)]="currentEmployee.EmploymentType"
+                  name="EmploymentType"
+                >
+                  <option value="Intern">Intern</option>
+                  <option value="Full-time">Full-time</option>
+                  <option value="Part-time">Part-time</option>
+                  <option value="Contract">Contract</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Column 5 -->
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="DefaultShift">Default Shift</label>
+                <select
+                  class="form-select"
+                  id="DefaultShift"
+                  [(ngModel)]="currentEmployee.DefaultShift"
+                  name="DefaultShift"
+                >
+                  <option value="WeekDay">WeekDay</option>
+                  <option value="WeekEnd">WeekEnd</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="EmergencyContactName">Emergency Contact Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="EmergencyContactName"
+                  [(ngModel)]="currentEmployee.EmergencyContactName"
+                  name="EmergencyContactName"
+                />
+              </div>
+              <div class="form-group">
+                <label for="EmergencyPhone">Emergency Phone</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="EmergencyPhone"
+                  [(ngModel)]="currentEmployee.EmergencyPhone"
+                  name="EmergencyPhone"
+                />
+              </div>
+              <div class="form-group">
+                <label for="Relation">Relation</label>
+                <select
+                  class="form-select"
+                  id="Relation"
+                  [(ngModel)]="currentEmployee.Relation"
+                  name="Relation"
+                >
+                  <option value="Married">Married</option>
+                  <option value="Unmarried">Unmarried</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Close
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="save()"
+          data-dismiss="modal"
+        >
+          Update
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
