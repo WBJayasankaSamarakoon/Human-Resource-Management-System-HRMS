@@ -1,45 +1,100 @@
 <div class="container-fluid mt-4">
-  <h2 class="mb-4">Upload Attendance Data</h2>
+  <h2 class="mb-4 text-center">Upload Attendance Report</h2>
 
   <div class="card">
     <div
       class="card-header bg-primary text-white d-flex justify-content-between align-items-center"
     >
       <div><i class="fas fa-file-upload"></i> Attendance Information</div>
-      <label for="fileUpload" class="btn btn-light">
-        <i class="fas fa-upload fa-sm"></i> Upload Excel File
+      <label for="excelFile" class="btn btn-light">
+        <i class="fas fa-upload fa-sm"></i> Choose Excel File
       </label>
       <input
         type="file"
-        id="fileUpload"
+        id="excelFile"
+        name="excelFile"
         class="d-none"
+        accept=".xlsx, .xls"
         (change)="ReadExcel($event)"
       />
     </div>
     <div class="card-body p-2">
-      <div
-        *ngIf="ExcelData && ExcelData.length > 0"
-        class="table-responsive mt-4"
-      >
-        <table id="attendanceTable" class="table table-bordered table-striped">
-          <thead>
-            <tr></tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let row of ExcelData">
-              <td *ngFor="let cell of row | keyvalue">{{ cell.value }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <form (submit)="uploadDataToBackend()">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="year">Year</label>
+            <select name="year" id="year" class="form-control" required>
+              <option *ngFor="let year of latestYears">{{ year }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="month">Month</label>
+            <select name="month" id="month" class="form-control" required>
+              <option *ngFor="let month of months">{{ month }}</option>
+            </select>
+          </div>
+        </div>
 
-      <button
-        class="btn btn-primary mt-3"
-        (click)="uploadDataToBackend()"
-        [disabled]="!ExcelData || ExcelData.length === 0"
-      >
-        Upload Data to Backend
-      </button>
+        <div class="button-row">
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="!ExcelData || ExcelData.length === 0"
+          >
+            Upload File
+          </button>
+          <a [routerLink]="['/view']" class="btn btn-secondary"
+            >View Uploaded</a
+          >
+        </div>
+
+        <!-- Table with Pagination and Scrolling -->
+        <div
+          *ngIf="filteredData && filteredData.length > 0"
+          class="table-responsive mt-4"
+        >
+          <table
+            id="attendanceTable"
+            class="table table-bordered table-striped"
+          >
+            <thead>
+              <tr>
+                <!-- Dynamic Headers based on Data -->
+                <th *ngFor="let header of tableHeaders">{{ header }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of paginatedData">
+                <td *ngFor="let key of tableHeaders">{{ row[key] }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination Controls -->
+        <nav aria-label="Page navigation" class="mt-3">
+          <ul class="pagination justify-content-center">
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <a class="page-link" (click)="changePage(currentPage - 1)"
+                >Previous</a
+              >
+            </li>
+            <li
+              class="page-item"
+              *ngFor="let page of pagesArray"
+              [class.active]="page === currentPage"
+            >
+              <a class="page-link" (click)="changePage(page)">{{ page }}</a>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage === totalPages">
+              <a class="page-link" (click)="changePage(currentPage + 1)"
+                >Next</a
+              >
+            </li>
+          </ul>
+        </nav>
+      </form>
     </div>
   </div>
 </div>
+<!-- work -->

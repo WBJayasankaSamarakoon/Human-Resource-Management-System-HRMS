@@ -31,6 +31,8 @@ class Attendance extends Model
         'Absent',
         'Leave',
         'Status',
-        'Records'
+        'Records',
+        'year',
+        'month'
     ];
 }

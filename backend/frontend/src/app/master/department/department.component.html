@@ -1,0 +1,214 @@
+<div class="container-fluid mt-4">
+  <h2 class="mb-4">Manage Departments</h2>
+
+  <div class="card">
+    <div
+      class="card-header bg-primary text-white d-flex justify-content-between align-items-center"
+    >
+      <div><i class="fas fa-building"></i> Departments Information</div>
+      <button
+        type="button"
+        class="btn btn-light"
+        (click)="openAddModal()"
+        aria-label="Add Department"
+        data-toggle="modal"
+        data-target="#addDepartmentModal"
+      >
+        <i class="fas fa-plus fa-sm"></i> Add
+      </button>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table id="departmentsTable" class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Department Name</th>
+              <th>Short Name</th>
+              <th>Department Code</th>
+              <th class="col-action">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="let DepartmentItem of DepartmentArray; trackBy: trackById"
+            >
+              <td>{{ DepartmentItem.id }}</td>
+              <td>{{ DepartmentItem.DepartmentName }}</td>
+              <td>{{ DepartmentItem.DepartmentShortName }}</td>
+              <td>{{ DepartmentItem.DepartmentCode }}</td>
+              <td class="col-action">
+                <button
+                  type="button"
+                  class="btn btn-success btn-sm"
+                  (click)="openEditModal(DepartmentItem)"
+                  aria-label="Edit Department"
+                  data-toggle="modal"
+                  data-target="#editDepartmentModal"
+                >
+                  <i class="fas fa-edit fa-sm text-white"></i>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-danger btn-sm"
+                  (click)="setDelete(DepartmentItem)"
+                  aria-label="Delete Department"
+                >
+                  <i class="fas fa-trash fa-sm text-white"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Department Modal -->
+<div
+  class="modal fade"
+  id="addDepartmentModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="addDepartmentModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addDepartmentModalLabel">Add Department</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Form for Adding Department -->
+        <div class="form-group">
+          <label for="departmentName">Department Name</label>
+          <input
+            type="text"
+            class="form-control"
+            id="departmentName"
+            placeholder="Enter Department Name"
+            [(ngModel)]="currentDepartment.DepartmentName"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="departmentShortName">Short Name</label>
+          <input
+            type="text"
+            class="form-control"
+            id="departmentShortName"
+            placeholder="Enter Short Name"
+            [(ngModel)]="currentDepartment.DepartmentShortName"
+          />
+        </div>
+        <div class="form-group">
+          <label for="departmentCode">Department Code</label>
+          <input
+            type="text"
+            class="form-control"
+            id="departmentCode"
+            placeholder="Enter Department Code"
+            [(ngModel)]="currentDepartment.DepartmentCode"
+          />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Close
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="save()"
+          data-dismiss="modal"
+        >
+          Add
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Department Modal -->
+<div
+  class="modal fade"
+  id="editDepartmentModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="editDepartmentModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editDepartmentModalLabel">
+          Edit Department
+        </h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Edit Department Form Fields -->
+        <div class="form-group">
+          <label for="departmentName">Department Name</label>
+          <input
+            type="text"
+            class="form-control"
+            id="departmentName"
+            placeholder="Enter Department Name"
+            [(ngModel)]="currentDepartment.DepartmentName"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="departmentShortName">Short Name</label>
+          <input
+            type="text"
+            class="form-control"
+            id="departmentShortName"
+            placeholder="Enter Short Name"
+            [(ngModel)]="currentDepartment.DepartmentShortName"
+          />
+        </div>
+        <div class="form-group">
+          <label for="departmentCode">Department Code</label>
+          <input
+            type="text"
+            class="form-control"
+            id="departmentCode"
+            placeholder="Enter Department Code"
+            [(ngModel)]="currentDepartment.DepartmentCode"
+          />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Close
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="save()"
+          data-dismiss="modal"
+        >
+          Update
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

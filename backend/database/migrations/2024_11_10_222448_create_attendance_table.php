@@ -23,8 +23,8 @@ class CreateAttendanceTable extends Migration
             $table->date('Date')->nullable();
             $table->string('Week', 10)->nullable();
             $table->string('Timetable', 255)->nullable();
-            $table->time('CheckIn')->nullable();
-            $table->time('CheckOut')->nullable();
+            $table->string('CheckIn', 10)->nullable();
+            $table->string('CheckOut', 10)->nullable();
             $table->integer('Work')->nullable();
             $table->integer('OT')->nullable();
             $table->integer('Attended')->nullable();
@@ -34,6 +34,8 @@ class CreateAttendanceTable extends Migration
             $table->integer('Leave')->nullable();
             $table->string('Status', 255)->nullable();
             $table->text('Records')->nullable();
+            $table->year('year')->nullable();
+            $table->string('month', 20)->nullable();
         });
     }
 

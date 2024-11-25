@@ -1,0 +1,214 @@
+<div class="container-fluid mt-4">
+  <h2 class="mb-4">Manage Shifts</h2>
+
+  <div class="card">
+    <div
+      class="card-header bg-primary text-white d-flex justify-content-between align-items-center"
+    >
+      <div><i class="fas fa-clock"></i> Shift Information</div>
+      <button
+        type="button"
+        class="btn btn-light"
+        (click)="openAddModal()"
+        aria-label="Add Shift"
+        data-toggle="modal"
+        data-target="#addShiftModal"
+      >
+        <i class="fas fa-plus fa-sm"></i> Add
+      </button>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table id="shiftTable" class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th class="col-id">ID</th>
+              <th>Start Time</th>
+              <th>End Time</th>
+              <th>Day</th>
+              <th class="col-action">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let ShiftItem of ShiftArray; trackBy: trackById">
+              <td>{{ ShiftItem.id }}</td>
+              <td>{{ ShiftItem.StartTime }}</td>
+              <td>{{ ShiftItem.EndTime }}</td>
+              <td>{{ ShiftItem.Week }}</td>
+              <td class="col-action">
+                <button
+                  type="button"
+                  class="btn btn-success btn-sm"
+                  (click)="openEditModal(ShiftItem)"
+                  aria-label="Edit Shift"
+                  data-toggle="modal"
+                  data-target="#editShiftModal"
+                >
+                  <i class="fas fa-edit fa-sm text-white"></i>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-danger btn-sm"
+                  (click)="setDelete(ShiftItem)"
+                  aria-label="Delete Shift"
+                >
+                  <i class="fas fa-trash fa-sm text-white"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for Add Shift -->
+<div
+  class="modal fade"
+  id="addShiftModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="addShiftModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addShiftModalLabel">Add Shift</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Form for Adding Shift -->
+        <div class="form-group">
+          <label for="shiftStartTime">Start Time</label>
+          <input
+            type="time"
+            class="form-control"
+            id="shiftStartTime"
+            placeholder="Enter Start Time"
+            [(ngModel)]="currentShift.StartTime"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="shiftEndTime">End Time</label>
+          <input
+            type="time"
+            class="form-control"
+            id="shiftEndTime"
+            placeholder="Enter End Time"
+            [(ngModel)]="currentShift.EndTime"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="shiftWeek">Day</label>
+          <input
+            type="text"
+            class="form-control"
+            id="shiftWeek"
+            placeholder="Enter Day"
+            [(ngModel)]="currentShift.Week"
+            required
+          />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Close
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="save()"
+          data-dismiss="modal"
+        >
+          Add
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Shift Modal -->
+<div
+  class="modal fade"
+  id="editShiftModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="editShiftModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editShiftModalLabel">Edit Shift</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Edit Shift Form Fields -->
+        <div class="form-group">
+          <label for="shiftStartTime">Start Time</label>
+          <input
+            type="time"
+            class="form-control"
+            id="shiftStartTime"
+            placeholder="Enter Start Time"
+            [(ngModel)]="currentShift.StartTime"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="shiftEndTime">End Time</label>
+          <input
+            type="time"
+            class="form-control"
+            id="shiftEndTime"
+            placeholder="Enter End Time"
+            [(ngModel)]="currentShift.EndTime"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="shiftWeek">Day</label>
+          <input
+            type="text"
+            class="form-control"
+            id="shiftWeek"
+            placeholder="Enter Day"
+            [(ngModel)]="currentShift.Week"
+            required
+          />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Close
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="save()"
+          data-dismiss="modal"
+        >
+          Update
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

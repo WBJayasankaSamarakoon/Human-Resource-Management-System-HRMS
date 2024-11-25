@@ -30,8 +30,11 @@ class AttendanceResource extends JsonResource
             'Leave' => $this->Leave,
             'Status' => $this->Status,
             'Records' => $this->Records,
+            'Year'       => $this->Date ? $this->Date->format('Y') : null,
+            'Month'      => $this->Date ? $this->Date->format('m') : null,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+
         ];
     }
 }

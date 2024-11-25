@@ -1,0 +1,32 @@
+.container-fluid {
+  .form-row {
+    display: flex;
+    align-items: center;
+
+    .form-group {
+      flex: 1;
+      margin-right: 0.5rem;
+
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+  }
+
+  .button-row {
+    display: flex;
+    justify-content: flex-start;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .table-responsive {
+    max-height: 500px; // Controls vertical scroll
+    overflow-y: auto;
+    overflow-x: auto; // Enables horizontal scroll if content is too wide
+  }
+
+  .pagination {
+    margin-top: 1rem;
+  }
+}

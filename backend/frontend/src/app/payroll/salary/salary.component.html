@@ -1,0 +1,186 @@
+<div class="container-fluid mt-4">
+  <h2 class="mb-4">Manage Salaries</h2>
+
+  <div class="card">
+    <div
+      class="card-header bg-primary text-white d-flex justify-content-between align-items-center"
+    >
+      <div><i class="fas fa-money-bill"></i> Salary Information</div>
+      <button
+        type="button"
+        class="btn btn-light"
+        (click)="openAddModal()"
+        aria-label="Add Salary"
+        data-toggle="modal"
+        data-target="#addSalaryModal"
+      >
+        <i class="fas fa-plus fa-sm"></i> Add
+      </button>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table id="salariesTable" class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Value</th>
+              <th class="col-action">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let SalaryItem of SalaryArray; trackBy: trackById">
+              <td>{{ SalaryItem.id }}</td>
+              <td>{{ SalaryItem.Name }}</td>
+              <td>{{ SalaryItem.Value }}</td>
+              <td class="col-action">
+                <button
+                  type="button"
+                  class="btn btn-success btn-sm"
+                  (click)="openEditModal(SalaryItem)"
+                  aria-label="Edit Salary"
+                  data-toggle="modal"
+                  data-target="#editSalaryModal"
+                >
+                  <i class="fas fa-edit fa-sm text-white"></i>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-danger btn-sm"
+                  (click)="setDelete(SalaryItem)"
+                  aria-label="Delete Salary"
+                >
+                  <i class="fas fa-trash fa-sm text-white"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for Add Salary -->
+<div
+  class="modal fade"
+  id="addSalaryModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="addSalaryModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addSalaryModalLabel">Add Salary</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="Name">Name</label>
+          <input
+            type="text"
+            class="form-control"
+            id="Name"
+            placeholder="Enter Name"
+            [(ngModel)]="currentSalary.Name"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="Value"> Value </label>
+          <input
+            type="text"
+            class="form-control"
+            id="Value"
+            placeholder="Enter Value"
+            [(ngModel)]="currentSalary.Value"
+          />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Close
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="save()"
+          data-dismiss="modal"
+        >
+          Add
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Salary Modal -->
+<div
+  class="modal fade"
+  id="editSalaryModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="editSalaryModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editSalaryModalLabel">Edit Salary</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="Name">Name</label>
+          <input
+            type="text"
+            class="form-control"
+            id="Name"
+            placeholder="Enter Name"
+            [(ngModel)]="currentSalary.Name"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="Value">Value</label>
+          <input
+            type="text"
+            class="form-control"
+            id="Value"
+            placeholder="Enter Value"
+            [(ngModel)]="currentSalary.Value"
+          />
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            Close
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            (click)="save()"
+            data-dismiss="modal"
+          >
+            Update
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

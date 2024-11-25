@@ -1,0 +1,61 @@
+<div class="container mt-5">
+  <h2 class="text-center mb-4">Upload Attendance Report</h2>
+
+  <!-- Year Selection -->
+  <div class="mb-3">
+    <label for="year" class="form-label">Year</label>
+    <select [(ngModel)]="selectedYear" id="year" class="form-select">
+      <option [value]="null">Choose Year</option>
+      <option *ngFor="let year of [2023, 2024, 2025]" [value]="year">
+        {{ year }}
+      </option>
+    </select>
+  </div>
+
+  <!-- Month Selection -->
+  <div class="mb-3">
+    <label for="month" class="form-label">Month</label>
+    <select [(ngModel)]="selectedMonth" id="month" class="form-select">
+      <option [value]="null">Choose Month</option>
+      <option *ngFor="let month of months" [value]="month.value">
+        {{ month.name }}
+      </option>
+    </select>
+  </div>
+
+  <!-- File Input -->
+  <div class="mb-3">
+    <label for="file" class="form-label">Excel File</label>
+    <input
+      type="file"
+      id="file"
+      class="form-control"
+      (change)="onFileSelected($event)"
+    />
+  </div>
+
+  <!-- Upload Button -->
+  <div class="d-flex">
+    <button
+      class="btn btn-primary me-2"
+      (click)="uploadFile()"
+      [disabled]="
+        isUploading || !selectedFile || !selectedYear || !selectedMonth
+      "
+    >
+      Upload
+    </button>
+    <button class="btn btn-secondary" (click)="navigateToView()">
+      View Uploaded Files
+    </button>
+  </div>
+
+  <!-- Display Message -->
+  <p
+    *ngIf="message"
+    [ngClass]="{ 'text-success': isSuccess, 'text-danger': !isSuccess }"
+    class="mt-3"
+  >
+    {{ message }}
+  </p>
+</div>

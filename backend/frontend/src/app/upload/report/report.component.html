@@ -1,0 +1,70 @@
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4>Employee Monthly Report</h4>
+    <div>
+      <button class="btn btn-outline-secondary me-2" (click)="goBack()">
+        Back
+      </button>
+      <button class="btn btn-outline-primary" (click)="downloadReport()">
+        Download Report
+      </button>
+    </div>
+  </div>
+
+  <!-- Table displaying the monthly report data -->
+  <div class="table-responsive">
+    <table
+      class="table table-bordered table-hover table-striped shadow-sm rounded"
+    >
+      <thead class="thead-light">
+        <tr>
+          <th>Person ID</th>
+          <th>Name</th>
+          <th>Department</th>
+          <th>Month</th>
+          <th>Late In Hours</th>
+          <th>Early Out Hours</th>
+          <th>Holidays</th>
+          <th>Leaves</th>
+          <th>Basic Salary</th>
+          <th>Attendance Incentive</th>
+          <th>Super Attendance</th>
+          <th>Performance Incentive</th>
+          <th>BRA1</th>
+          <th>BRA2</th>
+          <th>BRA3</th>
+          <th>Net Salary</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let report of employeeReports">
+          <td>{{ report.person_id }}</td>
+          <td>{{ report.name }}</td>
+          <td>{{ report.department }}</td>
+          <td>{{ report.month }}</td>
+          <td>{{ report.lateInHours | number : "1.1-2" }} hrs</td>
+          <td>{{ report.earlyOutHours | number : "1.1-2" }} hrs</td>
+          <td>{{ report.holidays }}</td>
+          <td>{{ report.leaves }}</td>
+          <td>{{ report.basicSalary }}</td>
+          <td>{{ report.AttendanceIncentive }}</td>
+          <td>{{ report.SuperAttendance }}</td>
+          <td>{{ report.PerformanceIncentive }}</td>
+          <td>{{ report.BRA1 }}</td>
+          <td>{{ report.BRA2 }}</td>
+          <td>{{ report.BRA3 }}</td>
+          <td>{{ report.netSalary }}</td>
+          <td>
+            <button
+              class="btn btn-info btn-sm"
+              (click)="generateReport(report)"
+            >
+              Payment Slip
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

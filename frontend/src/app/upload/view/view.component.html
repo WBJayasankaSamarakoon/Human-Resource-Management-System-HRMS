@@ -1,1 +1,92 @@
-<p>view works!</p>
+<div class="container">
+  <!-- Filter Form -->
+  <h1 class="text-center mb-4">View Uploaded Files</h1>
+  <form (submit)="filterFiles()" class="mb-4">
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="year">Select Year</label>
+        <select
+          id="year"
+          [(ngModel)]="selectedYear"
+          name="year"
+          class="form-control"
+        >
+          <option value="">Choose Year</option>
+          <option *ngFor="let year of years" [value]="year">{{ year }}</option>
+        </select>
+      </div>
+      <div class="form-group col-md-6">
+        <label for="month">Select Month</label>
+        <select
+          id="month"
+          [(ngModel)]="selectedMonth"
+          name="month"
+          class="form-control"
+        >
+          <option value="">Choose Month</option>
+          <option *ngFor="let month of months" [value]="month.value">
+            {{ month.name }}
+          </option>
+        </select>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary btn-block">
+      Filter Files
+    </button>
+  </form>
+
+  <!-- Status Message -->
+  <div
+    *ngIf="statusMessage"
+    class="alert"
+    [ngClass]="{
+      'alert-success': statusType === 'success',
+      'alert-danger': statusType === 'error'
+    }"
+  >
+    {{ statusMessage }}
+    <button *ngIf="statusMessage" (click)="closeAlert()" class="close">
+      &times;
+    </button>
+  </div>
+
+  <!-- Uploaded Files Header -->
+  <h2 class="mb-4 d-flex justify-content-between align-items-center">
+    Uploaded Files
+    <a routerLink="/upload" class="btn btn-secondary">Upload New File</a>
+  </h2>
+
+  <!-- Files List -->
+  <ul *ngIf="files.length > 0; else noFilesMessage" class="list-group">
+    <li
+      *ngFor="let file of files"
+      class="list-group-item d-flex justify-content-between align-items-center"
+    >
+      <div>
+        {{ file.filename }}
+        <span class="badge badge-primary badge-pill">
+          {{ file.year }}-{{ file.month }}
+        </span>
+      </div>
+      <div class="button-group">
+        <a
+          [href]="'/view/' + file.filename + '/' + file.year + '/' + file.month"
+          target="_blank"
+          class="btn btn-info btn-sm ml-2"
+          >View</a
+        >
+        <button (click)="deleteFile(file)" class="btn btn-danger btn-sm ml-2">
+          Delete
+        </button>
+        <button (click)="processFile(file)" class="btn btn-warning btn-sm ml-2">
+          Process
+        </button>
+      </div>
+    </li>
+  </ul>
+
+  <!-- No Files Found Message -->
+  <ng-template #noFilesMessage>
+    <div class="alert alert-warning">No files found</div>
+  </ng-template>
+</div>

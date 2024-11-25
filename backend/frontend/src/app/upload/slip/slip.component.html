@@ -1,0 +1,121 @@
+<div class="container mt-4">
+  <div class="payslip-container">
+    <!-- Company Information -->
+    <div class="header">
+      <h2 class="text-center">ULTIMATE ENGINEERING SOLUTIONS (PVT) LTD</h2>
+      <p><strong>Month:</strong> {{ employee.month }}</p>
+      <p><strong>Name:</strong> {{ employee.name }}</p>
+      <p><strong>Employee No.:</strong> {{ employee.person_id }}</p>
+    </div>
+
+    <!-- Salary Details Table -->
+    <table>
+      <tr>
+        <th>Description</th>
+        <th>Amount (LKR)</th>
+      </tr>
+      <tr>
+        <td>Basic Salary</td>
+        <td>{{ employee.basicSalary }}</td>
+      </tr>
+      <tr>
+        <td>B.R.A. 1</td>
+        <td>{{ employee.BRA1 }}</td>
+      </tr>
+      <tr>
+        <td>B.R.A. 2</td>
+        <td>{{ employee.BRA2 }}</td>
+      </tr>
+      <tr>
+        <th>Gross Salary</th>
+        <td>{{ employee.grossSalary }}</td>
+      </tr>
+      <tr>
+        <td>Late - {{ employee.lateHours }} Hours</td>
+        <td>{{ employee.lateDeduction }}</td>
+      </tr>
+      <tr>
+        <th>Salary for EPF</th>
+        <td>{{ employee.salaryForEPF }}</td>
+      </tr>
+    </table>
+
+    <!-- Additions Section -->
+    <h5 class="section-title">Additions</h5>
+    <table>
+      <tr>
+        <td>Attendance Incentive</td>
+        <td>{{ employee.attendanceIncentive }}</td>
+      </tr>
+      <tr>
+        <td>Supper Attendance</td>
+        <td>{{ employee.superAttendance }}</td>
+      </tr>
+      <tr>
+        <td>Performance Incentive</td>
+        <td>{{ employee.performanceIncentive }}</td>
+      </tr>
+      <tr>
+        <td>Sales Incentive</td>
+        <td>{{ employee.salesIncentive }}</td>
+      </tr>
+      <tr>
+        <td>OT - {{ employee.otHours }} Hrs</td>
+        <td>{{ employee.otDeduction }}</td>
+      </tr>
+    </table>
+
+    <!-- Deductions Section -->
+    <h5 class="section-title">Deductions</h5>
+    <table>
+      <tr>
+        <td>EPF 8%</td>
+        <td>{{ employee.epf8 }}</td>
+      </tr>
+      <tr>
+        <td>Advanced</td>
+        <td>{{ employee.advanced }}</td>
+      </tr>
+      <tr>
+        <td>Deduction</td>
+        <td>{{ employee.deduction }}</td>
+      </tr>
+      <tr>
+        <td>Telephone Expenses</td>
+        <td>{{ employee.telephoneExpenses }}</td>
+      </tr>
+      <tr>
+        <td>API Tax</td>
+        <td>{{ employee.apiTax }}</td>
+      </tr>
+    </table>
+
+    <!-- Leave Balance Section -->
+    <h5 class="section-title">Leave Balance</h5>
+    <table>
+      <tr>
+        <td>Approved Leaves - {{ employee.approvedLeaves }}</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Balance Leaves - {{ employee.balanceLeaves }}</td>
+        <td></td>
+      </tr>
+    </table>
+
+    <!-- Summary Section -->
+    <h5 class="section-title">Summary</h5>
+    <table>
+      <tr>
+        <td><strong>Total Deductions</strong></td>
+        <td>{{ employee.totalDeductions }}</td>
+      </tr>
+      <tr>
+        <td><strong>Net Salary</strong></td>
+        <td>
+          <strong>{{ employee.netSalary }}</strong>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>

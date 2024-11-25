@@ -1,0 +1,49 @@
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4>Processed Attendance Data</h4>
+    <div>
+      <button class="btn btn-secondary me-2" (click)="goBack()">Back</button>
+      <button class="btn btn-primary" (click)="processData()">Report</button>
+    </div>
+  </div>
+
+  <!-- Table displaying filtered data -->
+  <div class="table-responsive">
+    <table class="table table-hover table-striped table-bordered text-center">
+      <thead class="table-dark">
+        <tr>
+          <th>Person ID</th>
+          <th>Name</th>
+          <th>Department</th>
+          <th>Date</th>
+          <th>Day</th>
+          <th>Check-in</th>
+          <th>Check-out</th>
+          <th>Shift Start</th>
+          <th>Shift End</th>
+          <th>Late In</th>
+          <th>Early Out</th>
+          <th>Holiday</th>
+          <th>Leave Reason</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of employeeData">
+          <td>{{ data.person_id }}</td>
+          <td>{{ data.name }}</td>
+          <td>{{ data.department }}</td>
+          <td>{{ data.date }}</td>
+          <td>{{ data.week }}</td>
+          <td>{{ data.check_in }}</td>
+          <td>{{ data.check_out }}</td>
+          <td>{{ data.shiftStart }}</td>
+          <td>{{ data.shiftEnd }}</td>
+          <td>{{ data.lateIn }}</td>
+          <td>{{ data.earlyOut }}</td>
+          <td>{{ data.holiday ? "Yes" : "No" }}</td>
+          <td>{{ data.leaveReason || "-" }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
