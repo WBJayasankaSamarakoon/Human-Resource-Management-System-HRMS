@@ -5,9 +5,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\JsonResponse;
 
 class AdminController extends Controller
 {
@@ -110,5 +111,34 @@ class AdminController extends Controller
             Log::error('Error deleting admin: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to delete admin'], 500);
         }
+    }
+
+    /**
+     * Handle login requests for admin users.
+     */
+    public function login(Request $request): JsonResponse
+    {
+        // Validate the incoming data
+        $request->validate([
+            'username' => 'required|string',
+            'password' => 'required|string',
+        ]);
+
+        // Find the admin by username
+        $admin = Admin::where('username', $request->username)->first();
+
+        if (!$admin || !Hash::check($request->password, $admin->password)) {
+            // Authentication failed
+            return response()->json(['error' => 'Invalid credentials'], 401);
+        }
+
+        // Create a token using Sanctum
+        $token = $admin->createToken('Admin Token')->plainTextToken;
+
+        // Return the token in response
+        return response()->json([
+            'message' => 'Login successful',
+            'token' => $token,
+        ], 200);
     }
 }

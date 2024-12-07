@@ -1,0 +1,71 @@
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4>Monthly Attendance Data</h4>
+    <button class="btn btn-outline-secondary" (click)="goBack()">Back</button>
+  </div>
+
+  <div *ngIf="loading" class="text-center">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div class="table-responsive" *ngIf="pagedData.length > 0">
+    <table class="table table-hover table-striped table-bordered text-center">
+      <thead class="table-dark">
+        <tr>
+          <th>Emp ID</th>
+          <th>Name</th>
+          <th>No Pay Days</th>
+          <th>Leave Days</th>
+          <th>Holidays</th>
+          <th>Late Hours</th>
+          <th>Basic Salary</th>
+          <th>Allowances</th>
+          <th>Deductions</th>
+          <th>Net Salary</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let record of pagedData">
+          <td>{{ record.person_id }}</td>
+          <td>{{ record.name }}</td>
+          <td>{{ record.no_pay_count }}</td>
+          <td>{{ record.leave_days }}</td>
+          <td>{{ record.holidays }}</td>
+          <td>{{ record.late_hours }}</td>
+          <td>{{ record.basic_salary }}</td>
+          <td>{{ record.total_allowances }}</td>
+          <td>{{ record.deductions }}</td>
+          <td>{{ record.net_salary }}</td>
+          <td>
+            <button class="btn btn-sm btn-primary">Report</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <nav *ngIf="fileData.length > pageSize" class="mt-4">
+    <ul class="pagination justify-content-center">
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <button class="page-link" (click)="changePage(currentPage - 1)">
+          Previous
+        </button>
+      </li>
+      <li
+        *ngFor="let page of pages"
+        class="page-item"
+        [class.active]="page === currentPage"
+      >
+        <button class="page-link" (click)="changePage(page)">{{ page }}</button>
+      </li>
+      <li class="page-item" [class.disabled]="currentPage === totalPages">
+        <button class="page-link" (click)="changePage(currentPage + 1)">
+          Next
+        </button>
+      </li>
+    </ul>
+  </nav>
+</div>

@@ -9,8 +9,10 @@ class Upexcel extends Model
 {
     use HasFactory;
 
+    // Define the table name
     protected $table = 'upexcel';
 
+    // Specify the fillable fields
     protected $fillable = [
         'index',
         'person_id',
@@ -32,5 +34,6 @@ class Upexcel extends Model
         'leave',
         'status',
         'records',
+        'file_id',
     ];
 }

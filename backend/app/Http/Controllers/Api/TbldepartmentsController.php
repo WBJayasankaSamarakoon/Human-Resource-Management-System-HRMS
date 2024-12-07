@@ -26,7 +26,7 @@ class TbldepartmentsController extends Controller
         ]);
 
         $department = Tbldepartment::create($request->all());
-        return response()->json($department, 201); // HTTP 201 for created resource
+        return response()->json($department, 201);
     }
 
     // Display the specified department

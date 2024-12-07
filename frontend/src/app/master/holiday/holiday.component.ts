@@ -30,7 +30,7 @@ export class HolidayComponent {
   }
 
   getAllHolidays() {
-    this.http.get(`${apiBaseUrl}api/event`).subscribe((resultData: any) => {
+    this.http.get(`${apiBaseUrl}api/events`).subscribe((resultData: any) => {
       this.isResultLoaded = true;
       console.log(resultData);
       this.HolidayArray = resultData;
@@ -40,7 +40,7 @@ export class HolidayComponent {
   register() {
     let bodyData = { Title: this.title, Date: this.date };
     this.http
-      .post(`${apiBaseUrl}api/event`, bodyData)
+      .post(`${apiBaseUrl}api/events`, bodyData)
       .subscribe((resultData: any) => {
         console.log(resultData);
         alert('Holiday Registered Successfully');
@@ -59,7 +59,7 @@ export class HolidayComponent {
   updateRecords() {
     let bodyData = { Title: this.title, Date: this.date };
     this.http
-      .put(`${apiBaseUrl}api/event/${this.currentHolidayID}`, bodyData)
+      .put(`${apiBaseUrl}api/events/${this.currentHolidayID}`, bodyData)
       .subscribe((resultData: any) => {
         console.log(resultData);
         alert('Holiday Updated Successfully');
@@ -79,7 +79,7 @@ export class HolidayComponent {
 
   setDelete(data: any) {
     this.http
-      .delete(`${apiBaseUrl}api/event/${data.id}`)
+      .delete(`${apiBaseUrl}api/events/${data.id}`)
       .subscribe((resultData: any) => {
         console.log(resultData);
         alert('Holiday Deleted Successfully');

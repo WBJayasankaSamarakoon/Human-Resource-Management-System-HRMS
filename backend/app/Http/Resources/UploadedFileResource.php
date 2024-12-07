@@ -2,18 +2,18 @@
 
 namespace App\Http\Resources;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class UploadedFileResource extends JsonResource
 {
-    public function toArray($request)
+    /**
+     * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray(Request $request): array
     {
-        return [
-            'id' => $this->id,
-            'filename' => $this->filename,
-            'year' => $this->year,
-            'month' => $this->month,
-            'uploaded_at' => $this->uploaded_at,
-        ];
+        return parent::toArray($request);
     }
 }

@@ -12,30 +12,30 @@ import { HolidayComponent } from './master/holiday/holiday.component';
 import { ShiftComponent } from './master/shift/shift.component';
 import { CompanyComponent } from './master/company/company.component';
 import { CalendarComponent } from './master/calendar/calendar.component';
+import { PayrollComponent } from './payroll/payroll/payroll.component';
+import { ViewFileComponent } from './upload/view-file/view-file.component';
+import { ProcessComponent } from './upload/process/process.component';
+import { LoginComponent } from './views/pages/login/login.component';
+import { SlipComponent } from './upload/slip/slip.component';
 
 import { appConfig } from './app.config';
 import { routes } from './app.routes';
+
+// Modern HttpClient configuration
 import {
-  HttpClientModule,
   provideHttpClient,
   withInterceptorsFromDi,
 } from '@angular/common/http';
 
-//import path for UploadNewComponent
-import { UploadComponent } from './upload/upload/upload.component';
+// Import paths for additional components
 import { ReportComponent } from './upload/report/report.component';
 import { ViewComponent } from './upload/view/view.component';
-
-//import path for PayrollComponent
 import { SalaryComponent } from './payroll/salary/salary.component';
 import { PayComponent } from './payroll/pay/pay.component';
-
-//import path for LeaveComponent
 import { LeaveTypeComponent } from './leave/typeleave/typeleave.component';
 import { ManageLeaveComponent } from './leave/manageleave/manageleave.component';
-
-//import path for UserComponent
 import { AdminComponent } from './user/admin/admin.component';
+import { RegisterComponent } from './pages/register/register.component';
 
 @NgModule({
   declarations: [
@@ -49,7 +49,6 @@ import { AdminComponent } from './user/admin/admin.component';
     HolidayComponent,
     ShiftComponent,
     CalendarComponent,
-    UploadComponent,
     ReportComponent,
     ViewComponent,
     SalaryComponent,
@@ -57,13 +56,21 @@ import { AdminComponent } from './user/admin/admin.component';
     LeaveTypeComponent,
     ManageLeaveComponent,
     AdminComponent,
+    PayrollComponent,
+    ViewFileComponent,
+    ProcessComponent,
+    SlipComponent,
+    LoginComponent,
+    RegisterComponent,
   ],
 
   imports: [BrowserModule, FormsModule, RouterModule.forRoot(routes)],
+
   providers: [
     { provide: 'AppConfig', useValue: appConfig },
     provideHttpClient(withInterceptorsFromDi()),
   ],
+
   bootstrap: [AppComponent],
 })
 export class AppModule {}

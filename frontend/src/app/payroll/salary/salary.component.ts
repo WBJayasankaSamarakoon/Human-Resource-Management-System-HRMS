@@ -13,6 +13,7 @@ import { CommonModule } from '@angular/common';
 })
 export class SalaryComponent {
   SalaryArray: any[] = [];
+  payrolls: any[] = [];
   currentSalary: any = {
     id: '',
     Name: '',
@@ -52,6 +53,7 @@ export class SalaryComponent {
         console.log(resultData);
         alert('Salary Added Successfully');
         this.getAllSalaries();
+        this.updatePayrolls(); // Refresh payroll data after adding a salary
         this.resetForm();
       });
   }
@@ -66,6 +68,7 @@ export class SalaryComponent {
         console.log(resultData);
         alert('Salary Updated Successfully');
         this.getAllSalaries();
+        this.updatePayrolls(); // Refresh payroll data after updating a salary
         this.resetForm();
       });
   }
@@ -85,6 +88,7 @@ export class SalaryComponent {
         console.log(resultData);
         alert('Salary Deleted Successfully');
         this.getAllSalaries();
+        this.updatePayrolls(); // Refresh payroll data after deleting a salary
       });
   }
 
@@ -94,6 +98,17 @@ export class SalaryComponent {
       Name: '',
       Value: '',
     };
+  }
+
+  updatePayrolls() {
+    this.http.get(`${apiBaseUrl}api/payrolls`).subscribe({
+      next: (data: any) => {
+        this.payrolls = data; // Refresh local payroll data
+      },
+      error: (err) => {
+        console.error('Error fetching updated payrolls:', err);
+      },
+    });
   }
 
   trackById(index: number, salaryItem: any): number {

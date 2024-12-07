@@ -29,12 +29,22 @@ return new class extends Migration {
             $table->integer('leave')->default(0);
             $table->string('status');
             $table->string('records')->nullable();
+            $table->unsignedBigInteger('file_id')->nullable();
+            $table->foreign('file_id')
+                  ->references('id')
+                  ->on('uploaded_files')
+                  ->onDelete('cascade');
             $table->timestamps();
         });
     }
 
     public function down()
     {
+        Schema::table('upexcel', function (Blueprint $table) {
+            $table->dropForeign(['file_id']);
+            $table->dropColumn('file_id');
+        });
+
         Schema::dropIfExists('upexcel');
     }
 };

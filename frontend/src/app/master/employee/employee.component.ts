@@ -15,7 +15,7 @@ export class EmployeeComponent {
   EmployeeArray: any[] = [];
   currentEmployee: any = {
     id: '',
-    EmpId: '',
+    EmpId: null, // EmpId should be numeric
     NameWithInitials: '',
     EPFNumber: '',
     Phone: '',
@@ -111,9 +111,9 @@ export class EmployeeComponent {
   resetForm() {
     this.currentEmployee = {
       id: '',
-      EmpId: '',
+      EmpId: null, // Ensure EmpId is reset to null
       NameWithInitials: '',
-      EPF: '',
+      EPFNumber: '',
       Phone: '',
       CurrentAddress: '',
       PermanentAddress: '',

@@ -9,7 +9,6 @@ import { PositionComponent } from './master/position/position.component';
 import { GenderComponent } from './master/gender/gender.component';
 import { HolidayComponent } from './master/holiday/holiday.component';
 import { CalendarComponent } from './master/calendar/calendar.component';
-import { UploadComponent } from './upload/upload/upload.component';
 import { ReportComponent } from './upload/report/report.component';
 import { ViewComponent } from './upload/view/view.component';
 import { SalaryComponent } from './payroll/salary/salary.component';
@@ -17,6 +16,13 @@ import { PayComponent } from './payroll/pay/pay.component';
 import { LeaveTypeComponent } from './leave/typeleave/typeleave.component';
 import { ManageLeaveComponent } from './leave/manageleave/manageleave.component';
 import { AdminComponent } from './user/admin/admin.component';
+import { UpexcelComponent } from './upload/upexcel/upexcel.component';
+import { PayrollComponent } from './payroll/payroll/payroll.component';
+import { ViewFileComponent } from './upload/view-file/view-file.component';
+import { ProcessComponent } from './upload/process/process.component';
+import { SlipComponent } from './upload/slip/slip.component';
+import { LoginComponent } from './pages/login/login.component';
+import { RegisterComponent } from './pages/register/register.component';
 
 export const routes: Routes = [
   {
@@ -114,12 +120,6 @@ export const routes: Routes = [
       { path: 'calendar', component: CalendarComponent },
 
       {
-        path: 'upload',
-        component: UploadComponent,
-        data: { title: 'Upload' },
-      },
-
-      {
         path: 'report',
         component: ReportComponent,
         data: { title: 'report' },
@@ -129,6 +129,30 @@ export const routes: Routes = [
         path: 'view',
         component: ViewComponent,
         data: { title: 'view' },
+      },
+
+      {
+        path: 'view-file', // New Route
+        component: ViewFileComponent,
+        data: { title: 'View File' },
+      },
+
+      {
+        path: 'process', // New Route
+        component: ProcessComponent,
+        data: { title: 'process' },
+      },
+
+      {
+        path: 'slip', // New Route
+        component: SlipComponent,
+        data: { title: 'slip' },
+      },
+
+      {
+        path: 'upexcel',
+        component: UpexcelComponent,
+        data: { title: 'upexcel' },
       },
 
       {
@@ -162,51 +186,32 @@ export const routes: Routes = [
       },
 
       {
-        path: 'pages',
-        loadChildren: () =>
-          import('./views/pages/routes').then((m) => m.routes),
+        path: 'payroll',
+        component: PayrollComponent,
+        data: { title: 'payroll' },
       },
     ],
   },
-  {
-    path: '404',
-    loadComponent: () =>
-      import('./views/pages/page404/page404.component').then(
-        (m) => m.Page404Component
-      ),
-    data: {
-      title: 'Page 404',
-    },
-  },
-  {
-    path: '500',
-    loadComponent: () =>
-      import('./views/pages/page500/page500.component').then(
-        (m) => m.Page500Component
-      ),
-    data: {
-      title: 'Page 500',
-    },
-  },
+
   {
     path: 'login',
     loadComponent: () =>
-      import('./views/pages/login/login.component').then(
-        (m) => m.LoginComponent
-      ),
+      import('./pages/login/login.component').then((m) => m.LoginComponent),
     data: {
       title: 'Login Page',
     },
   },
+
   {
     path: 'register',
     loadComponent: () =>
-      import('./views/pages/register/register.component').then(
+      import('./pages/register/register.component').then(
         (m) => m.RegisterComponent
       ),
     data: {
       title: 'Register Page',
     },
   },
+
   { path: '**', redirectTo: 'dashboard' },
 ];

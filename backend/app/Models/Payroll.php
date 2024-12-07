@@ -9,7 +9,7 @@ class Payroll extends Model
 {
     use HasFactory;
 
-    protected $table = 'payroll'; // Table name
+    protected $table = 'payroll';
 
     protected $fillable = [
         'emp_id',

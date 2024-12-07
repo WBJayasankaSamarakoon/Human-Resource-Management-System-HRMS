@@ -20,7 +20,7 @@ import { iconSubset } from './icons/icon-subset';
   imports: [RouterOutlet],
 })
 export class AppComponent implements OnInit {
-  title = 'CoreUI Angular Admin Template';
+  title = 'Ultimate Engineering Solution';
 
   readonly #destroyRef: DestroyRef = inject(DestroyRef);
   readonly #activatedRoute: ActivatedRoute = inject(ActivatedRoute);

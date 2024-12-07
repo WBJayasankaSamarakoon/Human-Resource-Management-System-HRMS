@@ -16,7 +16,7 @@ class MachineResources extends JsonResource
     {
         //return parent::toArray($request);
         return [
-            'id' => $this->Id, // Assuming 'Id' is your primary key
+            'id' => $this->Id,
             'name' => $this->Name,
             'model' => $this->Model,
             'brand' => $this->Brand,

@@ -5,23 +5,94 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Payroll;
-use App\Models\Tblemployee;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\DB;
 
 class PayrollController extends Controller
 {
-    // Fetch all payroll records and join with employee data to include employee name
-    public function index()
+    // Fetch payroll records by EmpId
+    public function getPayrollByEmpId($empId)
     {
-        // Fetch payroll data and join with employee data to get the employee name
-        $payrolls = Payroll::with('employee')->get(); // Use the 'employee' relationship defined in the Payroll model
-        return response()->json($payrolls);  // Return the payrolls along with employee name
+        // $payrolls = Payroll::with('employee')
+        //     ->whereHas('employee', function ($query) use ($empId) {
+        //         $query->where('EmpId', $empId);
+        //     })
+        //     ->get();
+
+        // // Add employee_name and EmpId for convenience
+        // $payrolls->map(function ($payroll) {
+        //     $payroll->EmpId = $payroll->employee ? $payroll->employee->EmpId : 'Unknown';
+        //     $payroll->employee_name = $payroll->employee ? $payroll->employee->NameWithInitials : 'Unknown';
+        //     return $payroll;
+        // });
+
+
+        $data = DB::table('payroll')
+            ->join('tblemployees', 'payroll.emp_id', '=', 'tblemployees.EmpId')
+            ->join('upexcel', 'payroll.emp_id', '=', 'upexcel.person_id')
+            ->join('leave', 'payroll.emp_id', '=', 'leaves.employee_id')
+            //->join('events')
+
+            ->select('payroll.basic_salary',
+            'payroll.attendance',
+            'payroll.deducation',
+            'payroll.net_salary',
+
+            'tblemployees.EmpId',
+            'tblemployees.NameWithInitials',
+
+            'leave.date',
+
+            'upexcel.person_id',
+            'upexcel.name',
+            'upexcel.date'
+
+            )
+            ->get();
+
+        // Return the data as JSON
+        return response()->json([
+            'success' => true,
+            'data' => $data,
+        ]);
+
+
+
+       // return response()->json($payrolls);
+    }
+
+    // Fetch all payroll records (with employee details), with optional filtering by Person ID
+    public function index(Request $request)
+    {
+        // Get filter parameters
+        $personId = $request->query('person_id');
+
+        // Build the query
+        $query = Payroll::with('employee');
+
+        if ($personId) {
+            $query->whereHas('employee', function ($query) use ($personId) {
+                $query->where('EmpId', $personId);
+            });
+        }
+
+        $payrolls = $query->get();
+
+        // Map the results for additional data
+        $payrolls->map(function ($payroll) {
+            $payroll->EmpId = $payroll->employee ? $payroll->employee->EmpId : 'Unknown';
+            $payroll->employee_name = $payroll->employee ? $payroll->employee->NameWithInitials : 'Unknown';
+            return $payroll;
+        });
+
+        return response()->json($payrolls);
     }
 
     // Store a new payroll record
     public function store(Request $request)
     {
         $request->validate([
-            'emp_id' => 'required|integer|exists:tblemployees,id',
+            'emp_id' => 'required|integer|exists:tblemployees,EmpId',
             'basic_salary' => 'required|numeric',
             'payment_date' => 'required|date',
             'AttendanceIncentive' => 'nullable|numeric',
@@ -51,7 +122,7 @@ class PayrollController extends Controller
         // Create new payroll entry
         $payroll = Payroll::create($payrollData);
 
-        return response()->json($payroll, 201); // Return the created payroll record
+        return response()->json($payroll, 201);
     }
 
     // Show a specific payroll record by ID
@@ -69,7 +140,7 @@ class PayrollController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'emp_id' => 'required|integer|exists:tblemployees,id',
+            'emp_id' => 'required|integer|exists:tblemployees,EmpId',
             'basic_salary' => 'required|numeric',
             'payment_date' => 'required|date',
             'AttendanceIncentive' => 'nullable|numeric',
@@ -108,12 +179,21 @@ class PayrollController extends Controller
     // Delete a payroll record
     public function destroy($id)
     {
-        $payroll = Payroll::find($id);
-        if ($payroll) {
+        try {
+            $payroll = Payroll::find($id);
+
+            if (!$payroll) {
+                return response()->json(['message' => 'Payroll not found'], 404);
+            }
+
             $payroll->delete();
             return response()->json(['message' => 'Payroll deleted successfully']);
-        } else {
-            return response()->json(['message' => 'Payroll not found'], 404);
+        } catch (QueryException $e) {
+            // Handle foreign key constraint issues
+            return response()->json(
+                ['message' => 'Cannot delete payroll: ' . $e->getMessage()],
+                500
+            );
         }
     }
 }

@@ -22,7 +22,7 @@ class CreateLeaveTable extends Migration
             $table->timestamps();
 
             // Foreign Key Constraints (Assuming these tables exist)
-            $table->foreign('employee_id')->references('id')->on('tblemployees')->onDelete('cascade');
+            //$table->foreign('employee_id')->references('id')->on('tblemployees')->onDelete('cascade');
             $table->foreign('leave_type_id')->references('id')->on('leave_types')->onDelete('cascade');
         });
     }

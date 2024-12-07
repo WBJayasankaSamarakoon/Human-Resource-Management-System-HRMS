@@ -17,14 +17,14 @@ class PositionController extends Controller
     // Display a listing of positions
     public function index()
     {
-        return response()->json($this->position->all(), 200); // Explicitly return JSON response
+        return response()->json($this->position->all(), 200);
     }
 
     // Store a newly created position
     public function store(Request $request)
     {
         $position = $this->position->create($request->all());
-        return response()->json($position, 201); // Return created position with HTTP 201 status
+        return response()->json($position, 201);
     }
 
     // Display the specified position

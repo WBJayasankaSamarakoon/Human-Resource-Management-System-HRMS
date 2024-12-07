@@ -34,6 +34,7 @@ import { IconDirective } from '@coreui/icons-angular';
 import { WidgetsBrandComponent } from '../widgets/widgets-brand/widgets-brand.component';
 import { WidgetsDropdownComponent } from '../widgets/widgets-dropdown/widgets-dropdown.component';
 import { DashboardChartsData, IChartProps } from './dashboard-charts-data';
+import { HttpClient } from '@angular/common/http'; // Added for API calls
 
 interface IUser {
   name: string;
@@ -82,6 +83,12 @@ export class DashboardComponent implements OnInit {
   readonly #document: Document = inject(DOCUMENT);
   readonly #renderer: Renderer2 = inject(Renderer2);
   readonly #chartsData: DashboardChartsData = inject(DashboardChartsData);
+
+  // Variables for API counts
+  totalAdmins: number = 0;
+  totalEmployees: number = 0;
+  totalEvents: number = 0;
+  totalLeaves: number = 0;
 
   public users: IUser[] = [
     {
@@ -176,9 +183,14 @@ export class DashboardComponent implements OnInit {
     trafficRadio: new FormControl('Month'),
   });
 
+  constructor(private http: HttpClient) {} // Inject HttpClient
+
   ngOnInit(): void {
     this.initCharts();
     this.updateChartOnColorModeChange();
+
+    // Fetch the counts on initialization
+    this.fetchCounts();
   }
 
   initCharts(): void {
@@ -220,5 +232,20 @@ export class DashboardComponent implements OnInit {
         this.mainChartRef().update();
       });
     }
+  }
+
+  // New method to fetch counts
+  fetchCounts() {
+    this.http.get<any>('http://127.0.0.1:8000/api/dashboard/counts').subscribe({
+      next: (response) => {
+        this.totalAdmins = response.totalAdmins;
+        this.totalEmployees = response.totalEmployees;
+        this.totalEvents = response.totalEvents;
+        this.totalLeaves = response.totalLeaves;
+      },
+      error: (err) => {
+        console.error('Error fetching dashboard counts:', err);
+      },
+    });
   }
 }

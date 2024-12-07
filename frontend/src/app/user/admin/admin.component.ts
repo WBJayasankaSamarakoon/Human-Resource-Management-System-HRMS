@@ -38,7 +38,7 @@ export class AdminComponent {
   }
 
   openEditModal(adminItem: any) {
-    this.currentAdmin = { ...adminItem, password: '' }; // Do not prefill the password
+    this.currentAdmin = { ...adminItem, password: '' };
   }
 
   save() {

@@ -20,6 +20,7 @@ class TblemployeesController extends Controller
     public function store(Request $request): JsonResponse
     {
         $request->validate([
+            'EmpId' => 'required|numeric|unique:tblemployees,EmpId', // Ensure EmpId is numeric and unique
             'NameWithInitials' => 'required|string|max:255',
             'EPFNumber' => 'required|string|max:100',
             'Phone' => 'required|string|max:20',
@@ -39,11 +40,11 @@ class TblemployeesController extends Controller
             'EmergencyPhone' => 'required|string|max:20',
             'Relation' => 'required|string|max:100',
             'DefaultShift' => 'required|string|max:100',
-            'EmpId' => 'required|string|max:50',
         ]);
 
+        // Create employee
         $employee = Tblemployee::create($request->all());
-        return response()->json($employee, 201); // HTTP 201 for created resource
+        return response()->json($employee, 201);
     }
 
     // Display the specified employee
@@ -68,28 +69,29 @@ class TblemployeesController extends Controller
         }
 
         $request->validate([
-            'NameWithInitials' => 'sometimes|required|string|max:255',
-            'EPFNumber' => 'sometimes|required|string|max:100',
-            'Phone' => 'sometimes|required|string|max:20',
-            'CurrentAddress' => 'sometimes|required|string',
-            'PermanentAddress' => 'sometimes|required|string',
-            'PersonalEmail' => 'sometimes|required|email|max:255',
-            'CompanyEmail' => 'sometimes|required|email|max:255',
-            'DateOfJoining' => 'sometimes|required|date',
-            'Status' => 'sometimes|required|in:Active,Inactive,Suspended,Left',
-            'Salutation' => 'sometimes|required|in:Mr,Ms,Mrs',
-            'Designation' => 'sometimes|required|string|max:100',
-            'Branch' => 'sometimes|required|string|max:100',
-            'Company' => 'sometimes|required|string|max:100',
-            'ReportsTo' => 'sometimes|required|string|max:100',
-            'EmploymentType' => 'sometimes|required|in:Intern,Full-time,Part-time,Contract',
-            'EmergencyContactName' => 'sometimes|required|string|max:255',
-            'EmergencyPhone' => 'sometimes|required|string|max:20',
-            'Relation' => 'sometimes|required|string|max:100',
-            'DefaultShift' => 'sometimes|required|string|max:100',
-            'EmpId' => 'sometimes|required|string|max:50',
+            'EmpId' => 'required|numeric|unique:tblemployees,EmpId,' . $id, // Ensure EmpId is numeric and unique excluding current record
+            'NameWithInitials' => 'required|string|max:255',
+            'EPFNumber' => 'required|string|max:100',
+            'Phone' => 'required|string|max:20',
+            'CurrentAddress' => 'required|string',
+            'PermanentAddress' => 'required|string',
+            'PersonalEmail' => 'required|email|max:255',
+            'CompanyEmail' => 'required|email|max:255',
+            'DateOfJoining' => 'required|date',
+            'Status' => 'required|in:Active,Inactive,Suspended,Left',
+            'Salutation' => 'required|in:Mr,Ms,Mrs',
+            'Designation' => 'required|string|max:100',
+            'Branch' => 'required|string|max:100',
+            'Company' => 'required|string|max:100',
+            'ReportsTo' => 'required|string|max:100',
+            'EmploymentType' => 'required|in:Intern,Full-time,Part-time,Contract',
+            'EmergencyContactName' => 'required|string|max:255',
+            'EmergencyPhone' => 'required|string|max:20',
+            'Relation' => 'required|string|max:100',
+            'DefaultShift' => 'required|string|max:100',
         ]);
 
+        // Update employee
         $employee->update($request->all());
         return response()->json($employee, 200);
     }

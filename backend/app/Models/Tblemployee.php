@@ -22,7 +22,15 @@ class Tblemployee extends Model
         'CompanyEmail',
         'DateOfJoining',
         'Status',
+        'Salutation',
         'Designation',
         'Branch',
+        'Company',
+        'ReportsTo',
+        'EmploymentType',
+        'EmergencyContactName',
+        'EmergencyPhone',
+        'Relation',
+        'DefaultShift',
     ];
 }

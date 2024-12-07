@@ -1,113 +1,99 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-
-interface File {
-  filename: string;
-  year: string;
-  month: string;
-}
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { apiBaseUrl } from 'src/app/app.config';
 
 @Component({
   selector: 'app-view',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './view.component.html',
   styleUrls: ['./view.component.scss'],
 })
 export class ViewComponent implements OnInit {
-  statusMessage: string = '';
-  statusType: string = '';
-  selectedYear: string = '';
-  selectedMonth: string = '';
-  years: string[] = [];
+  selectedYear: number | null = null;
+  selectedMonth: number | null = null;
+  uploadedFiles: any[] = [];
+  message: string | null = null;
+
   months = [
-    { value: '01', name: 'January' },
-    { value: '02', name: 'February' },
-    { value: '03', name: 'March' },
-    { value: '04', name: 'April' },
-    { value: '05', name: 'May' },
-    { value: '06', name: 'June' },
-    { value: '07', name: 'July' },
-    { value: '08', name: 'August' },
-    { value: '09', name: 'September' },
-    { value: '10', name: 'October' },
-    { value: '11', name: 'November' },
-    { value: '12', name: 'December' },
+    { value: 1, name: 'January' },
+    { value: 2, name: 'February' },
+    { value: 3, name: 'March' },
+    { value: 4, name: 'April' },
+    { value: 5, name: 'May' },
+    { value: 6, name: 'June' },
+    { value: 7, name: 'July' },
+    { value: 8, name: 'August' },
+    { value: 9, name: 'September' },
+    { value: 10, name: 'October' },
+    { value: 11, name: 'November' },
+    { value: 12, name: 'December' },
   ];
-  files: File[] = [];
 
   constructor(private http: HttpClient, private router: Router) {}
 
   ngOnInit(): void {
-    this.fetchYears();
-    this.fetchFiles();
+    this.loadAllFiles();
   }
 
-  fetchYears(): void {
-    const currentYear = new Date().getFullYear();
-    this.years = [];
-    for (let i = 0; i < 5; i++) {
-      this.years.push((currentYear - i).toString());
-    }
-  }
-
-  fetchFiles(): void {
-    const params = {
-      year: this.selectedYear || '',
-      month: this.selectedMonth || '',
-    };
-    this.http.get<File[]>('/api/uploaded-files', { params }).subscribe(
-      (response: File[]) => {
-        this.files = response;
+  loadAllFiles(): void {
+    this.http.get<any[]>(`${apiBaseUrl}api/uploaded_files`).subscribe({
+      next: (data) => {
+        this.uploadedFiles = data;
+        this.message = data.length ? null : 'No files found.';
       },
-      (error) => {
-        console.error(error);
-        this.statusMessage = 'Failed to load uploaded files.';
-        this.statusType = 'error';
-      }
-    );
+      error: () => {
+        this.message = 'Failed to load files.';
+      },
+    });
   }
 
   filterFiles(): void {
-    this.fetchFiles(); // Refetch files based on selected year and month
-  }
-
-  closeAlert(): void {
-    this.statusMessage = '';
-  }
-
-  deleteFile(file: File): void {
-    if (confirm('Are you sure you want to delete this file?')) {
-      this.http.post('/api/delete-file', file).subscribe(
-        () => {
-          this.statusMessage = 'File deleted successfully.';
-          this.statusType = 'success';
-          this.fetchFiles();
-        },
-        (error) => {
-          console.error(error);
-          this.statusMessage = 'Failed to delete file.';
-          this.statusType = 'error';
-        }
-      );
+    if (!this.selectedYear || !this.selectedMonth) {
+      this.message = 'Please select both year and month.';
+      this.loadAllFiles();
+      return;
     }
+
+    this.http
+      .get<any[]>(
+        `${apiBaseUrl}api/uploaded_files?year=${this.selectedYear}&month=${this.selectedMonth}`
+      )
+      .subscribe({
+        next: (data) => {
+          this.uploadedFiles = data;
+          this.message = data.length
+            ? null
+            : 'No files found for the selected year and month.';
+        },
+        error: () => {
+          this.message = 'Failed to filter files.';
+        },
+      });
   }
 
-  processFile(file: File): void {
-    this.http.post('/api/process-file', file).subscribe(
-      () => {
-        this.statusMessage = 'File processed successfully.';
-        this.statusType = 'success';
-        this.fetchFiles(); // Refetch the file list after processing
-      },
-      (error) => {
-        console.error(error);
-        this.statusMessage = 'Failed to process file.';
-        this.statusType = 'error';
-      }
-    );
+  viewFile(file: any): void {
+    // Store file ID and navigate to the view-file component
+    localStorage.setItem('fileId', file.id.toString());
+    this.router.navigate(['/view-file']);
+  }
+
+  deleteFile(file: any): void {
+    if (confirm(`Are you sure you want to delete ${file.file_name}?`)) {
+      this.http
+        .delete(`${apiBaseUrl}api/uploaded_files/${file.id}/delete`)
+        .subscribe({
+          next: () => {
+            this.message = 'File and related data deleted successfully!';
+            this.loadAllFiles();
+          },
+          error: () => {
+            this.message = 'Failed to delete file.';
+          },
+        });
+    }
   }
 }

@@ -25,7 +25,7 @@ class LeaveTypeController extends Controller
         ]);
 
         $leaveType = LeaveType::create($request->all());
-        return response()->json($leaveType, 201);  // HTTP 201 for successful creation
+        return response()->json($leaveType, 201);
     }
 
     // Display the specified leave type

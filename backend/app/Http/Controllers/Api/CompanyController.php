@@ -28,7 +28,7 @@ class CompanyController extends Controller
         ]);
 
         $company = Company::create($request->all());
-        return response()->json($company, 201);  // HTTP 201 for successful creation
+        return response()->json($company, 201);
     }
 
     // Display the specified company

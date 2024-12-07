@@ -1,5 +1,37 @@
+.calendar-container {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
 full-calendar {
   width: 100%;
-  max-width: 900px;
+  max-width: 1000px;
   margin: 0 auto;
+}
+
+/* Bootstrap Modal customizations */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 110%;
+  height: 110%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal.fade.show {
+  display: flex !important;
+}
+
+.modal-dialog {
+  max-width: 400px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.modal-content {
+  padding: 20px;
 }

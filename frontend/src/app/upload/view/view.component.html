@@ -1,92 +1,63 @@
-<div class="container">
-  <!-- Filter Form -->
-  <h1 class="text-center mb-4">View Uploaded Files</h1>
-  <form (submit)="filterFiles()" class="mb-4">
-    <div class="form-row">
-      <div class="form-group col-md-6">
-        <label for="year">Select Year</label>
-        <select
-          id="year"
-          [(ngModel)]="selectedYear"
-          name="year"
-          class="form-control"
-        >
-          <option value="">Choose Year</option>
-          <option *ngFor="let year of years" [value]="year">{{ year }}</option>
-        </select>
-      </div>
-      <div class="form-group col-md-6">
-        <label for="month">Select Month</label>
-        <select
-          id="month"
-          [(ngModel)]="selectedMonth"
-          name="month"
-          class="form-control"
-        >
-          <option value="">Choose Month</option>
-          <option *ngFor="let month of months" [value]="month.value">
-            {{ month.name }}
-          </option>
-        </select>
-      </div>
-    </div>
-    <button type="submit" class="btn btn-primary btn-block">
-      Filter Files
-    </button>
-  </form>
+<div class="container mt-5">
+  <h2 class="text-center mb-4">View Uploaded Files</h2>
 
-  <!-- Status Message -->
-  <div
-    *ngIf="statusMessage"
-    class="alert"
-    [ngClass]="{
-      'alert-success': statusType === 'success',
-      'alert-danger': statusType === 'error'
-    }"
-  >
-    {{ statusMessage }}
-    <button *ngIf="statusMessage" (click)="closeAlert()" class="close">
-      &times;
-    </button>
+  <!-- Filter Section -->
+  <div class="row mb-3">
+    <div class="col-md-4">
+      <label for="year" class="form-label">Select Year</label>
+      <select class="form-select" [(ngModel)]="selectedYear" id="year">
+        <option [value]="null">Choose Year</option>
+        <option *ngFor="let year of [2023, 2024, 2025]" [value]="year">
+          {{ year }}
+        </option>
+      </select>
+    </div>
+
+    <div class="col-md-4">
+      <label for="month" class="form-label">Select Month</label>
+      <select class="form-select" [(ngModel)]="selectedMonth" id="month">
+        <option [value]="null">Choose Month</option>
+        <option *ngFor="let month of months" [value]="month.value">
+          {{ month.name }}
+        </option>
+      </select>
+    </div>
+
+    <div class="col-md-4 d-flex align-items-end">
+      <button class="btn btn-primary w-100" (click)="filterFiles()">
+        Filter Files
+      </button>
+    </div>
   </div>
 
-  <!-- Uploaded Files Header -->
-  <h2 class="mb-4 d-flex justify-content-between align-items-center">
-    Uploaded Files
-    <a routerLink="/upload" class="btn btn-secondary">Upload New File</a>
-  </h2>
-
-  <!-- Files List -->
-  <ul *ngIf="files.length > 0; else noFilesMessage" class="list-group">
-    <li
-      *ngFor="let file of files"
-      class="list-group-item d-flex justify-content-between align-items-center"
-    >
-      <div>
-        {{ file.filename }}
-        <span class="badge badge-primary badge-pill">
-          {{ file.year }}-{{ file.month }}
-        </span>
-      </div>
-      <div class="button-group">
-        <a
-          [href]="'/view/' + file.filename + '/' + file.year + '/' + file.month"
-          target="_blank"
-          class="btn btn-info btn-sm ml-2"
-          >View</a
-        >
-        <button (click)="deleteFile(file)" class="btn btn-danger btn-sm ml-2">
-          Delete
-        </button>
-        <button (click)="processFile(file)" class="btn btn-warning btn-sm ml-2">
-          Process
-        </button>
-      </div>
-    </li>
-  </ul>
-
-  <!-- No Files Found Message -->
-  <ng-template #noFilesMessage>
-    <div class="alert alert-warning">No files found</div>
-  </ng-template>
+  <h3>Uploaded Files</h3>
+  <table
+    *ngIf="uploadedFiles.length > 0"
+    class="table table-bordered table-striped mt-3"
+  >
+    <thead class="table-dark">
+      <tr>
+        <th>File Name</th>
+        <th>Year-Month</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let file of uploadedFiles">
+        <td>{{ file.file_name }}</td>
+        <td>{{ file.year }}-{{ file.month | number : "2.0" }}</td>
+        <td>
+          <button class="btn btn-info btn-sm me-2" (click)="viewFile(file)">
+            <i class="fas fa-eye"></i> View
+          </button>
+          <button class="btn btn-danger btn-sm" (click)="deleteFile(file)">
+            <i class="fas fa-trash-alt"></i> Delete
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <p *ngIf="uploadedFiles.length === 0" class="text-muted mt-3">
+    No files available.
+  </p>
 </div>

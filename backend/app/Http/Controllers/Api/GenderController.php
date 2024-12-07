@@ -24,7 +24,7 @@ class GenderController extends Controller
         ]);
 
         $gender = Gender::create($request->all());
-        return response()->json($gender, 201); // HTTP 201 for created resource
+        return response()->json($gender, 201);
     }
 
     // Display the specified gender

@@ -7,22 +7,12 @@
   visible
 >
   <c-sidebar-header class="border-bottom">
-    <c-sidebar-brand [routerLink]="[]">
-      <svg
-        [class]="{ icon: false }"
-        cIcon
-        class="sidebar-brand-full"
-        height="32"
-        name="logo"
-        title="CoreUI Logo"
-      ></svg>
-      <svg
-        cIcon
-        class="sidebar-brand-narrow"
-        height="32"
-        name="signet"
-        title="CoreUI Logo"
-      ></svg>
+    <c-sidebar-brand [routerLink]="[]" class="d-flex align-items-center">
+      <!-- Visible text styled for branding -->
+      <span class="ms-2 sidebar-brand-text">
+        Ultimate Engineering <br />
+        <small class="text-muted">Solution</small>
+      </span>
     </c-sidebar-brand>
   </c-sidebar-header>
 
@@ -62,10 +52,8 @@
     sidebarId="sidebar1"
   />
   <!--app-body-->
-  <div class="body flex-grow-1">
-    <c-container breakpoint="lg" class="h-auto px-4">
-      <router-outlet />
-    </c-container>
+  <div class="body flex-grow-1 p-3 m-3">
+    <router-outlet />
   </div>
   <!--app footer-->
   <app-default-footer />

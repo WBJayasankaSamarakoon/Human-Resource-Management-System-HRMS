@@ -35,7 +35,7 @@ class TblemployeesResource extends JsonResource
             'EmergencyPhone' => $this->EmergencyPhone,
             'Relation' => $this->Relation,
             'DefaultShift' => $this->DefaultShift,
-            'EmpId' => $this->EmpId,
+            'EmpId' => $this->EmpId, // EmpId is now numeric (unsignedBigInteger)
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
