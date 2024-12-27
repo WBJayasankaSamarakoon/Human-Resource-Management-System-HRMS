@@ -13,61 +13,36 @@ class PayrollController extends Controller
     // Fetch payroll records by EmpId
     public function getPayrollByEmpId($empId)
     {
-        // $payrolls = Payroll::with('employee')
-        //     ->whereHas('employee', function ($query) use ($empId) {
-        //         $query->where('EmpId', $empId);
-        //     })
-        //     ->get();
-
-        // // Add employee_name and EmpId for convenience
-        // $payrolls->map(function ($payroll) {
-        //     $payroll->EmpId = $payroll->employee ? $payroll->employee->EmpId : 'Unknown';
-        //     $payroll->employee_name = $payroll->employee ? $payroll->employee->NameWithInitials : 'Unknown';
-        //     return $payroll;
-        // });
-
-
         $data = DB::table('payroll')
             ->join('tblemployees', 'payroll.emp_id', '=', 'tblemployees.EmpId')
             ->join('upexcel', 'payroll.emp_id', '=', 'upexcel.person_id')
             ->join('leave', 'payroll.emp_id', '=', 'leaves.employee_id')
-            //->join('events')
-
-            ->select('payroll.basic_salary',
-            'payroll.attendance',
-            'payroll.deducation',
-            'payroll.net_salary',
-
-            'tblemployees.EmpId',
-            'tblemployees.NameWithInitials',
-
-            'leave.date',
-
-            'upexcel.person_id',
-            'upexcel.name',
-            'upexcel.date'
-
+            ->select(
+                'payroll.basic_salary',
+                'payroll.attendance',
+                'payroll.deducation',
+                'payroll.net_salary',
+                'payroll.payment_year',
+                'payroll.payment_month',
+                'tblemployees.EmpId',
+                'tblemployees.NameWithInitials',
+                'leave.date',
+                'upexcel.person_id',
+                'upexcel.name',
+                'upexcel.date'
             )
             ->get();
 
-        // Return the data as JSON
         return response()->json([
             'success' => true,
             'data' => $data,
         ]);
-
-
-
-       // return response()->json($payrolls);
     }
 
-    // Fetch all payroll records (with employee details), with optional filtering by Person ID
+    // Fetch all payroll records
     public function index(Request $request)
     {
-        // Get filter parameters
         $personId = $request->query('person_id');
-
-        // Build the query
         $query = Payroll::with('employee');
 
         if ($personId) {
@@ -78,7 +53,6 @@ class PayrollController extends Controller
 
         $payrolls = $query->get();
 
-        // Map the results for additional data
         $payrolls->map(function ($payroll) {
             $payroll->EmpId = $payroll->employee ? $payroll->employee->EmpId : 'Unknown';
             $payroll->employee_name = $payroll->employee ? $payroll->employee->NameWithInitials : 'Unknown';
@@ -94,7 +68,8 @@ class PayrollController extends Controller
         $request->validate([
             'emp_id' => 'required|integer|exists:tblemployees,EmpId',
             'basic_salary' => 'required|numeric',
-            'payment_date' => 'required|date',
+            'payment_year' => 'required|integer',
+            'payment_month' => 'required|integer',
             'AttendanceIncentive' => 'nullable|numeric',
             'SuperAttendance' => 'nullable|numeric',
             'PerformanceIncentive' => 'nullable|numeric',
@@ -104,24 +79,12 @@ class PayrollController extends Controller
             'deductions' => 'nullable|numeric',
         ]);
 
-        // Ensure missing fields are set to zero
         $payrollData = $request->only([
             'emp_id', 'basic_salary', 'AttendanceIncentive', 'SuperAttendance',
-            'PerformanceIncentive', 'BRA1', 'BRA2', 'BRA3', 'deductions', 'payment_date'
+            'PerformanceIncentive', 'BRA1', 'BRA2', 'BRA3', 'deductions', 'payment_year', 'payment_month'
         ]);
 
-        // Set default values for missing fields
-        $payrollData['AttendanceIncentive'] = $payrollData['AttendanceIncentive'] ?? 0.00;
-        $payrollData['SuperAttendance'] = $payrollData['SuperAttendance'] ?? 0.00;
-        $payrollData['PerformanceIncentive'] = $payrollData['PerformanceIncentive'] ?? 0.00;
-        $payrollData['BRA1'] = $payrollData['BRA1'] ?? 0.00;
-        $payrollData['BRA2'] = $payrollData['BRA2'] ?? 0.00;
-        $payrollData['BRA3'] = $payrollData['BRA3'] ?? 0.00;
-        $payrollData['deductions'] = $payrollData['deductions'] ?? 0.00;
-
-        // Create new payroll entry
         $payroll = Payroll::create($payrollData);
-
         return response()->json($payroll, 201);
     }
 
@@ -142,7 +105,8 @@ class PayrollController extends Controller
         $request->validate([
             'emp_id' => 'required|integer|exists:tblemployees,EmpId',
             'basic_salary' => 'required|numeric',
-            'payment_date' => 'required|date',
+            'payment_year' => 'required|integer',
+            'payment_month' => 'required|integer',
             'AttendanceIncentive' => 'nullable|numeric',
             'SuperAttendance' => 'nullable|numeric',
             'PerformanceIncentive' => 'nullable|numeric',
@@ -156,20 +120,10 @@ class PayrollController extends Controller
         if ($payroll) {
             $payrollData = $request->only([
                 'emp_id', 'basic_salary', 'AttendanceIncentive', 'SuperAttendance',
-                'PerformanceIncentive', 'BRA1', 'BRA2', 'BRA3', 'deductions', 'payment_date'
+                'PerformanceIncentive', 'BRA1', 'BRA2', 'BRA3', 'deductions', 'payment_year', 'payment_month'
             ]);
 
-            // Set default values for any missing fields
-            $payrollData['AttendanceIncentive'] = $payrollData['AttendanceIncentive'] ?? 0.00;
-            $payrollData['SuperAttendance'] = $payrollData['SuperAttendance'] ?? 0.00;
-            $payrollData['PerformanceIncentive'] = $payrollData['PerformanceIncentive'] ?? 0.00;
-            $payrollData['BRA1'] = $payrollData['BRA1'] ?? 0.00;
-            $payrollData['BRA2'] = $payrollData['BRA2'] ?? 0.00;
-            $payrollData['BRA3'] = $payrollData['BRA3'] ?? 0.00;
-            $payrollData['deductions'] = $payrollData['deductions'] ?? 0.00;
-
             $payroll->update($payrollData);
-
             return response()->json($payroll);
         }
 
@@ -187,13 +141,12 @@ class PayrollController extends Controller
             }
 
             $payroll->delete();
-            return response()->json(['message' => 'Payroll deleted successfully']);
+            return response()->json(['message' => 'Payroll record deleted successfully']);
         } catch (QueryException $e) {
-            // Handle foreign key constraint issues
-            return response()->json(
-                ['message' => 'Cannot delete payroll: ' . $e->getMessage()],
-                500
-            );
+            return response()->json([
+                'error' => 'Failed to delete payroll record',
+                'details' => $e->getMessage()
+            ], 500);
         }
     }
 }

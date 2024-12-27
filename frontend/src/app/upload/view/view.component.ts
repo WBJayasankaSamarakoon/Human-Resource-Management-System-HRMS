@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { apiBaseUrl } from 'src/app/app.config';
+import { apiBaseUrl } from '../../app.config';
 
 @Component({
   selector: 'app-view',
@@ -17,6 +17,7 @@ export class ViewComponent implements OnInit {
   selectedMonth: number | null = null;
   uploadedFiles: any[] = [];
   message: string | null = null;
+  isLoading: boolean = false;  // Add a loading flag
 
   months = [
     { value: 1, name: 'January' },
@@ -40,13 +41,16 @@ export class ViewComponent implements OnInit {
   }
 
   loadAllFiles(): void {
+    this.isLoading = true;  // Set loading to true
     this.http.get<any[]>(`${apiBaseUrl}api/uploaded_files`).subscribe({
       next: (data) => {
         this.uploadedFiles = data;
         this.message = data.length ? null : 'No files found.';
+        this.isLoading = false;  // Set loading to false once data is loaded
       },
       error: () => {
         this.message = 'Failed to load files.';
+        this.isLoading = false;  // Set loading to false if there's an error
       },
     });
   }
@@ -58,6 +62,7 @@ export class ViewComponent implements OnInit {
       return;
     }
 
+    this.isLoading = true;  // Set loading to true while filtering
     this.http
       .get<any[]>(
         `${apiBaseUrl}api/uploaded_files?year=${this.selectedYear}&month=${this.selectedMonth}`
@@ -68,21 +73,23 @@ export class ViewComponent implements OnInit {
           this.message = data.length
             ? null
             : 'No files found for the selected year and month.';
+          this.isLoading = false;  // Set loading to false after filtering
         },
         error: () => {
           this.message = 'Failed to filter files.';
+          this.isLoading = false;  // Set loading to false if there's an error
         },
       });
   }
 
   viewFile(file: any): void {
-    // Store file ID and navigate to the view-file component
     localStorage.setItem('fileId', file.id.toString());
     this.router.navigate(['/view-file']);
   }
 
   deleteFile(file: any): void {
     if (confirm(`Are you sure you want to delete ${file.file_name}?`)) {
+      this.isLoading = true;  // Set loading to true while deleting
       this.http
         .delete(`${apiBaseUrl}api/uploaded_files/${file.id}/delete`)
         .subscribe({
@@ -92,6 +99,7 @@ export class ViewComponent implements OnInit {
           },
           error: () => {
             this.message = 'Failed to delete file.';
+            this.isLoading = false;  // Set loading to false if there's an error
           },
         });
     }

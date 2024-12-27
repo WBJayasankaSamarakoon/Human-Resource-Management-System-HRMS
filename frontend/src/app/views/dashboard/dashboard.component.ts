@@ -11,6 +11,8 @@ import {
 } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ChartOptions } from 'chart.js';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import {
   AvatarComponent,
   ButtonDirective,
@@ -34,7 +36,8 @@ import { IconDirective } from '@coreui/icons-angular';
 import { WidgetsBrandComponent } from '../widgets/widgets-brand/widgets-brand.component';
 import { WidgetsDropdownComponent } from '../widgets/widgets-dropdown/widgets-dropdown.component';
 import { DashboardChartsData, IChartProps } from './dashboard-charts-data';
-import { HttpClient } from '@angular/common/http'; // Added for API calls
+import { HttpClient } from '@angular/common/http';
+
 
 interface IUser {
   name: string;
@@ -76,6 +79,8 @@ interface IUser {
     CardHeaderComponent,
     TableDirective,
     AvatarComponent,
+    FormsModule,
+    CommonModule,
   ],
 })
 export class DashboardComponent implements OnInit {
@@ -89,6 +94,9 @@ export class DashboardComponent implements OnInit {
   totalEmployees: number = 0;
   totalEvents: number = 0;
   totalLeaves: number = 0;
+
+    // Loading state
+    loading: boolean = false;
 
   public users: IUser[] = [
     {
@@ -236,15 +244,18 @@ export class DashboardComponent implements OnInit {
 
   // New method to fetch counts
   fetchCounts() {
-    this.http.get<any>('http://127.0.0.1:8000/api/dashboard/counts').subscribe({
+    this.loading = true; // Start loading
+    this.http.get<any>('https://laravel.ueshr.ultimate.lk/api/dashboard/counts').subscribe({
       next: (response) => {
         this.totalAdmins = response.totalAdmins;
         this.totalEmployees = response.totalEmployees;
         this.totalEvents = response.totalEvents;
         this.totalLeaves = response.totalLeaves;
+        this.loading = false; // Stop loading
       },
       error: (err) => {
         console.error('Error fetching dashboard counts:', err);
+        this.loading = false; // Stop loading on error
       },
     });
   }

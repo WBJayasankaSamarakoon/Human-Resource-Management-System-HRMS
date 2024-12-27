@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { apiBaseUrl } from 'src/app/app.config'; // Import apiBaseUrl from app.config
 
 @Component({
   selector: 'app-upexcel',
@@ -44,7 +45,7 @@ export class UpexcelComponent implements OnInit {
   }
 
   fetchAvailableFiles(): void {
-    this.http.get('http://localhost:8000/api/uploaded_files').subscribe({
+    this.http.get(`${apiBaseUrl}api/uploaded_files`).subscribe({
       next: (response: any) => {
         this.availableFiles = response;
       },
@@ -76,7 +77,7 @@ export class UpexcelComponent implements OnInit {
     formData.append('year', this.selectedYear.toString());
     formData.append('month', this.selectedMonth.toString());
 
-    this.http.post('http://localhost:8000/api/upexcel', formData).subscribe({
+    this.http.post(`${apiBaseUrl}api/upexcel`, formData).subscribe({
       next: (response: any) => {
         this.message = response.message || 'File uploaded successfully!';
         this.isSuccess = true;
@@ -100,7 +101,7 @@ export class UpexcelComponent implements OnInit {
     }
 
     this.http
-      .delete(`http://localhost:8000/api/uploaded_files/${fileId}/delete`)
+      .delete(`${apiBaseUrl}api/uploaded_files/${fileId}/delete`)
       .subscribe({
         next: (response: any) => {
           this.message = response.message || 'File deleted successfully!';
@@ -115,8 +116,7 @@ export class UpexcelComponent implements OnInit {
       });
   }
 
-  viewFile(fileId: number): void {
-    this.selectedFileId = fileId;
-    this.router.navigate(['/view'], { queryParams: { file_id: fileId } });
+  navigateToUploadedFiles(): void {
+    this.router.navigate(['/view']);
   }
 }

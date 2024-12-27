@@ -37,6 +37,10 @@ import { ManageLeaveComponent } from './leave/manageleave/manageleave.component'
 import { AdminComponent } from './user/admin/admin.component';
 import { RegisterComponent } from './pages/register/register.component';
 
+// Import the AuthGuard
+import { AuthGuard } from './auth.guard'; // Adjust the path if necessary
+import { HttpClientModule } from '@angular/common/http';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -64,13 +68,19 @@ import { RegisterComponent } from './pages/register/register.component';
     RegisterComponent,
   ],
 
-  imports: [BrowserModule, FormsModule, RouterModule.forRoot(routes)],
+  imports: [
+    BrowserModule,
+    FormsModule,
+    RouterModule.forRoot(routes), // Routing setup
+    HttpClientModule, // Required for HTTP requests
+  ],
 
   providers: [
     { provide: 'AppConfig', useValue: appConfig },
-    provideHttpClient(withInterceptorsFromDi()),
+    provideHttpClient(withInterceptorsFromDi()), // Modern HttpClient setup
+    AuthGuard, // Register the AuthGuard
   ],
 
-  bootstrap: [AppComponent],
+  bootstrap: [AppComponent], // Bootstrap root component
 })
 export class AppModule {}

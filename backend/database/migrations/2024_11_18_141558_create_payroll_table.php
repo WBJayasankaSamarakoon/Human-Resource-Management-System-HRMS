@@ -8,7 +8,8 @@ return new class extends Migration {
     public function up()
     {
         Schema::create('payroll', function (Blueprint $table) {
-            $table->increments('payroll_id');
+            $table->id();
+            //$table->increments('payroll_id');
             $table->unsignedBigInteger('emp_id');
             $table->decimal('basic_salary', 10, 2)->notNullable();
             $table->decimal('AttendanceIncentive', 10, 2)->default(0.00);
@@ -20,7 +21,8 @@ return new class extends Migration {
             $table->decimal('deductions', 10, 2)->default(0.00);
             $table->decimal('net_salary', 10, 2)
                   ->storedAs('basic_salary + AttendanceIncentive + SuperAttendance + PerformanceIncentive + BRA1 + BRA2 + BRA3 - deductions');
-            $table->dateTime('payment_date');
+            $table->integer('payment_year');
+            $table->integer('payment_month');
             $table->timestamps();
 
             // Add foreign key constraint

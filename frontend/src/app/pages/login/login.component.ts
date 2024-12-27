@@ -25,13 +25,12 @@ export class LoginComponent {
     // Send login request to the backend
     this.http.post(`${apiBaseUrl}api/auth/login`, this.user).subscribe(
       (response: any) => {
-        console.log(response);
-        // Store the token in localStorage (or cookies, depending on your choice)
-        localStorage.setItem('token', response.data.access_token);
-        this.router.navigate(['/dashboard']); // Redirect to dashboard after successful login
+        console.log('Login successful:', response);
+        localStorage.setItem('token', response.data.access_token); // Save token
+        this.router.navigate(['/dashboard']); // Redirect to dashboard
       },
       (error) => {
-        console.error(error);
+        console.error('Login error:', error);
         this.errorMessage = 'Invalid email or password';
       }
     );
@@ -45,7 +44,6 @@ export class LoginComponent {
     this.errorMessage = '';
   }
 
-  // New function to handle navigation to Register page
   navigateToRegister() {
     this.router.navigate(['/register']);
   }

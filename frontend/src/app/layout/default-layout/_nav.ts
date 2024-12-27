@@ -10,12 +10,10 @@ export const navItems: INavData[] = [
       text: 'NEW',
     },
   },
-
   {
     name: 'Interface',
     title: true,
   },
-
   {
     name: 'Upload Sheet',
     url: '/upload',
@@ -24,20 +22,13 @@ export const navItems: INavData[] = [
       {
         name: 'Upload File',
         url: '/upexcel',
-        icon: 'nav-icon-bullet',
+        iconComponent: { name: 'cil-file' },
       },
-
       {
         name: 'View Uploads',
         url: '/view',
-        icon: 'nav-icon-bullet',
+        iconComponent: { name: 'cil-list' },
       },
-
-      /*{
-        name: 'Report',
-        url: '/report',
-        icon: 'nav-icon-bullet',
-      },*/
     ],
   },
   {
@@ -48,78 +39,67 @@ export const navItems: INavData[] = [
       {
         name: 'Salary Structure',
         url: '/salary',
-        icon: 'nav-icon-bullet',
+        iconComponent: { name: 'cil-dollar' },
       },
-
       {
         name: 'Payroll Information',
         url: '/payroll',
-        icon: 'nav-icon-bullet',
+        iconComponent: { name: 'cil-notes' },
       },
     ],
   },
-
   {
     name: 'Master',
     url: '/master',
     iconComponent: { name: 'cil-settings' },
     children: [
       {
-        name: 'Employees',
+        name: 'Employee',
         url: '/employee',
-        icon: 'nav-icon-bullet',
+        iconComponent: { name: 'cil-user' },
       },
-
       {
-        name: 'Machines',
+        name: 'Machine',
         url: '/machine',
-        icon: 'nav-icon-bullet',
+        iconComponent: { name: 'cil-notes' },
       },
-
       {
-        name: 'Companies',
+        name: 'Company',
         url: '/company',
-        icon: 'nav-icon-bullet',
+        iconComponent: { name: 'cil-notes' },
       },
-
       {
-        name: 'Departments',
-        url: 'department',
-        icon: 'nav-icon-bullet',
+        name: 'Department',
+        url: '/department',
+        iconComponent: { name: 'cil-notes' },
       },
-
       {
-        name: 'Shifts',
-        url: 'shift',
-        icon: 'nav-icon-bullet',
+        name: 'Shift',
+        url: '/shift',
+        iconComponent: { name: 'cil-list' },
       },
-
       {
-        name: 'Positions',
-        url: 'position',
-        icon: 'nav-icon-bullet',
+        name: 'Position',
+        url: '/position',
+        iconComponent: { name: 'cil-notes' },
       },
-
       {
-        name: 'Genders',
-        url: 'gender',
-        icon: 'nav-icon-bullet',
+        name: 'Gender',
+        url: '/gender',
+        iconComponent: { name: 'cil-people' },
       },
-
       {
         name: 'Calendar',
-        url: 'calendar',
-        icon: 'nav-icon-bullet',
+        url: '/calendar',
+        iconComponent: { name: 'cil-calendar' },
       },
-
       {
-        name: 'Holidays',
-        url: 'holiday',
-        icon: 'nav-icon-bullet',
+        name: 'Holiday',
+        url: '/holiday',
+        iconComponent: { name: 'cil-sun' },
       },
     ],
   },
-
   {
     name: 'Leave',
     url: '/leave',
@@ -128,17 +108,15 @@ export const navItems: INavData[] = [
       {
         name: 'Manage Leave Type',
         url: '/typeleave',
-        icon: 'nav-icon-bullet',
+        iconComponent: { name: 'cil-list' },
       },
-
       {
         name: 'Manage Leave Employee',
         url: '/manageleave',
-        icon: 'nav-icon-bullet',
+        iconComponent: { name: 'cil-user' },
       },
     ],
   },
-
   {
     title: true,
     name: 'Login Details',
@@ -151,7 +129,7 @@ export const navItems: INavData[] = [
       {
         name: 'Admin',
         url: '/admin',
-        icon: 'nav-icon-bullet',
+        iconComponent: { name: 'cil-shield-alt' },
       },
     ],
   },

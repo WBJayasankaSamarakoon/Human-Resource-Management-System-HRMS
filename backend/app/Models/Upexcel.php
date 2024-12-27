@@ -9,10 +9,8 @@ class Upexcel extends Model
 {
     use HasFactory;
 
-    // Define the table name
     protected $table = 'upexcel';
 
-    // Specify the fillable fields
     protected $fillable = [
         'index',
         'person_id',
@@ -36,4 +34,22 @@ class Upexcel extends Model
         'records',
         'file_id',
     ];
+
+    // Relationship with UploadedFile
+    public function uploadedFile()
+    {
+        return $this->belongsTo(UploadedFile::class, 'file_id', 'id');
+    }
+
+    // Relationship with Tblemployee
+    public function employee()
+    {
+        return $this->belongsTo(Tblemployee::class, 'person_id', 'EmpId');
+    }
+
+    // Accessor for late hours (sum of late and early hours converted to hours)
+    public function getLateHoursAttribute()
+    {
+        return round(($this->late + $this->early) / 60, 2);
+    }
 }

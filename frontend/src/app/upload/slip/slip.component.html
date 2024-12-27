@@ -3,9 +3,9 @@
     <!-- Company Information -->
     <div class="header">
       <h2 class="text-center">ULTIMATE ENGINEERING SOLUTIONS (PVT) LTD</h2>
-      <p><strong>Month:</strong> {{ employee.month }}</p>
-      <p><strong>Name:</strong> {{ employee.name }}</p>
-      <p><strong>Employee No.:</strong> {{ employee.person_id }}</p>
+      <p><strong>Month:</strong> {{ slipData.month || "Not Available" }}</p>
+      <p><strong>Name:</strong> {{ slipData.name }}</p>
+      <p><strong>Employee No.:</strong> {{ slipData.empId }}</p>
     </div>
 
     <!-- Salary Details Table -->
@@ -16,27 +16,39 @@
       </tr>
       <tr>
         <td>Basic Salary</td>
-        <td>{{ employee.basicSalary }}</td>
+        <td>{{ slipData.basicSalary }}</td>
       </tr>
       <tr>
         <td>B.R.A. 1</td>
-        <td>{{ employee.BRA1 }}</td>
+        <td>{{ slipData.bra1 }}</td>
       </tr>
       <tr>
         <td>B.R.A. 2</td>
-        <td>{{ employee.BRA2 }}</td>
+        <td>{{ slipData.bra2 }}</td>
+      </tr>
+      <tr>
+        <td>B.R.A. 3</td>
+        <td>{{ slipData.bra3 }}</td>
       </tr>
       <tr>
         <th>Gross Salary</th>
-        <td>{{ employee.grossSalary }}</td>
+        <td>
+          <!--
+          {{
+            (slipData.basicSalary || 0) +
+              (slipData.bra1 || 0) +
+              (slipData.bra2 || 0) +
+              (slipData.bra3 || 0)
+          }} -->
+        </td>
       </tr>
       <tr>
-        <td>Late - {{ employee.lateHours }} Hours</td>
-        <td>{{ employee.lateDeduction }}</td>
+        <td>Late - {{ slipData.lateHours }} Hours</td>
+        <td>{{ slipData.lateHours * 0 }} LKR</td>
       </tr>
       <tr>
         <th>Salary for EPF</th>
-        <td>{{ employee.salaryForEPF }}</td>
+        <td>{{ slipData.basicSalary }}</td>
       </tr>
     </table>
 
@@ -45,23 +57,23 @@
     <table>
       <tr>
         <td>Attendance Incentive</td>
-        <td>{{ employee.attendanceIncentive }}</td>
+        <td>{{ slipData.attendanceIncentive }}</td>
       </tr>
       <tr>
-        <td>Supper Attendance</td>
-        <td>{{ employee.superAttendance }}</td>
+        <td>Super Attendance</td>
+        <td>{{ slipData.superAttendance }}</td>
       </tr>
       <tr>
         <td>Performance Incentive</td>
-        <td>{{ employee.performanceIncentive }}</td>
+        <td>{{ slipData.performanceIncentive }}</td>
       </tr>
       <tr>
         <td>Sales Incentive</td>
-        <td>{{ employee.salesIncentive }}</td>
+        <td>{{ slipData.salesIncentive || "0.00" }}</td>
       </tr>
       <tr>
-        <td>OT - {{ employee.otHours }} Hrs</td>
-        <td>{{ employee.otDeduction }}</td>
+        <td>OT - {{ slipData.otHours }} Hrs</td>
+        <td>{{ slipData.otAmount || "0" }}</td>
       </tr>
     </table>
 
@@ -70,23 +82,23 @@
     <table>
       <tr>
         <td>EPF 8%</td>
-        <td>{{ employee.epf8 }}</td>
+        <td>{{ slipData.epf || "0" }}</td>
       </tr>
       <tr>
         <td>Advanced</td>
-        <td>{{ employee.advanced }}</td>
+        <td>{{ slipData.advanced || "0" }}</td>
       </tr>
       <tr>
         <td>Deduction</td>
-        <td>{{ employee.deduction }}</td>
+        <td>{{ slipData.deductions }}</td>
       </tr>
       <tr>
         <td>Telephone Expenses</td>
-        <td>{{ employee.telephoneExpenses }}</td>
+        <td>{{ slipData.telephoneExpenses || "0.00" }}</td>
       </tr>
       <tr>
         <td>API Tax</td>
-        <td>{{ employee.apiTax }}</td>
+        <td>{{ slipData.apiTax || "0.00" }}</td>
       </tr>
     </table>
 
@@ -94,12 +106,12 @@
     <h5 class="section-title">Leave Balance</h5>
     <table>
       <tr>
-        <td>Approved Leaves - {{ employee.approvedLeaves }}</td>
-        <td></td>
+        <td>Approved Leaves - {{ slipData.leaveDays }}</td>
+        <td>{{ slipData.leaveDays }}</td>
       </tr>
       <tr>
-        <td>Balance Leaves - {{ employee.balanceLeaves }}</td>
-        <td></td>
+        <td>Balance Leaves - {{ slipData.balanceLeaves || "0" }}</td>
+        <td>{{ slipData.balanceLeaves || "0" }}</td>
       </tr>
     </table>
 
@@ -108,12 +120,12 @@
     <table>
       <tr>
         <td><strong>Total Deductions</strong></td>
-        <td>{{ employee.totalDeductions }}</td>
+        <td>{{ slipData.totalDeductions || "0.00" }}</td>
       </tr>
       <tr>
         <td><strong>Net Salary</strong></td>
         <td>
-          <strong>{{ employee.netSalary }}</strong>
+          <strong>{{ slipData.netSalary }}</strong>
         </td>
       </tr>
     </table>

@@ -9,9 +9,13 @@ class UploadedFile extends Model
 {
     use HasFactory;
 
-    // Define the table name if it's not "uploaded_files"
     protected $table = 'uploaded_files';
 
-    // Define the fillable fields
     protected $fillable = ['file_name', 'year', 'month'];
+
+    // Relationship with Upexcel
+    public function upexcel()
+    {
+        return $this->hasMany(Upexcel::class, 'file_id', 'id');
+    }
 }

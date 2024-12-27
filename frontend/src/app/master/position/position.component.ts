@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { apiBaseUrl } from 'src/app/app.config';
+import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { apiBaseUrl } from '../../app.config';
 
 @Component({
   selector: 'app-position',
@@ -17,57 +17,46 @@ export class PositionComponent {
     id: '',
     Name: '',
   };
+  isLoading: boolean = false;
+  showNameError: boolean = false;
 
   constructor(private http: HttpClient) {
     this.getAllPositions();
   }
 
   getAllPositions() {
-    this.http.get(`${apiBaseUrl}api/position`).subscribe((resultData: any) => {
-      if (Array.isArray(resultData)) {
-        this.PositionArray = resultData;
-      } else {
-        console.error('API response is not an array:', resultData);
-        this.PositionArray = [];
+    this.isLoading = true;
+    this.http.get(`${apiBaseUrl}api/position`).subscribe(
+      (resultData: any) => {
+        this.PositionArray = Array.isArray(resultData) ? resultData : [];
+        this.isLoading = false;
+      },
+      () => {
+        console.error('Error loading positions.');
+        this.isLoading = false;
       }
-    });
+    );
   }
 
   openAddModal() {
     this.resetForm();
-    this.currentPosition.id = '';
+    this.showNameError = false;
+    this.removeModalFade();
   }
 
   openEditModal(positionItem: any) {
     this.currentPosition = { ...positionItem };
-  }
-
-  register() {
-    this.http
-      .post(`${apiBaseUrl}api/position`, this.currentPosition)
-      .subscribe((resultData: any) => {
-        console.log(resultData);
-        alert('Position Registered Successfully');
-        this.getAllPositions();
-        this.resetForm();
-      });
-  }
-
-  updateRecords() {
-    this.http
-      .put(
-        `${apiBaseUrl}api/position/${this.currentPosition.id}`,
-        this.currentPosition
-      )
-      .subscribe((resultData: any) => {
-        console.log(resultData);
-        alert('Position Updated Successfully');
-        this.getAllPositions();
-        this.resetForm();
-      });
+    this.showNameError = false;
+    this.removeModalFade();
   }
 
   save() {
+    this.showNameError = !this.currentPosition.Name?.trim();
+
+    if (this.showNameError) {
+      return;
+    }
+
     if (!this.currentPosition.id) {
       this.register();
     } else {
@@ -75,14 +64,90 @@ export class PositionComponent {
     }
   }
 
-  setDelete(positionItem: any) {
-    this.http
-      .delete(`${apiBaseUrl}api/position/${positionItem.id}`)
-      .subscribe((resultData: any) => {
-        console.log(resultData);
-        alert('Position Deleted Successfully');
+  register() {
+    this.http.post(`${apiBaseUrl}api/position`, this.currentPosition).subscribe(
+      () => {
+        this.alertSuccess('Position added successfully!');
         this.getAllPositions();
-      });
+        this.resetForm();
+        this.closeModal(); // Close the modal after save
+      },
+      (error) => {
+        console.error('Error adding position:', error);
+        this.alertError('Failed to add position!');
+      }
+    );
+  }
+
+  updateRecords() {
+    this.http
+      .put(`${apiBaseUrl}api/position/${this.currentPosition.id}`, this.currentPosition)
+      .subscribe(
+        () => {
+          this.alertSuccess('Position updated successfully!');
+          this.getAllPositions();
+          this.resetForm();
+          this.closeModal(); // Close the modal after save
+        },
+        (error) => {
+          console.error('Error updating position:', error);
+          this.alertError('Failed to update position!');
+        }
+      );
+  }
+
+  confirmDelete(position: any) {
+    this.currentPosition = { ...position };
+    const confirmationModal = document.getElementById('confirmationModal');
+    if (confirmationModal) {
+      confirmationModal.classList.add('visible');
+    }
+  }
+
+  deletePosition() {
+    if (this.currentPosition.id) {
+      this.deleteRecord(this.currentPosition);
+      this.closeConfirmationModal();
+    }
+  }
+
+  deleteRecord(position: any) {
+    this.http.delete(`${apiBaseUrl}api/position/${position.id}`).subscribe(
+      () => {
+        this.alertSuccess('Position deleted successfully!');
+        this.getAllPositions();
+      },
+      (error) => {
+        console.error('Error deleting position:', error);
+        this.alertError('Failed to delete position!');
+      }
+    );
+  }
+
+  closeConfirmationModal() {
+    const confirmationModal = document.getElementById('confirmationModal');
+    if (confirmationModal) {
+      confirmationModal.classList.remove('visible');
+    }
+  }
+
+  alertSuccess(message: string) {
+    this.showAlert(message, 'success');
+  }
+
+  alertError(message: string) {
+    this.showAlert(message, 'error');
+  }
+
+  showAlert(message: string, type: string) {
+    const alertBox = document.getElementById('custom-alert');
+    if (alertBox) {
+      alertBox.innerText = message;
+      alertBox.className = `alert-box visible ${type}`;
+      setTimeout(() => {
+        alertBox.classList.remove('visible');
+      }, 3000);
+    }
   }
 
   resetForm() {
@@ -90,9 +155,26 @@ export class PositionComponent {
       id: '',
       Name: '',
     };
+    this.showNameError = false;
   }
 
   trackById(index: number, positionItem: any): number {
     return positionItem.id;
+  }
+
+  closeModal() {
+    const modal = document.getElementById('addPositionModal') as HTMLElement;
+    if (modal) {
+      modal.classList.remove('show');
+      modal.style.display = 'none';
+      this.removeModalFade();
+    }
+  }
+
+  removeModalFade() {
+    const modalBackdrop = document.querySelector('.modal-backdrop');
+    if (modalBackdrop) {
+      modalBackdrop.remove();
+    }
   }
 }

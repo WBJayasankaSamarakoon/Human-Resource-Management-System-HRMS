@@ -1,11 +1,32 @@
-<div class="container-fluid mt-4">
-  <h2 class="mb-4">Manage Machines</h2>
+<div class="container-fluid">
+  <h2 class="mb-4">Manage Machine</h2>
+
+<!-- Custom Alert Box -->
+<div id="custom-alert" class="alert-box"></div>
+
+<!-- Custom Confirmation Modal -->
+<div id="confirmationModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">Delete Machine</h5>
+      <button type="button" class="close" (click)="closeConfirmationModal()">
+        <span>&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>Are you sure you want to delete {{ currentMachine.Name }}?</p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="closeConfirmationModal()">Cancel</button>
+      <button type="button" class="btn btn-danger" (click)="deleteMachine()">OK</button>
+    </div>
+  </div>
+</div>
 
   <div class="card">
     <div
       class="card-header bg-primary text-white d-flex justify-content-between align-items-center"
     >
-      <div><i class="fas fa-tools"></i> Machine Information</div>
       <button
         type="button"
         class="btn btn-light"
@@ -18,7 +39,14 @@
       </button>
     </div>
     <div class="card-body">
-      <div class="table-responsive">
+      <!-- Loading Spinner -->
+      <div *ngIf="isLoading" class="text-center">
+        <div class="spinner-border text-primary" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+
+      <div class="table-responsive" *ngIf="!isLoading">
         <table id="machinesTable" class="table table-bordered table-striped">
           <thead>
             <tr>
@@ -49,7 +77,7 @@
                 <button
                   type="button"
                   class="btn btn-danger btn-sm"
-                  (click)="setDelete(MachineItem)"
+                  (click)="confirmDelete(MachineItem)"
                   aria-label="Delete Machine"
                 >
                   <i class="fas fa-trash fa-sm text-white"></i>
@@ -63,136 +91,117 @@
   </div>
 </div>
 
-<!-- Modal for Add Machine -->
-<div
-  class="modal fade"
-  id="addMachineModal"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="addMachineModalLabel"
-  aria-hidden="true"
->
+<!-- Add Machine Modal -->
+<div class="modal fade" id="addMachineModal" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="addMachineModalLabel">Add Machine</h5>
-        <button
-          type="button"
-          class="close"
-          data-dismiss="modal"
-          aria-label="Close"
-        >
-          <span aria-hidden="true">&times;</span>
+        <h5 class="modal-title">Add Machine</h5>
+        <button type="button" class="close" data-dismiss="modal">
+          <span>&times;</span>
         </button>
       </div>
       <div class="modal-body">
-        <div class="form-group">
-          <label for="machineName">Name</label>
-          <input
-            type="text"
-            class="form-control"
-            id="machineName"
-            placeholder="Enter Machine Name"
-            [(ngModel)]="currentMachine.Name"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="machineModel">Model</label>
-          <input
-            type="text"
-            class="form-control"
-            id="machineModel"
-            placeholder="Enter Machine Model"
-            [(ngModel)]="currentMachine.Model"
-          />
-        </div>
-        <div class="form-group">
-          <label for="machineBrand">Brand</label>
-          <input
-            type="text"
-            class="form-control"
-            id="machineBrand"
-            placeholder="Enter Machine Brand"
-            [(ngModel)]="currentMachine.Brand"
-          />
-        </div>
+        <form>
+          <div class="form-group">
+            <label>Name</label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Enter Machine Name"
+              [(ngModel)]="currentMachine.Name"
+              name="Name"
+              required
+            />
+            <small *ngIf="showNameError" class="text-danger">
+              Machine Name is required
+            </small>
+          </div>
+          <div class="form-group mt-3">
+            <label>Model</label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Enter Machine Model"
+              [(ngModel)]="currentMachine.Model"
+              name="Model"
+              required
+            />
+            <!-- <small *ngIf="showModelError" class="text-danger">
+              Machine Model is required
+            </small> -->
+          </div>
+          <div class="form-group mt-3">
+            <label>Brand</label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Enter Machine Brand"
+              [(ngModel)]="currentMachine.Brand"
+              name="Brand"
+              required
+            />
+            <!-- <small *ngIf="showBrandError" class="text-danger">
+              Machine Brand is required
+            </small> -->
+          </div>
+        </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">
-          Close
-        </button>
-        <button
-          type="button"
-          class="btn btn-primary"
-          (click)="save()"
-          data-dismiss="modal"
-        >
-          Add
-        </button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="closeModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="save()">Add</button>
       </div>
     </div>
   </div>
 </div>
 
+
 <!-- Edit Machine Modal -->
-<div
-  class="modal fade"
-  id="editMachineModal"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="editMachineModalLabel"
-  aria-hidden="true"
->
+<div class="modal fade" id="editMachineModal" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="editMachineModalLabel">Edit Machine</h5>
-        <button
-          type="button"
-          class="close"
-          data-dismiss="modal"
-          aria-label="Close"
-        >
-          <span aria-hidden="true">&times;</span>
+        <h5 class="modal-title">Edit Machine</h5>
+        <button type="button" class="close" data-dismiss="modal">
+          <span>&times;</span>
         </button>
       </div>
       <div class="modal-body">
         <div class="form-group">
-          <label for="machineName">Name</label>
+          <label>Name</label>
           <input
             type="text"
             class="form-control"
-            id="machineName"
             placeholder="Enter Machine Name"
             [(ngModel)]="currentMachine.Name"
+            name="Name"
             required
           />
         </div>
-        <div class="form-group">
-          <label for="machineModel">Model</label>
+        <div class="form-group mt-3">
+          <label>Model</label>
           <input
             type="text"
             class="form-control"
-            id="machineModel"
             placeholder="Enter Machine Model"
             [(ngModel)]="currentMachine.Model"
+            name="Model"
           />
         </div>
-        <div class="form-group">
-          <label for="machineBrand">Brand</label>
+        <div class="form-group mt-3">
+          <label>Brand</label>
           <input
             type="text"
             class="form-control"
-            id="machineBrand"
             placeholder="Enter Machine Brand"
             [(ngModel)]="currentMachine.Brand"
+            name="Brand"
           />
         </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">
-          Close
+          Cancel
         </button>
         <button
           type="button"

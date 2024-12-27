@@ -16,12 +16,11 @@
         <tr>
           <th>Emp ID</th>
           <th>Name</th>
-          <th>No Pay Days</th>
           <th>Leave Days</th>
           <th>Holidays</th>
           <th>Late Hours</th>
           <th>Basic Salary</th>
-          <th>Allowances</th>
+          <th>Total Allowances</th>
           <th>Deductions</th>
           <th>Net Salary</th>
           <th>Action</th>
@@ -29,9 +28,8 @@
       </thead>
       <tbody>
         <tr *ngFor="let record of pagedData">
-          <td>{{ record.person_id }}</td>
+          <td>{{ record.emp_id }}</td>
           <td>{{ record.name }}</td>
-          <td>{{ record.no_pay_count }}</td>
           <td>{{ record.leave_days }}</td>
           <td>{{ record.holidays }}</td>
           <td>{{ record.late_hours }}</td>
@@ -40,7 +38,12 @@
           <td>{{ record.deductions }}</td>
           <td>{{ record.net_salary }}</td>
           <td>
-            <button class="btn btn-sm btn-primary">Report</button>
+            <button
+              class="btn btn-sm btn-primary"
+              (click)="navigateToSlip(record.emp_id)"
+            >
+              Report
+            </button>
           </td>
         </tr>
       </tbody>

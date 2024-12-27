@@ -36,12 +36,14 @@ export class ProcessComponent implements OnInit {
 
   loadFileData(fileId: string): void {
     this.loading = true;
-    const url = `${apiBaseUrl}api/process/${fileId}/combined-data`;
+    const url = `${apiBaseUrl}api/uploaded_files/${fileId}/view/combined-data`;
 
     this.http.get<any>(url).subscribe({
       next: (response) => {
-        if (response.success) {
-          this.fileData = response.data || [];
+        if (response.data && Array.isArray(response.data)) {
+          this.fileData = response.data.map((record: any) =>
+            this.formatRecord(record)
+          );
           this.totalPages = Math.ceil(this.fileData.length / this.pageSize);
           this.pages = Array.from({ length: this.totalPages }, (_, i) => i + 1);
           this.updatePagedData();
@@ -59,6 +61,19 @@ export class ProcessComponent implements OnInit {
     });
   }
 
+  formatRecord(record: any): any {
+    return {
+      ...record,
+      leave_days: record.leave_days || 0,
+      holidays: record.holidays || 0,
+      late_hours: record.late_hours || 0,
+      basic_salary: record.basic_salary || 0.0,
+      total_allowances: record.total_allowances || 0.0,
+      deductions: record.deductions || 0.0,
+      net_salary: record.net_salary || 0.0,
+    };
+  }
+
   updatePagedData(): void {
     const startIndex = (this.currentPage - 1) * this.pageSize;
     const endIndex = startIndex + this.pageSize;
@@ -69,6 +84,10 @@ export class ProcessComponent implements OnInit {
     if (page < 1 || page > this.totalPages) return;
     this.currentPage = page;
     this.updatePagedData();
+  }
+
+  navigateToSlip(empId: string): void {
+    this.router.navigate(['/slip'], { queryParams: { emp_id: empId } });
   }
 
   goBack(): void {

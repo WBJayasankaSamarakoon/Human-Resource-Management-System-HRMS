@@ -1,11 +1,40 @@
-<div class="container-fluid mt-4">
-  <h2 class="mb-4">Manage Companies</h2>
+<div class="container-fluid">
+  <h2 class="mb-4">Manage Company</h2>
+
+<!-- Custom Alert Box -->
+<div id="custom-alert" class="alert-box"></div>
+
+<!-- Custom Confirmation Modal -->
+<div id="confirmationModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">Delete Company</h5>
+        <button type="button" class="close" (click)="closeConfirmationModal()">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete {{ currentCompany.Name }}?</p>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="closeConfirmationModal()"
+        >
+          Cancel
+        </button>
+        <button type="button" class="btn btn-danger" (click)="deleteCompany()">
+          OK
+        </button>
+      </div>
+    </div>
+  </div>
 
   <div class="card">
     <div
       class="card-header bg-primary text-white d-flex justify-content-between align-items-center"
     >
-      <div><i class="fas fa-building"></i> Company Information</div>
       <button
         type="button"
         class="btn btn-light"
@@ -18,7 +47,14 @@
       </button>
     </div>
     <div class="card-body">
-      <div class="table-responsive">
+      <!-- Loading Spinner -->
+      <div *ngIf="isLoading" class="text-center">
+        <div class="spinner-border text-primary" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+
+      <div class="table-responsive" *ngIf="!isLoading">
         <table id="companiesTable" class="table table-bordered table-striped">
           <thead>
             <tr>
@@ -44,7 +80,6 @@
                   type="button"
                   class="btn btn-success btn-sm"
                   (click)="openEditModal(CompanyItem)"
-                  aria-label="Edit Company"
                   data-toggle="modal"
                   data-target="#editCompanyModal"
                 >
@@ -53,8 +88,7 @@
                 <button
                   type="button"
                   class="btn btn-danger btn-sm"
-                  (click)="setDelete(CompanyItem)"
-                  aria-label="Delete Company"
+                  (click)="confirmDelete(CompanyItem)"
                 >
                   <i class="fas fa-trash fa-sm text-white"></i>
                 </button>
@@ -68,97 +102,92 @@
 </div>
 
 <!-- Modal for Add Company -->
-<div
-  class="modal fade"
-  id="addCompanyModal"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="addCompanyModalLabel"
-  aria-hidden="true"
->
+<div class="modal fade" id="addCompanyModal" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="addCompanyModalLabel">Add Company</h5>
-        <button
-          type="button"
-          class="close"
-          data-dismiss="modal"
-          aria-label="Close"
-        >
-          <span aria-hidden="true">&times;</span>
+        <h5 class="modal-title">Add Company</h5>
+        <button type="button" class="close" data-dismiss="modal">
+          <span>&times;</span>
         </button>
       </div>
       <div class="modal-body">
-        <!-- Form for Adding Company -->
-        <div class="form-group">
-          <label for="companyName">Name</label>
-          <input
-            type="text"
-            class="form-control"
-            id="companyName"
-            placeholder="Enter Company Name"
-            [(ngModel)]="currentCompany.Name"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="companyAddress">Address</label>
-          <input
-            type="text"
-            class="form-control"
-            id="companyAddress"
-            placeholder="Enter Address"
-            [(ngModel)]="currentCompany.Address"
-          />
-        </div>
-        <div class="form-group">
-          <label for="companyEmail">Email</label>
-          <input
-            type="email"
-            class="form-control"
-            id="companyEmail"
-            placeholder="Enter Email"
-            [(ngModel)]="currentCompany.Email"
-          />
-        </div>
-        <div class="form-group">
-          <label for="companyTelephone">Telephone</label>
-          <input
-            type="tel"
-            class="form-control"
-            id="companyTelephone"
-            placeholder="Enter Telephone"
-            [(ngModel)]="currentCompany.Telephone"
-          />
-        </div>
-        <div class="form-group">
-          <label for="companyFax">Fax</label>
-          <input
-            type="text"
-            class="form-control"
-            id="companyFax"
-            placeholder="Enter Fax"
-            [(ngModel)]="currentCompany.Fax"
-          />
-        </div>
+        <form>
+          <div class="form-group">
+            <label>Name</label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Enter Name"
+              [(ngModel)]="currentCompany.Name"
+              name="Name"
+              required
+            />
+            <small *ngIf="showNameError" class="text-danger">
+              Name is required
+            </small>
+          </div>
+          <div class="form-group mt-3">
+            <label>Address</label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Enter Address"
+              [(ngModel)]="currentCompany.Address"
+              name="Address"
+            />
+            <!-- <small *ngIf="showAddressError" class="text-danger">
+              Address is required
+            </small> -->
+          </div>
+          <div class="form-group mt-3">
+            <label>Email</label>
+            <input
+              type="email"
+              class="form-control"
+              placeholder="Enter Email"
+              [(ngModel)]="currentCompany.Email"
+              name="Email"
+            />
+            <!-- <small *ngIf="showEmailError" class="text-danger">
+              Email is required
+            </small> -->
+          </div>
+          <div class="form-group mt-3">
+            <label>Telephone</label>
+            <input
+              type="tel"
+              class="form-control"
+              placeholder="Enter Telephone"
+              [(ngModel)]="currentCompany.Telephone"
+              name="Telephone"
+            />
+            <!-- <small *ngIf="showTelephoneError" class="text-danger">
+              Telephone is required
+            </small> -->
+          </div>
+          <div class="form-group mt-3">
+            <label>Fax</label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Enter Fax"
+              [(ngModel)]="currentCompany.Fax"
+              name="Fax"
+            />
+            <!-- <small *ngIf="showFaxError" class="text-danger">
+              Fax is required
+            </small> -->
+          </div>
+        </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">
-          Close
-        </button>
-        <button
-          type="button"
-          class="btn btn-primary"
-          (click)="save()"
-          data-dismiss="modal"
-        >
-          Add
-        </button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="closeModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="save()">Add</button>
+      </div>
       </div>
     </div>
   </div>
-</div>
 
 <!-- Edit Company Modal -->
 <div
@@ -184,7 +213,7 @@
       </div>
       <div class="modal-body">
         <!-- Edit Company Form Fields -->
-        <div class="form-group">
+        <div class="form-group mt-3">
           <label for="companyName">Name</label>
           <input
             type="text"
@@ -195,7 +224,7 @@
             required
           />
         </div>
-        <div class="form-group">
+        <div class="form-group mt-3">
           <label for="companyAddress">Address</label>
           <input
             type="text"
@@ -205,7 +234,7 @@
             [(ngModel)]="currentCompany.Address"
           />
         </div>
-        <div class="form-group">
+        <div class="form-group mt-3">
           <label for="companyEmail">Email</label>
           <input
             type="email"
@@ -215,7 +244,7 @@
             [(ngModel)]="currentCompany.Email"
           />
         </div>
-        <div class="form-group">
+        <div class="form-group mt-3">
           <label for="companyTelephone">Telephone</label>
           <input
             type="tel"
@@ -225,7 +254,7 @@
             [(ngModel)]="currentCompany.Telephone"
           />
         </div>
-        <div class="form-group">
+        <div class="form-group mt-3">
           <label for="companyFax">Fax</label>
           <input
             type="text"
@@ -238,7 +267,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">
-          Close
+          Cancel
         </button>
         <button
           type="button"

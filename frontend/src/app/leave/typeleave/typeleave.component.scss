@@ -1,5 +1,5 @@
 .container-fluid {
-  margin-top: 2rem;
+  margin-top: 0rem;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 
   h2 {
@@ -50,7 +50,6 @@
           background-color: #6c757d;
 
           th {
-            color: rgb(0, 0, 0);
             font-weight: 500;
             padding: 0.5rem;
             font-size: 1rem;
@@ -58,7 +57,6 @@
             border: 1px solid #dee2e6;
           }
 
-          // Center align the Action header
           th.col-action {
             text-align: center;
           }
@@ -97,5 +95,146 @@
         }
       }
     }
+  }
+
+  // Custom Alert Box Styling
+  #custom-alert {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    background-color: #28a745; /* Green background */
+    color: #fff; /* White text */
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    font-size: 1rem;
+    display: none;
+    animation: fadeIn 0.5s, fadeOut 0.5s 2.5s;
+  }
+
+  #custom-alert.visible {
+    display: block;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeOut {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+  }
+}
+
+/* ----------------------------- */
+
+/* Custom Modal Styles */
+#confirmationModal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+}
+
+#confirmationModal.visible {
+  display: flex;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 400px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.close {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.modal-body {
+  margin-top: 10px;
+  font-size: 16px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.modal-footer button {
+  margin-left: 10px;
+}
+
+.modal-footer .btn-danger {
+  background-color: #f44336;
+  border-color: #f44336;
+}
+
+.modal-footer .btn-secondary {
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+
+/* Custom Alert Box Styles */
+.alert-box {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  color: white;
+  opacity: 0;
+  visibility: hidden;
+  z-index: 9999;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+
+  &.visible {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  &.success {
+    background-color: #28a745;
+  }
+
+  &.error {
+    background-color: #dc3545;
   }
 }

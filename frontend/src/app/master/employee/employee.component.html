@@ -1,11 +1,35 @@
 <div class="container-fluid mt-4">
-  <h2 class="mb-4">Manage Employees</h2>
+  <h2 class="mb-4">Manage Employee</h2>
+
+<!-- Custom Alert Box -->
+<div id="custom-alert" class="alert-box"></div>
+
+<!-- Custom Confirmation Modal -->
+<div id="confirmationModal" class="modal">
+  <div class="modal-contentt">
+    <div class="modal-header">
+        <h5 class="modal-title">Delete Employee</h5>
+        <button type="button" class="close" (click)="closeConfirmationModal()">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>
+          Are you sure you want to delete
+          {{ currentEmployee.NameWithInitials }}?
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeConfirmationModal()">Cancel</button>
+        <button type="button" class="btn btn-danger" (click)="deleteEmployee()">OK</button>
+      </div>
+    </div>
+  </div>
 
   <div class="card">
     <div
       class="card-header bg-primary text-white d-flex justify-content-between align-items-center"
     >
-      <div><i class="fas fa-users"></i> Employees Information</div>
       <button
         type="button"
         class="btn btn-light"
@@ -17,12 +41,19 @@
         <i class="fas fa-plus fa-sm"></i> Add
       </button>
     </div>
-    <div class="card-body p-2">
-      <div class="table-responsive">
+    <div class="card-body">
+      <!-- Loading Spinner -->
+      <div *ngIf="isLoading" class="text-center">
+        <div class="spinner-border text-primary" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+
+      <div class="table-responsive" *ngIf="!isLoading">
         <table id="employeesTable" class="table table-bordered table-striped">
           <thead>
             <tr>
-              <th>Sr No</th>
+              <th>ID</th>
               <th>Emp Id</th>
               <th>Name</th>
               <th>EPF</th>
@@ -83,7 +114,7 @@
                 <button
                   type="button"
                   class="btn btn-danger btn-sm"
-                  (click)="setDelete(EmployeeItem)"
+                  (click)="confirmDelete(EmployeeItem)"
                   aria-label="Delete Employee"
                 >
                   <i class="fas fa-trash fa-sm text-white"></i>
@@ -135,7 +166,7 @@
                   required
                 />
               </div>
-              <div class="form-group">
+              <div class="form-group mt-3">
                 <label for="NameWithInitials">Name with Initials</label>
                 <input
                   type="text"
@@ -146,7 +177,7 @@
                   required
                 />
               </div>
-              <div class="form-group">
+              <div class="form-group mt-3">
                 <label for="EPFNumber">EPF Number</label>
                 <input
                   type="text"
@@ -156,7 +187,7 @@
                   name="EPFNumber"
                 />
               </div>
-              <div class="form-group">
+              <div class="form-group mt-3">
                 <label for="Phone">Phone Number</label>
                 <input
                   type="text"
@@ -179,7 +210,7 @@
                   name="CurrentAddress"
                 ></textarea>
               </div>
-              <div class="form-group">
+              <div class="form-group mt-3">
                 <label for="PersonalEmail">Personal Email</label>
                 <input
                   type="email"
@@ -189,7 +220,7 @@
                   name="PersonalEmail"
                 />
               </div>
-              <div class="form-group">
+              <div class="form-group mt-3">
                 <label for="DateOfJoining">Date of Joining</label>
                 <input
                   type="date"
@@ -199,7 +230,7 @@
                   name="DateOfJoining"
                 />
               </div>
-              <div class="form-group">
+              <div class="form-group mt-3">
                 <label for="Salutation">Salutation</label>
                 <select
                   class="form-select"
@@ -216,7 +247,7 @@
 
             <!-- Column 3 -->
             <div class="col-md-4">
-              <div class="form-group">
+              <div class="form-group ">
                 <label for="PermanentAddress">Permanent Address</label>
                 <textarea
                   class="form-control"
@@ -225,7 +256,7 @@
                   name="PermanentAddress"
                 ></textarea>
               </div>
-              <div class="form-group">
+              <div class="form-group mt-3">
                 <label for="CompanyEmail">Company Email</label>
                 <input
                   type="email"
@@ -235,7 +266,7 @@
                   name="CompanyEmail"
                 />
               </div>
-              <div class="form-group">
+              <div class="form-group mt-3">
                 <label for="Status">Status</label>
                 <select
                   class="form-select"
@@ -249,7 +280,7 @@
                   <option value="Left">Left</option>
                 </select>
               </div>
-              <div class="form-group">
+              <div class="form-group mt-3">
                 <label for="Designation">Designation</label>
                 <select
                   class="form-select"
@@ -281,7 +312,7 @@
                   <option value="Branch 04">Branch 04</option>
                 </select>
               </div>
-              <div class="form-group">
+              <div class="form-group mt-3">
                 <label for="Company">Company</label>
                 <select
                   class="form-select"
@@ -289,13 +320,12 @@
                   [(ngModel)]="currentEmployee.Company"
                   name="Company"
                 >
-                  <option value="Company 01">Company 01</option>
-                  <option value="Company 02">Company 02</option>
-                  <option value="Company 03">Company 03</option>
-                  <option value="Company 04">Company 04</option>
+                  <option *ngFor="let company of CompanyArray" [value]="company.Name">
+                    {{ company.Name }}
+                  </option>
                 </select>
               </div>
-              <div class="form-group">
+              <div class="form-group mt-3">
                 <label for="ReportsTo">Reports To</label>
                 <input
                   type="text"
@@ -305,7 +335,7 @@
                   name="ReportsTo"
                 />
               </div>
-              <div class="form-group">
+              <div class="form-group mt-3">
                 <label for="EmploymentType">Employment Type</label>
                 <select
                   class="form-select"
@@ -331,11 +361,12 @@
                   [(ngModel)]="currentEmployee.DefaultShift"
                   name="DefaultShift"
                 >
-                  <option value="WeekDay">WeekDay</option>
-                  <option value="WeekEnd">WeekEnd</option>
+                  <option *ngFor="let shift of ShiftArray" [value]="shift.Week">
+                    {{ shift.Week }}
+                  </option>
                 </select>
               </div>
-              <div class="form-group">
+              <div class="form-group mt-3">
                 <label for="EmergencyContactName">Emergency Contact Name</label>
                 <input
                   type="text"
@@ -345,7 +376,7 @@
                   name="EmergencyContactName"
                 />
               </div>
-              <div class="form-group">
+              <div class="form-group mt-3">
                 <label for="EmergencyPhone">Emergency Phone</label>
                 <input
                   type="text"
@@ -355,7 +386,7 @@
                   name="EmergencyPhone"
                 />
               </div>
-              <div class="form-group">
+              <div class="form-group mt-3">
                 <label for="Relation">Relation</label>
                 <select
                   class="form-select"
@@ -372,17 +403,8 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">
-          Close
-        </button>
-        <button
-          type="button"
-          class="btn btn-primary"
-          (click)="save()"
-          data-dismiss="modal"
-        >
-          Add
-        </button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="closeModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="save()">Add</button>
       </div>
     </div>
   </div>
@@ -426,8 +448,8 @@
                   required
                 />
               </div>
-              <br />
-              <div class="form-group">
+
+              <div class="form-group mt-3">
                 <label for="NameWithInitials">Name with Initials</label>
                 <input
                   type="text"
@@ -438,8 +460,8 @@
                   required
                 />
               </div>
-              <br />
-              <div class="form-group">
+
+              <div class="form-group mt-3">
                 <label for="EPFNumber">EPF Number</label>
                 <input
                   type="text"
@@ -449,8 +471,8 @@
                   name="EPFNumber"
                 />
               </div>
-              <br />
-              <div class="form-group">
+
+              <div class="form-group mt-3">
                 <label for="Phone">Phone Number</label>
                 <input
                   type="text"
@@ -461,7 +483,7 @@
                 />
               </div>
             </div>
-            <br />
+
 
             <!-- Column 2 -->
             <div class="col-md-4">
@@ -474,8 +496,8 @@
                   name="CurrentAddress"
                 ></textarea>
               </div>
-              <br />
-              <div class="form-group">
+
+              <div class="form-group mt-3">
                 <label for="PersonalEmail">Personal Email</label>
                 <input
                   type="email"
@@ -485,8 +507,8 @@
                   name="PersonalEmail"
                 />
               </div>
-              <br />
-              <div class="form-group">
+
+              <div class="form-group mt-3">
                 <label for="DateOfJoining">Date of Joining</label>
                 <input
                   type="date"
@@ -496,8 +518,8 @@
                   name="DateOfJoining"
                 />
               </div>
-              <br />
-              <div class="form-group">
+
+              <div class="form-group mt-3">
                 <label for="Salutation">Salutation</label>
                 <select
                   class="form-select"
@@ -511,7 +533,7 @@
                 </select>
               </div>
             </div>
-            <br />
+
 
             <!-- Column 3 -->
             <div class="col-md-4">
@@ -524,8 +546,8 @@
                   name="PermanentAddress"
                 ></textarea>
               </div>
-              <br />
-              <div class="form-group">
+
+              <div class="form-group mt-3">
                 <label for="CompanyEmail">Company Email</label>
                 <input
                   type="email"
@@ -535,8 +557,8 @@
                   name="CompanyEmail"
                 />
               </div>
-              <br />
-              <div class="form-group">
+
+              <div class="form-group mt-3">
                 <label for="Status">Status</label>
                 <select
                   class="form-select"
@@ -550,8 +572,8 @@
                   <option value="Left">Left</option>
                 </select>
               </div>
-              <br />
-              <div class="form-group">
+
+              <div class="form-group mt-3">
                 <label for="Designation">Designation</label>
                 <select
                   class="form-select"
@@ -566,7 +588,7 @@
                 </select>
               </div>
             </div>
-            <br />
+
 
             <!-- Column 4 -->
             <div class="col-md-4">
@@ -584,8 +606,8 @@
                   <option value="Branch 04">Branch 04</option>
                 </select>
               </div>
-              <br />
-              <div class="form-group">
+
+              <div class="form-group mt-3">
                 <label for="Company">Company</label>
                 <select
                   class="form-select"
@@ -599,8 +621,8 @@
                   <option value="Company 04">Company 04</option>
                 </select>
               </div>
-              <br />
-              <div class="form-group">
+
+              <div class="form-group mt-3">
                 <label for="ReportsTo">Reports To</label>
                 <input
                   type="text"
@@ -610,8 +632,8 @@
                   name="ReportsTo"
                 />
               </div>
-              <br />
-              <div class="form-group">
+
+              <div class="form-group mt-3">
                 <label for="EmploymentType">Employment Type</label>
                 <select
                   class="form-select"
@@ -626,7 +648,7 @@
                 </select>
               </div>
             </div>
-            <br />
+
 
             <!-- Column 5 -->
             <div class="col-md-4">
@@ -642,8 +664,8 @@
                   <option value="WeekEnd">WeekEnd</option>
                 </select>
               </div>
-              <br />
-              <div class="form-group">
+
+              <div class="form-group mt-3">
                 <label for="EmergencyContactName">Emergency Contact Name</label>
                 <input
                   type="text"
@@ -653,8 +675,8 @@
                   name="EmergencyContactName"
                 />
               </div>
-              <br />
-              <div class="form-group">
+
+              <div class="form-group mt-3">
                 <label for="EmergencyPhone">Emergency Phone</label>
                 <input
                   type="text"
@@ -664,8 +686,8 @@
                   name="EmergencyPhone"
                 />
               </div>
-              <br />
-              <div class="form-group">
+
+              <div class="form-group mt-3">
                 <label for="Relation">Relation</label>
                 <select
                   class="form-select"
@@ -684,7 +706,7 @@
 
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">
-          Close
+          Cancel
         </button>
         <button
           type="button"

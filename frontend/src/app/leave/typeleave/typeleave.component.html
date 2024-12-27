@@ -1,11 +1,35 @@
-<div class="container-fluid mt-4">
+<div class="container-fluid">
   <h2 class="mb-4">Manage Leave Types</h2>
+
+<!-- Custom Alert Box -->
+<div id="custom-alert" class="alert-box"></div>
+
+<!-- Custom Confirmation Modal -->
+<div id="confirmationModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+        <h5 class="modal-title">Delete Leave Type</h5>
+        <button type="button" class="close" (click)="closeConfirmationModal()">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>
+          Are you sure you want to delete
+          {{ currentLeaveType.LeaveType }}?
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeConfirmationModal()">Cancel</button>
+        <button type="button" class="btn btn-danger" (click)="deleteLeaveType()">OK</button>
+      </div>
+    </div>
+  </div>
 
   <div class="card">
     <div
       class="card-header bg-primary text-white d-flex justify-content-between align-items-center"
     >
-      <div><i class="fas fa-calendar-alt"></i> Leave Type Information</div>
       <button
         type="button"
         class="btn btn-light"
@@ -18,7 +42,14 @@
       </button>
     </div>
     <div class="card-body">
-      <div class="table-responsive">
+      <!-- Loading Spinner -->
+      <div *ngIf="isLoading" class="text-center">
+        <div class="spinner-border text-primary" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+
+      <div class="table-responsive" *ngIf="!isLoading">
         <table id="leaveTypesTable" class="table table-bordered table-striped">
           <thead>
             <tr>
@@ -29,9 +60,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr
-              *ngFor="let leaveTypeItem of leaveTypesArray; trackBy: trackById"
-            >
+            <tr *ngFor="let leaveTypeItem of leaveTypesArray; trackBy: trackById">
               <td>{{ leaveTypeItem.id }}</td>
               <td>{{ leaveTypeItem.LeaveType }}</td>
               <td>{{ leaveTypeItem.Description }}</td>
@@ -49,7 +78,7 @@
                 <button
                   type="button"
                   class="btn btn-danger btn-sm"
-                  (click)="setDelete(leaveTypeItem)"
+                  (click)="confirmDelete(leaveTypeItem)"
                   aria-label="Delete Leave Type"
                 >
                   <i class="fas fa-trash fa-sm text-white"></i>
@@ -63,118 +92,99 @@
   </div>
 </div>
 
-<!-- Modal for Add Leave Type -->
-<div
-  class="modal fade"
-  id="addLeaveTypeModal"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="addLeaveTypeModalLabel"
-  aria-hidden="true"
->
+<!-- Add Leave Type Modal -->
+<div class="modal fade" id="addLeaveTypeModal" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="addLeaveTypeModalLabel">Add Leave Type</h5>
-        <button
-          type="button"
-          class="close"
-          data-dismiss="modal"
-          aria-label="Close"
-        >
-          <span aria-hidden="true">&times;</span>
+        <h5 class="modal-title">Add Leave Type</h5>
+        <button type="button" class="close" data-dismiss="modal">
+          <span>&times;</span>
         </button>
       </div>
       <div class="modal-body">
-        <div class="form-group">
-          <label for="name">Name</label>
-          <input
-            type="text"
-            class="form-control"
-            id="name"
-            placeholder="Enter Name"
-            [(ngModel)]="currentLeaveType.LeaveType"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="description">Description</label>
-          <input
-            type="text"
-            class="form-control"
-            id="description"
-            placeholder="Enter Description"
-            [(ngModel)]="currentLeaveType.Description"
-          />
-        </div>
+        <form>
+          <div class="form-group">
+            <label>Name</label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Enter Leave Type Name"
+              [(ngModel)]="currentLeaveType.LeaveType"
+              name="LeaveType"
+              required
+            />
+            <small *ngIf="showLeaveTypeError" class="text-danger">
+              Leave Type Name is required
+            </small>
+          </div>
+          <div class="form-group mt-3">
+            <label>Description</label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Enter Description"
+              [(ngModel)]="currentLeaveType.Description"
+              name="Description"
+              required
+            />
+            <!-- <small *ngIf="showDescriptionError" class="text-danger">
+              Description is required
+            </small> -->
+          </div>
+        </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">
-          Close
-        </button>
-        <button
-          type="button"
-          class="btn btn-primary"
-          (click)="save()"
-          data-dismiss="modal"
-        >
-          Add
-        </button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="closeModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="save()">Add</button>
       </div>
     </div>
   </div>
 </div>
 
 <!-- Edit Leave Type Modal -->
-<div
-  class="modal fade"
-  id="editLeaveTypeModal"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="editLeaveTypeModalLabel"
-  aria-hidden="true"
->
+<div class="modal fade" id="editLeaveTypeModal" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="editLeaveTypeModalLabel">
-          Edit Leave Type
-        </h5>
-        <button
-          type="button"
-          class="close"
-          data-dismiss="modal"
-          aria-label="Close"
-        >
-          <span aria-hidden="true">&times;</span>
+        <h5 class="modal-title">Edit Leave Type</h5>
+        <button type="button" class="close" data-dismiss="modal">
+          <span>&times;</span>
         </button>
       </div>
       <div class="modal-body">
         <div class="form-group">
-          <label for="name">Name</label>
+          <label>Name</label>
           <input
             type="text"
             class="form-control"
-            id="name"
-            placeholder="Enter Name"
+            placeholder="Enter Leave Type Name"
             [(ngModel)]="currentLeaveType.LeaveType"
+            name="LeaveType"
             required
           />
+          <small *ngIf="showLeaveTypeError" class="text-danger">
+            Leave Type Name is required
+          </small>
         </div>
-        <div class="form-group">
-          <label for="description">Description</label>
+        <div class="form-group mt-3">
+          <label>Description</label>
           <input
             type="text"
             class="form-control"
-            id="description"
             placeholder="Enter Description"
             [(ngModel)]="currentLeaveType.Description"
+            name="Description"
+            required
           />
+          <!-- <small *ngIf="showDescriptionError" class="text-danger">
+            Description is required
+          </small> -->
         </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">
-          Close
+          Cancel
         </button>
         <button
           type="button"

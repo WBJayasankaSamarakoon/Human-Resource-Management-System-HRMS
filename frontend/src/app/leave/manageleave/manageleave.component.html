@@ -1,11 +1,35 @@
-<div class="container-fluid mt-4">
+<div class="container-fluid">
   <h2 class="mb-4">Manage Employee Leaves</h2>
+
+<!-- Custom Alert Box -->
+<div id="custom-alert" class="alert-box"></div>
+
+<!-- Custom Confirmation Modal -->
+<div id="confirmationModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+        <h5 class="modal-title">Delete Leave</h5>
+        <button type="button" class="close" (click)="closeConfirmationModal()">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>
+          Are you sure you want to delete leave for
+          {{ currentLeave.employeeName }}?
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeConfirmationModal()">Cancel</button>
+        <button type="button" class="btn btn-danger" (click)="deleteLeave()">OK</button>
+      </div>
+    </div>
+  </div>
 
   <div class="card">
     <div
       class="card-header bg-primary text-white d-flex justify-content-between align-items-center"
     >
-      <div><i class="fas fa-calendar-alt"></i> Leave Information</div>
       <button
         type="button"
         class="btn btn-light"
@@ -18,7 +42,14 @@
       </button>
     </div>
     <div class="card-body">
-      <div class="table-responsive">
+      <!-- Loading Spinner -->
+      <div *ngIf="isLoading" class="text-center">
+        <div class="spinner-border text-primary" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+
+      <div class="table-responsive" *ngIf="!isLoading">
         <table id="leavesTable" class="table table-bordered table-striped">
           <thead>
             <tr>
@@ -34,15 +65,10 @@
             <tr *ngFor="let leave of leaveArray; trackBy: trackById">
               <td>{{ leave.id }}</td>
               <td>{{ leave.employeeName }}</td>
-              <!-- Display Employee Name -->
               <td>{{ leave.leaveType }}</td>
-              <!-- Display Leave Type -->
               <td>{{ leave.startDate | date : "yyyy-MM-dd" }}</td>
-              <!-- Format Start Date -->
               <td>{{ leave.endDate | date : "yyyy-MM-dd" }}</td>
-              <!-- Format End Date -->
               <td class="col-action">
-                <!-- Edit Button -->
                 <button
                   type="button"
                   class="btn btn-success btn-sm"
@@ -53,11 +79,10 @@
                 >
                   <i class="fas fa-edit fa-sm text-white"></i>
                 </button>
-                <!-- Delete Button -->
                 <button
                   type="button"
                   class="btn btn-danger btn-sm"
-                  (click)="setDelete(leave)"
+                  (click)="confirmDelete(leave)"
                   aria-label="Delete Leave"
                 >
                   <i class="fas fa-trash fa-sm text-white"></i>
@@ -71,118 +96,101 @@
   </div>
 </div>
 
-<!-- Modal for Add Leave -->
-<div
-  class="modal fade"
-  id="addLeaveModal"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="addLeaveModalLabel"
-  aria-hidden="true"
->
+<!-- Add Leave Modal -->
+<div class="modal fade" id="addLeaveModal" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="addLeaveModalLabel">Add Leave</h5>
-        <button
-          type="button"
-          class="close"
-          data-dismiss="modal"
-          aria-label="Close"
-        >
-          <span aria-hidden="true">&times;</span>
+        <h5 class="modal-title">Add Leave</h5>
+        <button type="button" class="close" data-dismiss="modal">
+          <span>&times;</span>
         </button>
       </div>
-
       <div class="modal-body">
-        <div class="form-group">
-          <label for="employeeSelect">Employee</label>
-          <select
-            id="employeeSelect"
-            class="form-select"
-            [(ngModel)]="currentLeave.employeeId"
-            required
-          >
-            <option
-              *ngFor="let employee of employeesArray"
-              [value]="employee.id"
+        <form>
+          <div class="form-group">
+            <label for="employee">Employee</label>
+            <select
+              class="form-control"
+              [(ngModel)]="currentLeave.employeeId"
+              name="employee"
+              id="employee"
+              required
+              aria-label="Select employee"
             >
-              {{ employee.NameWithInitials }}
-            </option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="leaveTypeSelect">Leave Type</label>
-          <select
-            id="leaveTypeSelect"
-            class="form-select"
-            [(ngModel)]="currentLeave.leaveTypeId"
-            required
-          >
-            <option *ngFor="let type of leaveTypesArray" [value]="type.id">
-              {{ type.typeName }}
-            </option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="startDate">Start Date</label>
-          <input
-            type="date"
-            class="form-control"
-            id="startDate"
-            [(ngModel)]="currentLeave.startDate"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="endDate">End Date</label>
-          <input
-            type="date"
-            class="form-control"
-            id="endDate"
-            [(ngModel)]="currentLeave.endDate"
-            required
-          />
-        </div>
+              <option *ngFor="let employee of employeesArray" [value]="employee.id">
+                {{ employee.NameWithInitials }}
+              </option>
+            </select>
+            <small *ngIf="showEmployeeError" class="text-danger">
+              Employee selection is required
+            </small>
+          </div>
+          <div class="form-group mt-3">
+            <label for="leaveType">Leave Type</label>
+            <select
+              class="form-control"
+              [(ngModel)]="currentLeave.leaveTypeId"
+              name="leaveType"
+              id="leaveType"
+              required
+              aria-label="Select leave type"
+            >
+              <option *ngFor="let type of leaveTypesArray" [value]="type.id">
+                {{ type.typeName }}
+              </option>
+            </select>
+            <small *ngIf="showLeaveTypeError" class="text-danger">
+              Leave type is required
+            </small>
+          </div>
+          <div class="form-group mt-3">
+            <label for="startDate">Start Date</label>
+            <input
+              type="date"
+              class="form-control"
+              [(ngModel)]="currentLeave.startDate"
+              name="startDate"
+              id="startDate"
+              required
+            />
+            <small *ngIf="showStartDateError" class="text-danger">
+              Start date is required
+            </small>
+          </div>
+          <div class="form-group mt-3">
+            <label for="endDate">End Date</label>
+            <input
+              type="date"
+              class="form-control"
+              [(ngModel)]="currentLeave.endDate"
+              name="endDate"
+              id="endDate"
+              required
+            />
+            <small *ngIf="showEndDateError" class="text-danger">
+              End date is required
+            </small>
+          </div>
+        </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">
-          Close
-        </button>
-        <button
-          type="button"
-          class="btn btn-primary"
-          (click)="save()"
-          data-dismiss="modal"
-        >
-          Add
-        </button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="save()">Add</button>
       </div>
     </div>
   </div>
 </div>
 
+
 <!-- Edit Leave Modal -->
-<div
-  class="modal fade"
-  id="editLeaveModal"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="editLeaveModalLabel"
-  aria-hidden="true"
->
+<div class="modal fade" id="editLeaveModal" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="editLeaveModalLabel">Edit Leave</h5>
-        <button
-          type="button"
-          class="close"
-          data-dismiss="modal"
-          aria-label="Close"
-        >
-          <span aria-hidden="true">&times;</span>
+        <h5 class="modal-title">Edit Leave</h5>
+        <button type="button" class="close" data-dismiss="modal">
+          <span>&times;</span>
         </button>
       </div>
       <div class="modal-body">
@@ -194,15 +202,12 @@
             [(ngModel)]="currentLeave.employeeId"
             required
           >
-            <option
-              *ngFor="let employee of employeesArray"
-              [value]="employee.id"
-            >
+            <option *ngFor="let employee of employeesArray" [value]="employee.id">
               {{ employee.NameWithInitials }}
             </option>
           </select>
         </div>
-        <div class="form-group">
+        <div class="form-group mt-3">
           <label for="leaveTypeSelectEdit">Leave Type</label>
           <select
             id="leaveTypeSelectEdit"
@@ -215,7 +220,7 @@
             </option>
           </select>
         </div>
-        <div class="form-group">
+        <div class="form-group mt-3">
           <label for="startDateEdit">Start Date</label>
           <input
             type="date"
@@ -225,7 +230,7 @@
             required
           />
         </div>
-        <div class="form-group">
+        <div class="form-group mt-3">
           <label for="endDateEdit">End Date</label>
           <input
             type="date"
@@ -238,7 +243,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">
-          Close
+          Cancel
         </button>
         <button
           type="button"

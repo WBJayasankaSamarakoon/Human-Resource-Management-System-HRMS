@@ -21,17 +21,14 @@ class Payroll extends Model
         'BRA2',
         'BRA3',
         'deductions',
-        'payment_date',
-    ];
-
-    protected $casts = [
-        'payment_date' => 'datetime',
+        'payment_year',
+        'payment_month',
     ];
 
     // Define the relationship with Tblemployee
     public function employee()
     {
-        return $this->belongsTo(Tblemployee::class, 'emp_id', 'id');
+        return $this->belongsTo(Tblemployee::class, 'emp_id', 'EmpId');
     }
 
     // Add a dynamic accessor for all allowances

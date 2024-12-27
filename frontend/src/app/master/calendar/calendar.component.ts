@@ -7,6 +7,8 @@ import { FullCalendarModule } from '@fullcalendar/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Router } from '@angular/router';
+import { apiBaseUrl } from '../../app.config';
 
 @Component({
   selector: 'app-calendar',
@@ -33,9 +35,14 @@ export class CalendarComponent implements OnInit {
 
   showModal = false;
   newEvent = { title: '', date: '' };
-  apiUrl = 'http://localhost:8000/api/events';
+  apiUrl = `${apiBaseUrl}api/events`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private router: Router) {}
+
+  //Navigation Holiday
+  navigateToHoliday(): void {
+    this.router.navigate(['/holiday']);
+  }
 
   ngOnInit(): void {
     this.loadEvents();

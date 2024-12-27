@@ -1,5 +1,10 @@
-import { Routes } from '@angular/router';
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+import { AuthGuard } from './auth.guard';
 import { DefaultLayoutComponent } from './layout';
+import { DashboardComponent } from './views/dashboard/dashboard.component';
+//import { ProfileComponent } from './views/profile/profile.component';
+import { LoginComponent } from './pages/login/login.component';
 import { MachineComponent } from './master/machine/machine.component';
 import { EmployeeComponent } from './master/employee/employee.component';
 import { CompanyComponent } from './master/company/company.component';
@@ -12,7 +17,6 @@ import { CalendarComponent } from './master/calendar/calendar.component';
 import { ReportComponent } from './upload/report/report.component';
 import { ViewComponent } from './upload/view/view.component';
 import { SalaryComponent } from './payroll/salary/salary.component';
-import { PayComponent } from './payroll/pay/pay.component';
 import { LeaveTypeComponent } from './leave/typeleave/typeleave.component';
 import { ManageLeaveComponent } from './leave/manageleave/manageleave.component';
 import { AdminComponent } from './user/admin/admin.component';
@@ -21,8 +25,6 @@ import { PayrollComponent } from './payroll/payroll/payroll.component';
 import { ViewFileComponent } from './upload/view-file/view-file.component';
 import { ProcessComponent } from './upload/process/process.component';
 import { SlipComponent } from './upload/slip/slip.component';
-import { LoginComponent } from './pages/login/login.component';
-import { RegisterComponent } from './pages/register/register.component';
 
 export const routes: Routes = [
   {
@@ -39,179 +41,141 @@ export const routes: Routes = [
     children: [
       {
         path: 'dashboard',
-        loadChildren: () =>
-          import('./views/dashboard/routes').then((m) => m.routes),
+        component: DashboardComponent,
+        canActivate: [AuthGuard],
+        data: { title: 'Dashboard' },
       },
-      {
-        path: 'theme',
-        loadChildren: () =>
-          import('./views/theme/routes').then((m) => m.routes),
-      },
-      {
-        path: 'base',
-        loadChildren: () => import('./views/base/routes').then((m) => m.routes),
-      },
-      {
-        path: 'buttons',
-        loadChildren: () =>
-          import('./views/buttons/routes').then((m) => m.routes),
-      },
-      {
-        path: 'forms',
-        loadChildren: () =>
-          import('./views/forms/routes').then((m) => m.routes),
-      },
-      {
-        path: 'icons',
-        loadChildren: () =>
-          import('./views/icons/routes').then((m) => m.routes),
-      },
-      {
-        path: 'notifications',
-        loadChildren: () =>
-          import('./views/notifications/routes').then((m) => m.routes),
-      },
-      {
-        path: 'widgets',
-        loadChildren: () =>
-          import('./views/widgets/routes').then((m) => m.routes),
-      },
-
+      // {
+      //   path: 'profile',
+      //   component: ProfileComponent,
+      //   canActivate: [AuthGuard],
+      //   data: { title: 'Profile' },
+      // },
       {
         path: 'machine',
         component: MachineComponent,
+        canActivate: [AuthGuard],
       },
-
       {
         path: 'employee',
         component: EmployeeComponent,
+        canActivate: [AuthGuard],
       },
-
       {
         path: 'company',
         component: CompanyComponent,
+        canActivate: [AuthGuard],
       },
-
       {
         path: 'shift',
         component: ShiftComponent,
+        canActivate: [AuthGuard],
       },
-
       {
         path: 'department',
         component: DepartmentComponent,
+        canActivate: [AuthGuard],
       },
-
       {
         path: 'position',
         component: PositionComponent,
+        canActivate: [AuthGuard],
       },
-
       {
         path: 'gender',
         component: GenderComponent,
+        canActivate: [AuthGuard],
       },
-
       {
         path: 'holiday',
         component: HolidayComponent,
+        canActivate: [AuthGuard],
       },
-
-      { path: 'calendar', component: CalendarComponent },
-
+      {
+        path: 'calendar',
+        component: CalendarComponent,
+        canActivate: [AuthGuard],
+      },
       {
         path: 'report',
         component: ReportComponent,
-        data: { title: 'report' },
+        canActivate: [AuthGuard],
+        data: { title: 'Report' },
       },
-
       {
         path: 'view',
         component: ViewComponent,
-        data: { title: 'view' },
+        canActivate: [AuthGuard],
+        data: { title: 'View' },
       },
-
       {
-        path: 'view-file', // New Route
+        path: 'view-file',
         component: ViewFileComponent,
+        canActivate: [AuthGuard],
         data: { title: 'View File' },
       },
-
       {
-        path: 'process', // New Route
+        path: 'process',
         component: ProcessComponent,
-        data: { title: 'process' },
+        canActivate: [AuthGuard],
+        data: { title: 'Process' },
       },
-
       {
-        path: 'slip', // New Route
+        path: 'slip',
         component: SlipComponent,
-        data: { title: 'slip' },
+        canActivate: [AuthGuard],
+        data: { title: 'Slip' },
       },
-
       {
         path: 'upexcel',
         component: UpexcelComponent,
-        data: { title: 'upexcel' },
+        canActivate: [AuthGuard],
+        data: { title: 'Upload Excel' },
       },
-
       {
         path: 'salary',
         component: SalaryComponent,
-        data: { title: 'salary' },
+        canActivate: [AuthGuard],
+        data: { title: 'Salary' },
       },
-
-      {
-        path: 'pay',
-        component: PayComponent,
-        data: { title: 'salary' },
-      },
-
       {
         path: 'typeleave',
         component: LeaveTypeComponent,
-        data: { title: 'typeleave' },
+        canActivate: [AuthGuard],
+        data: { title: 'Leave Type' },
       },
-
       {
         path: 'manageleave',
         component: ManageLeaveComponent,
-        data: { title: 'typeleave' },
+        canActivate: [AuthGuard],
+        data: { title: 'Manage Leave' },
       },
-
       {
         path: 'admin',
         component: AdminComponent,
-        data: { title: 'admin' },
+        canActivate: [AuthGuard],
+        data: { title: 'Admin' },
       },
-
       {
         path: 'payroll',
         component: PayrollComponent,
-        data: { title: 'payroll' },
+        canActivate: [AuthGuard],
+        data: { title: 'Payroll' },
       },
     ],
   },
-
   {
     path: 'login',
-    loadComponent: () =>
-      import('./pages/login/login.component').then((m) => m.LoginComponent),
+    component: LoginComponent,
     data: {
       title: 'Login Page',
     },
   },
-
-  {
-    path: 'register',
-    loadComponent: () =>
-      import('./pages/register/register.component').then(
-        (m) => m.RegisterComponent
-      ),
-    data: {
-      title: 'Register Page',
-    },
-  },
-
-  { path: '**', redirectTo: 'dashboard' },
+  { path: '**', redirectTo: '/login' },
 ];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule],
+})
+export class AppRoutingModule {}

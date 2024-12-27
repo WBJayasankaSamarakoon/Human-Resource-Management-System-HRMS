@@ -1,11 +1,35 @@
-<div class="container-fluid mt-4">
-  <h2 class="mb-4">Manage Shifts</h2>
+<div class="container-fluid">
+  <h2 class="mb-4">Manage Shift</h2>
+
+<!-- Custom Alert Box -->
+<div id="custom-alert" class="alert-box"></div>
+
+<!-- Custom Confirmation Modal -->
+<div id="confirmationModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">Delete Shift</h5>
+      <button type="button" class="close" (click)="closeConfirmationModal()">
+        <span>&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>
+        Are you sure you want to delete
+        {{ currentShift.Week }}?
+      </p>
+    </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeConfirmationModal()">Cancel</button>
+        <button type="button" class="btn btn-danger" (click)="deleteShift()">OK</button>
+      </div>
+    </div>
+  </div>
 
   <div class="card">
     <div
       class="card-header bg-primary text-white d-flex justify-content-between align-items-center"
     >
-      <div><i class="fas fa-clock"></i> Shift Information</div>
       <button
         type="button"
         class="btn btn-light"
@@ -18,11 +42,18 @@
       </button>
     </div>
     <div class="card-body">
-      <div class="table-responsive">
+      <!-- Loading Spinner -->
+      <div *ngIf="isLoading" class="text-center">
+        <div class="spinner-border text-primary" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+
+      <div class="table-responsive" *ngIf="!isLoading">
         <table id="shiftTable" class="table table-bordered table-striped">
           <thead>
             <tr>
-              <th class="col-id">ID</th>
+              <th>ID</th>
               <th>Start Time</th>
               <th>End Time</th>
               <th>Day</th>
@@ -49,7 +80,7 @@
                 <button
                   type="button"
                   class="btn btn-danger btn-sm"
-                  (click)="setDelete(ShiftItem)"
+                  (click)="confirmDelete(ShiftItem)"
                   aria-label="Delete Shift"
                 >
                   <i class="fas fa-trash fa-sm text-white"></i>
@@ -63,142 +94,118 @@
   </div>
 </div>
 
-<!-- Modal for Add Shift -->
-<div
-  class="modal fade"
-  id="addShiftModal"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="addShiftModalLabel"
-  aria-hidden="true"
->
+<!-- Add Shift Modal -->
+<div class="modal fade" id="addShiftModal" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="addShiftModalLabel">Add Shift</h5>
-        <button
-          type="button"
-          class="close"
-          data-dismiss="modal"
-          aria-label="Close"
-        >
-          <span aria-hidden="true">&times;</span>
+        <h5 class="modal-title">Add Shift</h5>
+        <button type="button" class="close" data-dismiss="modal">
+          <span>&times;</span>
         </button>
       </div>
       <div class="modal-body">
-        <!-- Form for Adding Shift -->
-        <div class="form-group">
-          <label for="shiftStartTime">Start Time</label>
-          <input
-            type="time"
-            class="form-control"
-            id="shiftStartTime"
-            placeholder="Enter Start Time"
-            [(ngModel)]="currentShift.StartTime"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="shiftEndTime">End Time</label>
-          <input
-            type="time"
-            class="form-control"
-            id="shiftEndTime"
-            placeholder="Enter End Time"
-            [(ngModel)]="currentShift.EndTime"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="shiftWeek">Day</label>
-          <input
-            type="text"
-            class="form-control"
-            id="shiftWeek"
-            placeholder="Enter Day"
-            [(ngModel)]="currentShift.Week"
-            required
-          />
-        </div>
+        <form>
+          <div class="form-group">
+            <label>Start Time</label>
+            <input
+              type="time"
+              class="form-control"
+              placeholder="Enter Start Time"
+              [(ngModel)]="currentShift.StartTime"
+              name="StartTime"
+              required
+            />
+            <!-- <small *ngIf="showStartTimeError" class="text-danger">
+              Start Time is required
+            </small> -->
+          </div>
+          <div class="form-group mt-3">
+            <label>End Time</label>
+            <input
+              type="time"
+              class="form-control"
+              placeholder="Enter End Time"
+              [(ngModel)]="currentShift.EndTime"
+              name="EndTime"
+              required
+            />
+            <!-- <small *ngIf="showEndTimeError" class="text-danger">
+              End Time is required
+            </small> -->
+          </div>
+          <div class="form-group mt-3">
+            <label>Day</label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Enter Day"
+              [(ngModel)]="currentShift.Week"
+              name="Week"
+              required
+            />
+            <small *ngIf="showWeekError" class="text-danger">
+              Day is required
+            </small>
+          </div>
+        </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">
-          Close
-        </button>
-        <button
-          type="button"
-          class="btn btn-primary"
-          (click)="save()"
-          data-dismiss="modal"
-        >
-          Add
-        </button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="closeModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="save()">Add</button>
       </div>
     </div>
   </div>
 </div>
 
 <!-- Edit Shift Modal -->
-<div
-  class="modal fade"
-  id="editShiftModal"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="editShiftModalLabel"
-  aria-hidden="true"
->
+<div class="modal fade" id="editShiftModal" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="editShiftModalLabel">Edit Shift</h5>
-        <button
-          type="button"
-          class="close"
-          data-dismiss="modal"
-          aria-label="Close"
-        >
-          <span aria-hidden="true">&times;</span>
+        <h5 class="modal-title">Edit Shift</h5>
+        <button type="button" class="close" data-dismiss="modal">
+          <span>&times;</span>
         </button>
       </div>
       <div class="modal-body">
-        <!-- Edit Shift Form Fields -->
         <div class="form-group">
-          <label for="shiftStartTime">Start Time</label>
+          <label>Start Time</label>
           <input
             type="time"
             class="form-control"
-            id="shiftStartTime"
             placeholder="Enter Start Time"
             [(ngModel)]="currentShift.StartTime"
+            name="StartTime"
             required
           />
         </div>
-        <div class="form-group">
-          <label for="shiftEndTime">End Time</label>
+        <div class="form-group mt-3">
+          <label>End Time</label>
           <input
             type="time"
             class="form-control"
-            id="shiftEndTime"
             placeholder="Enter End Time"
             [(ngModel)]="currentShift.EndTime"
+            name="EndTime"
             required
           />
         </div>
-        <div class="form-group">
-          <label for="shiftWeek">Day</label>
+        <div class="form-group mt-3">
+          <label>Day</label>
           <input
             type="text"
             class="form-control"
-            id="shiftWeek"
             placeholder="Enter Day"
             [(ngModel)]="currentShift.Week"
+            name="Week"
             required
           />
         </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">
-          Close
+          Cancel
         </button>
         <button
           type="button"

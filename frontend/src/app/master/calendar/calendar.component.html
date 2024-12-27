@@ -1,4 +1,11 @@
 <div class="calendar-container">
+  <!-- Header with Navigation Button -->
+  <div class="d-flex justify-content-start align-items-center mb-3">
+    <button type="button" class="btn btn-custom" (click)="navigateToHoliday()">
+      Check Holiday
+    </button>
+  </div>
+
   <full-calendar [options]="calendarOptions" class="calendar"></full-calendar>
 </div>
 

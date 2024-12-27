@@ -1,13 +1,11 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { apiBaseUrl } from 'src/app/app.config';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
-declare var $: any; // jQuery for modal handling
+import { CommonModule } from '@angular/common';
+import { apiBaseUrl } from '../../app.config';
 
 @Component({
-  selector: 'app-manageleave',
+  selector: 'app-manage-leave',
   standalone: true,
   imports: [FormsModule, CommonModule],
   templateUrl: './manageleave.component.html',
@@ -24,6 +22,11 @@ export class ManageLeaveComponent {
     startDate: '',
     endDate: '',
   };
+  isLoading: boolean = false;
+  showEmployeeError: boolean = false;
+  showLeaveTypeError: boolean = false;
+  showStartDateError: boolean = false;
+  showEndDateError: boolean = false;
 
   constructor(private http: HttpClient) {
     this.getAllLeaves();
@@ -33,18 +36,23 @@ export class ManageLeaveComponent {
 
   // Fetch all leave records from the API
   getAllLeaves() {
-    this.http.get(`${apiBaseUrl}api/leave`).subscribe((data: any) => {
-      // Process the leave data to include employee and leaveType names
-      this.leaveArray = data.map((leave: any) => ({
-        ...leave,
-        employeeName: leave.employee
-          ? leave.employee.NameWithInitials
-          : 'Unknown',
-        leaveType: leave.leaveType ? leave.leaveType.LeaveType : 'Unknown',
-        startDate: leave.start_date,
-        endDate: leave.end_date,
-      }));
-    });
+    this.isLoading = true;
+    this.http.get(`${apiBaseUrl}api/leave`).subscribe(
+      (data: any) => {
+        this.leaveArray = data.map((leave: any) => ({
+          ...leave,
+          employeeName: leave.employee ? leave.employee.NameWithInitials : 'Unknown',
+          leaveType: leave.leaveType ? leave.leaveType.LeaveType : 'Unknown',
+          startDate: leave.start_date,
+          endDate: leave.end_date,
+        }));
+        this.isLoading = false;
+      },
+      (error) => {
+        console.error('Error loading leaves:', error);
+        this.isLoading = false;
+      }
+    );
   }
 
   // Fetch all employees from the API
@@ -67,57 +75,34 @@ export class ManageLeaveComponent {
   // Open modal for adding a new leave entry
   openAddModal() {
     this.resetForm();
-    this.currentLeave.id = '';
+    this.showEmployeeError = false;
+    this.showLeaveTypeError = false;
+    this.showStartDateError = false;
+    this.showEndDateError = false;
+    this.removeModalFade();
   }
 
   // Open modal for editing a leave entry
   openEditModal(leave: any) {
     this.currentLeave = { ...leave };
-  }
-
-  // Register a new leave record
-  register() {
-    if (!this.currentLeave.employeeId || !this.currentLeave.leaveTypeId) {
-      alert('Please select both Employee and Leave Type');
-      return;
-    }
-
-    const leaveData = {
-      employee_id: this.currentLeave.employeeId,
-      leave_type_id: this.currentLeave.leaveTypeId,
-      start_date: this.currentLeave.startDate,
-      end_date: this.currentLeave.endDate,
-    };
-
-    this.http.post(`${apiBaseUrl}api/leave`, leaveData).subscribe(() => {
-      alert('Leave Registered Successfully');
-      this.getAllLeaves(); // Refresh table data
-      this.resetForm();
-      $('#addLeaveModal').modal('hide'); // Close the modal
-    });
-  }
-
-  // Update an existing leave record
-  updateRecords() {
-    const leaveData = {
-      employee_id: this.currentLeave.employeeId,
-      leave_type_id: this.currentLeave.leaveTypeId,
-      start_date: this.currentLeave.startDate,
-      end_date: this.currentLeave.endDate,
-    };
-
-    this.http
-      .put(`${apiBaseUrl}api/leave/${this.currentLeave.id}`, leaveData)
-      .subscribe(() => {
-        alert('Leave Updated Successfully');
-        this.getAllLeaves(); // Refresh table data
-        this.resetForm();
-        $('#editLeaveModal').modal('hide'); // Close the modal
-      });
+    this.showEmployeeError = false;
+    this.showLeaveTypeError = false;
+    this.showStartDateError = false;
+    this.showEndDateError = false;
+    this.removeModalFade();
   }
 
   // Save leave (either add or update)
   save() {
+    this.showEmployeeError = !this.currentLeave.employeeId?.trim();
+    this.showLeaveTypeError = !this.currentLeave.leaveTypeId?.trim();
+    this.showStartDateError = !this.currentLeave.startDate?.trim();
+    this.showEndDateError = !this.currentLeave.endDate?.trim();
+
+    if (this.showEmployeeError || this.showLeaveTypeError || this.showStartDateError || this.showEndDateError) {
+      return;
+    }
+
     if (!this.currentLeave.id) {
       this.register();
     } else {
@@ -125,12 +110,106 @@ export class ManageLeaveComponent {
     }
   }
 
+  // Register a new leave record
+  register() {
+    this.isLoading = true;
+    const leaveData = {
+      employee_id: this.currentLeave.employeeId,
+      leave_type_id: this.currentLeave.leaveTypeId,
+      start_date: this.currentLeave.startDate,
+      end_date: this.currentLeave.endDate,
+    };
+    this.http.post(`${apiBaseUrl}api/leave`, leaveData).subscribe(
+      () => {
+        this.alertSuccess('Leave Registered Successfully');
+        this.getAllLeaves();
+        this.resetForm();
+        this.closeModal();
+      },
+      (error) => {
+        this.alertError('Failed to register leave');
+        this.isLoading = false;
+      }
+    );
+  }
+
+  // Update an existing leave record
+  updateRecords() {
+    this.isLoading = true;
+    const leaveData = {
+      employee_id: this.currentLeave.employeeId,
+      leave_type_id: this.currentLeave.leaveTypeId,
+      start_date: this.currentLeave.startDate,
+      end_date: this.currentLeave.endDate,
+    };
+    this.http.put(`${apiBaseUrl}api/leave/${this.currentLeave.id}`, leaveData).subscribe(
+      () => {
+        this.alertSuccess('Leave Updated Successfully');
+        this.getAllLeaves();
+        this.resetForm();
+        this.closeModal();
+      },
+      (error) => {
+        this.alertError('Failed to update leave');
+        this.isLoading = false;
+      }
+    );
+  }
+
   // Delete a leave record
-  setDelete(leave: any) {
-    this.http.delete(`${apiBaseUrl}api/leave/${leave.id}`).subscribe(() => {
-      alert('Leave Deleted Successfully');
-      this.getAllLeaves(); // Refresh table data after deletion
-    });
+  confirmDelete(leave: any) {
+    this.currentLeave = { ...leave };
+    const confirmationModal = document.getElementById('confirmationModal');
+    if (confirmationModal) {
+      confirmationModal.classList.add('visible');
+    }
+  }
+
+  deleteLeave() {
+    if (this.currentLeave.id) {
+      this.deleteRecord(this.currentLeave);
+      this.closeConfirmationModal();
+    }
+  }
+
+  deleteRecord(leave: any) {
+    this.http.delete(`${apiBaseUrl}api/leave/${leave.id}`).subscribe(
+      () => {
+        this.alertSuccess('Leave Deleted Successfully');
+        this.getAllLeaves();
+      },
+      (error) => {
+        this.alertError('Failed to delete leave');
+      }
+    );
+  }
+
+  closeConfirmationModal() {
+    const confirmationModal = document.getElementById('confirmationModal');
+    if (confirmationModal) {
+      confirmationModal.classList.remove('visible');
+    }
+  }
+
+  // Handle alert success messages
+  alertSuccess(message: string) {
+    this.showAlert(message, 'success');
+  }
+
+  // Handle alert error messages
+  alertError(message: string) {
+    this.showAlert(message, 'error');
+  }
+
+  showAlert(message: string, type: string) {
+    const alertBox = document.getElementById('custom-alert');
+    if (alertBox) {
+      alertBox.innerText = message;
+      alertBox.className = `visible ${type}`;
+      setTimeout(() => {
+        alertBox.classList.remove('visible', type);
+      }, 3000);
+    }
   }
 
   // Reset the current leave form
@@ -142,10 +221,31 @@ export class ManageLeaveComponent {
       startDate: '',
       endDate: '',
     };
+    this.showEmployeeError = false;
+    this.showLeaveTypeError = false;
+    this.showStartDateError = false;
+    this.showEndDateError = false;
   }
 
-  // Track leave data
+  // Track leave data by ID
   trackById(index: number, leave: any) {
     return leave.id;
+  }
+
+  closeModal() {
+    const modal = document.getElementById('addLeaveModal') as HTMLElement;
+    if (modal) {
+      modal.classList.remove('show');
+      modal.style.display = 'none';
+      this.removeModalFade();
+    }
+  }
+
+  // Remove modal backdrop fade
+  removeModalFade() {
+    const modalBackdrop = document.querySelector('.modal-backdrop');
+    if (modalBackdrop) {
+      modalBackdrop.remove();
+    }
   }
 }

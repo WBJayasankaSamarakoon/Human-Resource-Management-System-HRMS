@@ -21,9 +21,7 @@ export class RegisterComponent {
   };
   errorMessage: string = '';
   successMessage: string = '';
-
   constructor(private http: HttpClient, private router: Router) {}
-
   register() {
     // Send registration request to the backend
     this.http.post(`${apiBaseUrl}api/auth/register`, this.user).subscribe(
@@ -41,7 +39,6 @@ export class RegisterComponent {
       }
     );
   }
-
   resetForm() {
     this.user = {
       name: '',

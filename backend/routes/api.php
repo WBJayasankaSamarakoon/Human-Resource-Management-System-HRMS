@@ -59,7 +59,11 @@ Route::get('/dashboard/counts', [DashboardController::class, 'getCounts']);
 
 // Payroll Routes
 Route::get('payrolls', [PayrollController::class, 'index']);
-Route::get('payrolls/by-empid/{empId}', [PayrollController::class, 'getPayrollByEmpId']);
+Route::post('payrolls', [PayrollController::class, 'store']);
+Route::put('payrolls/{id}', [PayrollController::class, 'update']);
+Route::delete('payrolls/{id}', [PayrollController::class, 'destroy']);
+Route::get('payroll/{empId}', [PayrollController::class, 'getPayrollByEmpId']);
+//Route::get('payrolls/by-empid/{empId}', [PayrollController::class, 'getPayrollByEmpId']);
 
 // File Upload Routes
 Route::group(['prefix' => 'uploaded_files'], function () {
@@ -69,6 +73,8 @@ Route::group(['prefix' => 'uploaded_files'], function () {
     Route::get('{fileId}/view/combined-data', [ViewFileController::class, 'getCombinedData']);
 });
 
+// Route::get('uploaded_files1/getCombinedData', [ViewFileController::class, 'getCombinedData']);
+
 // Process Routes
 Route::get('process/{id}/combined-data', [ProcessController::class, 'getCombinedData'])->name('process.combinedData');
 
@@ -76,3 +82,7 @@ Route::get('process/{id}/combined-data', [ProcessController::class, 'getCombined
 Route::get('/test', function () {
     return response()->json(['message' => 'API working successfully'], 200);
 });
+Route::get('/greeting', function () {
+    return response()->json(['message' => 'API working successfully'], 200);
+});
+
