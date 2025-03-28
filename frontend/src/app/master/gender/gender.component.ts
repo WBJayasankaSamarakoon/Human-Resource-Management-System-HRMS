@@ -81,7 +81,10 @@ export class GenderComponent {
 
   updateRecords() {
     this.http
-      .put(`${apiBaseUrl}api/gender/${this.currentGender.id}`, this.currentGender)
+      .put(
+        `${apiBaseUrl}api/gender/${this.currentGender.id}`,
+        this.currentGender
+      )
       .subscribe(
         () => {
           this.alertSuccess('Gender updated successfully!');

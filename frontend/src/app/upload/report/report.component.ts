@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { apiBaseUrl } from 'src/app/app.config';
+import { apiBaseUrl } from '../../app.config';
 
 @Component({
   selector: 'app-report',

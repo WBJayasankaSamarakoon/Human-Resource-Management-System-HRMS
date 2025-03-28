@@ -1,13 +1,13 @@
 <div class="container-fluid mt-4">
   <h2 class="mb-4">Manage Employee</h2>
 
-<!-- Custom Alert Box -->
-<div id="custom-alert" class="alert-box"></div>
+  <!-- Custom Alert Box -->
+  <div id="custom-alert" class="alert-box"></div>
 
-<!-- Custom Confirmation Modal -->
-<div id="confirmationModal" class="modal">
-  <div class="modal-contentt">
-    <div class="modal-header">
+  <!-- Custom Confirmation Modal -->
+  <div id="confirmationModal" class="modal">
+    <div class="modal-contentt">
+      <div class="modal-header">
         <h5 class="modal-title">Delete Employee</h5>
         <button type="button" class="close" (click)="closeConfirmationModal()">
           <span>&times;</span>
@@ -20,8 +20,16 @@
         </p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeConfirmationModal()">Cancel</button>
-        <button type="button" class="btn btn-danger" (click)="deleteEmployee()">OK</button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="closeConfirmationModal()"
+        >
+          Cancel
+        </button>
+        <button type="button" class="btn btn-danger" (click)="deleteEmployee()">
+          OK
+        </button>
       </div>
     </div>
   </div>
@@ -57,6 +65,7 @@
               <th>Emp Id</th>
               <th>Name</th>
               <th>EPF</th>
+              <th>Eligible for EPF/ETF</th>
               <th>Phone</th>
               <th>Current Address</th>
               <th>Permanent Address</th>
@@ -67,6 +76,7 @@
               <th>Salutation</th>
               <th>Designation</th>
               <th>Branch</th>
+              <th>Department</th>
               <th>Company</th>
               <th>Reports To</th>
               <th>Employment Type</th>
@@ -83,6 +93,14 @@
               <td>{{ EmployeeItem.EmpId }}</td>
               <td>{{ EmployeeItem.NameWithInitials }}</td>
               <td>{{ EmployeeItem.EPFNumber }}</td>
+              <td>
+                <span *ngIf="EmployeeItem.EpfEligible">
+                  <i class="fa-regular fa-square-check"></i> Active
+                </span>
+                <span *ngIf="!EmployeeItem.EpfEligible" class="text-muted">
+                  <i class="fa-regular fa-square"></i> Non-Active
+                </span>
+              </td>
               <td>{{ EmployeeItem.Phone }}</td>
               <td>{{ EmployeeItem.CurrentAddress }}</td>
               <td>{{ EmployeeItem.PermanentAddress }}</td>
@@ -93,13 +111,14 @@
               <td>{{ EmployeeItem.Salutation }}</td>
               <td>{{ EmployeeItem.Designation }}</td>
               <td>{{ EmployeeItem.Branch }}</td>
+              <td>{{ EmployeeItem.Department }}</td>
               <td>{{ EmployeeItem.Company }}</td>
               <td>{{ EmployeeItem.ReportsTo }}</td>
               <td>{{ EmployeeItem.EmploymentType }}</td>
               <td>{{ EmployeeItem.EmergencyContactName }}</td>
               <td>{{ EmployeeItem.EmergencyPhone }}</td>
               <td>{{ EmployeeItem.Relation }}</td>
-              <td>{{ EmployeeItem.DefaultShift }}</td>
+              <td>{{ EmployeeItem.empshift.Name }}</td>
               <td class="col-action">
                 <button
                   type="button"
@@ -156,7 +175,7 @@
             <!-- Column 1 -->
             <div class="col-md-4">
               <div class="form-group">
-                <label for="EmpId">Employee ID</label>
+                <label for="EmpId">Employee ID <span class="text-danger">*</span></label>
                 <input
                   type="number"
                   class="form-control"
@@ -165,9 +184,15 @@
                   name="EmpId"
                   required
                 />
+                <small
+                  *ngIf="showEmployeeEmpIdError && !currentEmployee.EmpId"
+                  class="text-danger"
+                >
+                  Employee ID is required
+                </small>
               </div>
               <div class="form-group mt-3">
-                <label for="NameWithInitials">Name with Initials</label>
+                <label for="NameWithInitials">Name with Initials<span class="text-danger">*</span></label>
                 <input
                   type="text"
                   class="form-control"
@@ -176,6 +201,15 @@
                   name="NameWithInitials"
                   required
                 />
+                <small
+                  *ngIf="
+                    showEmployeeNameWithInitialsError &&
+                    !currentEmployee.NameWithInitials
+                  "
+                  class="text-danger"
+                >
+                  Employee Name is required
+                </small>
               </div>
               <div class="form-group mt-3">
                 <label for="EPFNumber">EPF Number</label>
@@ -187,6 +221,24 @@
                   name="EPFNumber"
                 />
               </div>
+
+              <div class="form-group mt-3">
+                <label for="EpfEligible">Eligible for EPF/ETF</label>
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="EpfEligible"
+                    [(ngModel)]="currentEmployee.EpfEligible"
+                    name="EpfEligible"
+                  />
+                  <label class="form-check-label" for="EpfEligible">
+                    Active
+                  </label>
+                </div>
+                <small *ngIf="!currentEmployee.EpfEligible" class="text-muted">Non-Active</small>
+              </div>
+
               <div class="form-group mt-3">
                 <label for="Phone">Phone Number</label>
                 <input
@@ -196,19 +248,6 @@
                   [(ngModel)]="currentEmployee.Phone"
                   name="Phone"
                 />
-              </div>
-            </div>
-
-            <!-- Column 2 -->
-            <div class="col-md-4">
-              <div class="form-group">
-                <label for="CurrentAddress">Current Address</label>
-                <textarea
-                  class="form-control"
-                  id="CurrentAddress"
-                  [(ngModel)]="currentEmployee.CurrentAddress"
-                  name="CurrentAddress"
-                ></textarea>
               </div>
               <div class="form-group mt-3">
                 <label for="PersonalEmail">Personal Email</label>
@@ -221,15 +260,18 @@
                 />
               </div>
               <div class="form-group mt-3">
-                <label for="DateOfJoining">Date of Joining</label>
-                <input
-                  type="date"
-                  class="form-control"
-                  id="DateOfJoining"
-                  [(ngModel)]="currentEmployee.DateOfJoining"
-                  name="DateOfJoining"
-                />
+                <label for="Relation">Relation</label>
+                <select
+                  class="form-select"
+                  id="Relation"
+                  [(ngModel)]="currentEmployee.Relation"
+                  name="Relation"
+                >
+                  <option value="Married">Married</option>
+                  <option value="Unmarried">Unmarried</option>
+                </select>
               </div>
+
               <div class="form-group mt-3">
                 <label for="Salutation">Salutation</label>
                 <select
@@ -245,39 +287,47 @@
               </div>
             </div>
 
-            <!-- Column 3 -->
+            <!-- Column 2 -->
             <div class="col-md-4">
-              <div class="form-group ">
-                <label for="PermanentAddress">Permanent Address</label>
+              <div class="form-group">
+                <label for="CurrentAddress">Current Address</label>
                 <textarea
                   class="form-control"
-                  id="PermanentAddress"
-                  [(ngModel)]="currentEmployee.PermanentAddress"
-                  name="PermanentAddress"
+                  id="CurrentAddress"
+                  [(ngModel)]="currentEmployee.CurrentAddress"
+                  name="CurrentAddress"
                 ></textarea>
               </div>
               <div class="form-group mt-3">
-                <label for="CompanyEmail">Company Email</label>
-                <input
-                  type="email"
-                  class="form-control"
-                  id="CompanyEmail"
-                  [(ngModel)]="currentEmployee.CompanyEmail"
-                  name="CompanyEmail"
-                />
-              </div>
-              <div class="form-group mt-3">
-                <label for="Status">Status</label>
+                <label for="Department">Department</label>
                 <select
                   class="form-select"
-                  id="Status"
-                  [(ngModel)]="currentEmployee.Status"
-                  name="Status"
+                  id="Department"
+                  [(ngModel)]="currentEmployee.Department"
+                  name="Department"
                 >
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
-                  <option value="Suspended">Suspended</option>
-                  <option value="Left">Left</option>
+                  <option
+                    *ngFor="let department of DepartmentArray"
+                    [value]="department.DepartmentName"
+                  >
+                    {{ department.DepartmentName }}
+                  </option>
+                </select>
+              </div>
+              <div class="form-group mt-3">
+                <label for="Company">Company</label>
+                <select
+                  class="form-select"
+                  id="Company"
+                  [(ngModel)]="currentEmployee.Company"
+                  name="Company"
+                >
+                  <option
+                    *ngFor="let company of CompanyArray"
+                    [value]="company.Name"
+                  >
+                    {{ company.Name }}
+                  </option>
                 </select>
               </div>
               <div class="form-group mt-3">
@@ -294,37 +344,6 @@
                   <option value="HR Manager">HR Manager</option>
                 </select>
               </div>
-            </div>
-
-            <!-- Column 4 -->
-            <div class="col-md-4">
-              <div class="form-group">
-                <label for="Branch">Branch</label>
-                <select
-                  class="form-select"
-                  id="Branch"
-                  [(ngModel)]="currentEmployee.Branch"
-                  name="Branch"
-                >
-                  <option value="Branch 01">Branch 01</option>
-                  <option value="Branch 02">Branch 02</option>
-                  <option value="Branch 03">Branch 03</option>
-                  <option value="Branch 04">Branch 04</option>
-                </select>
-              </div>
-              <div class="form-group mt-3">
-                <label for="Company">Company</label>
-                <select
-                  class="form-select"
-                  id="Company"
-                  [(ngModel)]="currentEmployee.Company"
-                  name="Company"
-                >
-                  <option *ngFor="let company of CompanyArray" [value]="company.Name">
-                    {{ company.Name }}
-                  </option>
-                </select>
-              </div>
               <div class="form-group mt-3">
                 <label for="ReportsTo">Reports To</label>
                 <input
@@ -334,37 +353,6 @@
                   [(ngModel)]="currentEmployee.ReportsTo"
                   name="ReportsTo"
                 />
-              </div>
-              <div class="form-group mt-3">
-                <label for="EmploymentType">Employment Type</label>
-                <select
-                  class="form-select"
-                  id="EmploymentType"
-                  [(ngModel)]="currentEmployee.EmploymentType"
-                  name="EmploymentType"
-                >
-                  <option value="Intern">Intern</option>
-                  <option value="Full-time">Full-time</option>
-                  <option value="Part-time">Part-time</option>
-                  <option value="Contract">Contract</option>
-                </select>
-              </div>
-            </div>
-
-            <!-- Column 5 -->
-            <div class="col-md-4">
-              <div class="form-group">
-                <label for="DefaultShift">Default Shift</label>
-                <select
-                  class="form-select"
-                  id="DefaultShift"
-                  [(ngModel)]="currentEmployee.DefaultShift"
-                  name="DefaultShift"
-                >
-                  <option *ngFor="let shift of ShiftArray" [value]="shift.Week">
-                    {{ shift.Week }}
-                  </option>
-                </select>
               </div>
               <div class="form-group mt-3">
                 <label for="EmergencyContactName">Emergency Contact Name</label>
@@ -386,25 +374,125 @@
                   name="EmergencyPhone"
                 />
               </div>
+            </div>
+
+            <!-- Column 3 -->
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="PermanentAddress">Permanent Address</label>
+                <textarea
+                  class="form-control"
+                  id="PermanentAddress"
+                  [(ngModel)]="currentEmployee.PermanentAddress"
+                  name="PermanentAddress"
+                ></textarea>
+              </div>
               <div class="form-group mt-3">
-                <label for="Relation">Relation</label>
+                <label for="CompanyEmail">Company Email</label>
+                <input
+                  type="email"
+                  class="form-control"
+                  id="CompanyEmail"
+                  [(ngModel)]="currentEmployee.CompanyEmail"
+                  name="CompanyEmail"
+                />
+              </div>
+
+              <div class="form-group mt-3">
+                <label for="Status">Status</label>
                 <select
                   class="form-select"
-                  id="Relation"
-                  [(ngModel)]="currentEmployee.Relation"
-                  name="Relation"
+                  id="Status"
+                  [(ngModel)]="currentEmployee.Status"
+                  name="Status"
                 >
-                  <option value="Married">Married</option>
-                  <option value="Unmarried">Unmarried</option>
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                  <option value="Suspended">Suspended</option>
+                  <option value="Left">Left</option>
                 </select>
               </div>
+              <div class="form-group mt-3">
+                <label for="Branch">Branch</label>
+                <select
+                  class="form-select"
+                  id="Branch"
+                  [(ngModel)]="currentEmployee.Branch"
+                  name="Branch"
+                >
+                  <option value="Branch 01">Branch A</option>
+                  <option value="Branch 02">Branch B</option>
+                  <option value="Branch 03">Branch C</option>
+                  <option value="Branch 04">Branch D</option>
+                </select>
+              </div>
+              <div class="form-group mt-3">
+                <label for="DefaultShift">Default Shift<span class="text-danger">*</span></label>
+                <select
+                  class="form-select"
+                  id="DefaultShift"
+                  [(ngModel)]="currentEmployee.DefaultShift"
+                  name="DefaultShift"
+                  required
+                  aria-label="Select DefaultShift"
+                >
+                  <option *ngFor="let shift of shiftArray" [value]="shift.id">
+                    {{ shift.Name }}
+                  </option>
+                </select>
+                <small
+                  *ngIf="showDefaultShiftError && !currentEmployee.DefaultShift"
+                  class="text-danger"
+                >
+                  Shift selection is required
+                </small>
+              </div>
+              <div class="form-group mt-3">
+                <label for="EmploymentType">Employment Type</label>
+                <select
+                  class="form-select"
+                  id="EmploymentType"
+                  [(ngModel)]="currentEmployee.EmploymentType"
+                  name="EmploymentType"
+                >
+                  <option value="Intern">Intern</option>
+                  <option value="Full-time">Full-time</option>
+                  <option value="Part-time">Part-time</option>
+                  <option value="Contract">Contract</option>
+                </select>
+              </div>
+              <div class="form-group mt-3">
+                <label for="DateOfJoining">Date of Joining</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  id="DateOfJoining"
+                  [(ngModel)]="currentEmployee.DateOfJoining"
+                  name="DateOfJoining"
+                />
+              </div>
             </div>
+
+            <!-- Column 4 -->
+            <div class="col-md-4"></div>
+
+            <!-- Column 5 -->
+            <div class="col-md-4"></div>
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="closeModal()">Cancel</button>
-        <button type="button" class="btn btn-primary" (click)="save()">Add</button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-dismiss="modal"
+          (click)="closeModal()"
+        >
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary" (click)="save()">
+          Add
+        </button>
       </div>
     </div>
   </div>
@@ -447,8 +535,10 @@
                   name="EmpId"
                   required
                 />
+                <small *ngIf="!currentEmployee.EmpId" class="text-danger">
+                  Employee ID is required
+                </small>
               </div>
-
               <div class="form-group mt-3">
                 <label for="NameWithInitials">Name with Initials</label>
                 <input
@@ -459,8 +549,13 @@
                   name="NameWithInitials"
                   required
                 />
+                <small
+                  *ngIf="!currentEmployee.NameWithInitials"
+                  class="text-danger"
+                >
+                  Employee Name is required
+                </small>
               </div>
-
               <div class="form-group mt-3">
                 <label for="EPFNumber">EPF Number</label>
                 <input
@@ -473,6 +568,23 @@
               </div>
 
               <div class="form-group mt-3">
+                <label for="EpfEligible">Eligible for EPF/ETF</label>
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="EpfEligible"
+                    [(ngModel)]="currentEmployee.EpfEligible"
+                    name="EpfEligible"
+                  />
+                  <label class="form-check-label" for="EpfEligible">
+                    Active
+                  </label>
+                </div>
+                <small *ngIf="!currentEmployee.EpfEligible" class="text-muted">Non-Active</small>
+              </div>
+
+              <div class="form-group mt-3">
                 <label for="Phone">Phone Number</label>
                 <input
                   type="text"
@@ -482,21 +594,6 @@
                   name="Phone"
                 />
               </div>
-            </div>
-
-
-            <!-- Column 2 -->
-            <div class="col-md-4">
-              <div class="form-group">
-                <label for="CurrentAddress">Current Address</label>
-                <textarea
-                  class="form-control"
-                  id="CurrentAddress"
-                  [(ngModel)]="currentEmployee.CurrentAddress"
-                  name="CurrentAddress"
-                ></textarea>
-              </div>
-
               <div class="form-group mt-3">
                 <label for="PersonalEmail">Personal Email</label>
                 <input
@@ -507,16 +604,17 @@
                   name="PersonalEmail"
                 />
               </div>
-
               <div class="form-group mt-3">
-                <label for="DateOfJoining">Date of Joining</label>
-                <input
-                  type="date"
-                  class="form-control"
-                  id="DateOfJoining"
-                  [(ngModel)]="currentEmployee.DateOfJoining"
-                  name="DateOfJoining"
-                />
+                <label for="Relation">Relation</label>
+                <select
+                  class="form-select"
+                  id="Relation"
+                  [(ngModel)]="currentEmployee.Relation"
+                  name="Relation"
+                >
+                  <option value="Married">Married</option>
+                  <option value="Unmarried">Unmarried</option>
+                </select>
               </div>
 
               <div class="form-group mt-3">
@@ -534,6 +632,94 @@
               </div>
             </div>
 
+            <!-- Column 2 -->
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="CurrentAddress">Current Address</label>
+                <textarea
+                  class="form-control"
+                  id="CurrentAddress"
+                  [(ngModel)]="currentEmployee.CurrentAddress"
+                  name="CurrentAddress"
+                ></textarea>
+              </div>
+              <div class="form-group mt-3">
+                <label for="Department">Department</label>
+                <select
+                  class="form-select"
+                  id="Department"
+                  [(ngModel)]="currentEmployee.Department"
+                  name="Department"
+                >
+                  <option
+                    *ngFor="let department of DepartmentArray"
+                    [value]="department.DepartmentName"
+                  >
+                    {{ department.DepartmentName }}
+                  </option>
+                </select>
+              </div>
+              <div class="form-group mt-3">
+                <label for="Company">Company</label>
+                <select
+                  class="form-select"
+                  id="Company"
+                  [(ngModel)]="currentEmployee.Company"
+                  name="Company"
+                >
+                  <option
+                    *ngFor="let company of CompanyArray"
+                    [value]="company.Name"
+                  >
+                    {{ company.Name }}
+                  </option>
+                </select>
+              </div>
+              <div class="form-group mt-3">
+                <label for="Designation">Designation</label>
+                <select
+                  class="form-select"
+                  id="Designation"
+                  [(ngModel)]="currentEmployee.Designation"
+                  name="Designation"
+                >
+                  <option value="Director">Director</option>
+                  <option value="Project Manager">Project Manager</option>
+                  <option value="General Manager">General Manager</option>
+                  <option value="HR Manager">HR Manager</option>
+                </select>
+              </div>
+              <div class="form-group mt-3">
+                <label for="ReportsTo">Reports To</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="ReportsTo"
+                  [(ngModel)]="currentEmployee.ReportsTo"
+                  name="ReportsTo"
+                />
+              </div>
+              <div class="form-group mt-3">
+                <label for="EmergencyContactName">Emergency Contact Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="EmergencyContactName"
+                  [(ngModel)]="currentEmployee.EmergencyContactName"
+                  name="EmergencyContactName"
+                />
+              </div>
+              <div class="form-group mt-3">
+                <label for="EmergencyPhone">Emergency Phone</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="EmergencyPhone"
+                  [(ngModel)]="currentEmployee.EmergencyPhone"
+                  name="EmergencyPhone"
+                />
+              </div>
+            </div>
 
             <!-- Column 3 -->
             <div class="col-md-4">
@@ -546,7 +732,6 @@
                   name="PermanentAddress"
                 ></textarea>
               </div>
-
               <div class="form-group mt-3">
                 <label for="CompanyEmail">Company Email</label>
                 <input
@@ -572,27 +757,7 @@
                   <option value="Left">Left</option>
                 </select>
               </div>
-
               <div class="form-group mt-3">
-                <label for="Designation">Designation</label>
-                <select
-                  class="form-select"
-                  id="Designation"
-                  [(ngModel)]="currentEmployee.Designation"
-                  name="Designation"
-                >
-                  <option value="Director">Director</option>
-                  <option value="Project Manager">Project Manager</option>
-                  <option value="General Manager">General Manager</option>
-                  <option value="HR Manager">HR Manager</option>
-                </select>
-              </div>
-            </div>
-
-
-            <!-- Column 4 -->
-            <div class="col-md-4">
-              <div class="form-group">
                 <label for="Branch">Branch</label>
                 <select
                   class="form-select"
@@ -606,33 +771,19 @@
                   <option value="Branch 04">Branch 04</option>
                 </select>
               </div>
-
               <div class="form-group mt-3">
-                <label for="Company">Company</label>
+                <label for="DefaultShift">Default Shift</label>
                 <select
                   class="form-select"
-                  id="Company"
-                  [(ngModel)]="currentEmployee.Company"
-                  name="Company"
+                  id="DefaultShift"
+                  [(ngModel)]="currentEmployee.DefaultShift"
+                  name="DefaultShift"
                 >
-                  <option value="Company 01">Company 01</option>
-                  <option value="Company 02">Company 02</option>
-                  <option value="Company 03">Company 03</option>
-                  <option value="Company 04">Company 04</option>
+                  <option *ngFor="let shift of shiftArray" [value]="shift.id">
+                    {{ shift.Name }}
+                  </option>
                 </select>
               </div>
-
-              <div class="form-group mt-3">
-                <label for="ReportsTo">Reports To</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="ReportsTo"
-                  [(ngModel)]="currentEmployee.ReportsTo"
-                  name="ReportsTo"
-                />
-              </div>
-
               <div class="form-group mt-3">
                 <label for="EmploymentType">Employment Type</label>
                 <select
@@ -647,59 +798,23 @@
                   <option value="Contract">Contract</option>
                 </select>
               </div>
+              <div class="form-group mt-3">
+                <label for="DateOfJoining">Date of Joining</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  id="DateOfJoining"
+                  [(ngModel)]="currentEmployee.DateOfJoining"
+                  name="DateOfJoining"
+                />
+              </div>
             </div>
 
+            <!-- Column 4 -->
+            <div class="col-md-4"></div>
 
             <!-- Column 5 -->
-            <div class="col-md-4">
-              <div class="form-group">
-                <label for="DefaultShift">Default Shift</label>
-                <select
-                  class="form-select"
-                  id="DefaultShift"
-                  [(ngModel)]="currentEmployee.DefaultShift"
-                  name="DefaultShift"
-                >
-                  <option value="WeekDay">WeekDay</option>
-                  <option value="WeekEnd">WeekEnd</option>
-                </select>
-              </div>
-
-              <div class="form-group mt-3">
-                <label for="EmergencyContactName">Emergency Contact Name</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="EmergencyContactName"
-                  [(ngModel)]="currentEmployee.EmergencyContactName"
-                  name="EmergencyContactName"
-                />
-              </div>
-
-              <div class="form-group mt-3">
-                <label for="EmergencyPhone">Emergency Phone</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="EmergencyPhone"
-                  [(ngModel)]="currentEmployee.EmergencyPhone"
-                  name="EmergencyPhone"
-                />
-              </div>
-
-              <div class="form-group mt-3">
-                <label for="Relation">Relation</label>
-                <select
-                  class="form-select"
-                  id="Relation"
-                  [(ngModel)]="currentEmployee.Relation"
-                  name="Relation"
-                >
-                  <option value="Married">Married</option>
-                  <option value="Unmarried">Unmarried</option>
-                </select>
-              </div>
-            </div>
+            <div class="col-md-4"></div>
           </div>
         </div>
       </div>

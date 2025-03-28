@@ -22,12 +22,12 @@ export const navItems: INavData[] = [
       {
         name: 'Upload File',
         url: '/upexcel',
-        iconComponent: { name: 'cil-file' },
+        iconComponent: { name: 'cil-dot' },
       },
       {
         name: 'View Uploads',
         url: '/view',
-        iconComponent: { name: 'cil-list' },
+        iconComponent: { name: 'cil-dot' },
       },
     ],
   },
@@ -39,12 +39,12 @@ export const navItems: INavData[] = [
       {
         name: 'Salary Structure',
         url: '/salary',
-        iconComponent: { name: 'cil-dollar' },
+        iconComponent: { name: 'cil-dot' },
       },
       {
         name: 'Payroll Information',
         url: '/payroll',
-        iconComponent: { name: 'cil-notes' },
+        iconComponent: { name: 'cil-dot' },
       },
     ],
   },
@@ -54,66 +54,150 @@ export const navItems: INavData[] = [
     iconComponent: { name: 'cil-settings' },
     children: [
       {
-        name: 'Employee',
-        url: '/employee',
-        iconComponent: { name: 'cil-user' },
-      },
-      {
-        name: 'Machine',
-        url: '/machine',
-        iconComponent: { name: 'cil-notes' },
-      },
-      {
         name: 'Company',
         url: '/company',
-        iconComponent: { name: 'cil-notes' },
+        iconComponent: { name: 'cil-dot' },
       },
       {
         name: 'Department',
         url: '/department',
-        iconComponent: { name: 'cil-notes' },
+        iconComponent: { name: 'cil-dot' },
+      },
+      // {
+      //   name: 'Shift',
+      //   url: '/shift',
+      //   iconComponent: { name: 'cil-list' },
+      // },
+      {
+        name: 'Employee',
+        url: '/employee',
+        iconComponent: { name: 'cil-dot' },
       },
       {
-        name: 'Shift',
-        url: '/shift',
-        iconComponent: { name: 'cil-list' },
+        name: 'Machine',
+        url: '/machine',
+        iconComponent: { name: 'cil-dot' },
       },
       {
         name: 'Position',
         url: '/position',
-        iconComponent: { name: 'cil-notes' },
+        iconComponent: { name: 'cil-dot' },
       },
       {
         name: 'Gender',
         url: '/gender',
-        iconComponent: { name: 'cil-people' },
+        iconComponent: { name: 'cil-dot' },
       },
       {
         name: 'Calendar',
         url: '/calendar',
-        iconComponent: { name: 'cil-calendar' },
+        iconComponent: { name: 'cil-dot' },
       },
       {
         name: 'Holiday',
         url: '/holiday',
-        iconComponent: { name: 'cil-sun' },
+        iconComponent: { name: 'cil-dot' },
+      },
+      {
+        name: 'Additional',
+        url: '/addallowances',
+        iconComponent: { name: 'cil-dot' },
+      },
+      {
+        name: 'Deductions',
+        url: '/adddeductions',
+        iconComponent: { name: 'cil-dot' },
+      },
+      {
+        name: 'Late',
+        url: '/late',
+        iconComponent: { name: 'cil-dot' },
+      },
+
+    ],
+  },
+
+  {
+    name: 'Attendance',
+    url: '/attendance',
+    iconComponent: { name: 'cil-spreadsheet' },
+    children: [
+      {
+        name: 'Attendance Parameter',
+        url: '/parameter',
+        iconComponent: { name: 'cil-dot' },
       },
     ],
   },
+
   {
-    name: 'Leave',
+    name: 'Day of Week',
+    url: '/day',
+    iconComponent: { name: 'cil-spreadsheet' },
+    children: [
+      {
+        name: 'Week Days',
+        url: '/week',
+        iconComponent: { name: 'cil-dot' },
+      },
+    ],
+  },
+
+  {
+    name: 'Shift Master',
+    url: '/shift',
+    iconComponent: { name: 'cil-spreadsheet' },
+    children: [
+      {
+        name: 'Employee Shift',
+        url: '/empshift',
+        iconComponent: { name: 'cil-dot' },
+      },
+      {
+        name: 'Shift Type',
+        url: '/typeshift',
+        iconComponent: { name: 'cil-dot' },
+      },
+      {
+        name: 'Employee Shift Line',
+        url: '/shiftline',
+        iconComponent: { name: 'cil-dot' },
+      },
+    ],
+  },
+
+  {
+    name: 'Approval Master',
+    url: '/approve',
+    iconComponent: { name: 'cil-spreadsheet' },
+    children: [
+      {
+        name: 'Leave Approve',
+        url: '/leaveapproval',
+        iconComponent: { name: 'cil-dot' },
+      },
+    ],
+  },
+
+  {
+    name: 'Leave Master',
     url: '/leave',
     iconComponent: { name: 'cil-calendar' },
     children: [
       {
         name: 'Manage Leave Type',
         url: '/typeleave',
-        iconComponent: { name: 'cil-list' },
+        iconComponent: { name: 'cil-dot' },
+      },
+      {
+        name: 'Leave Day Type',
+        url: '/leaveday',
+        iconComponent: { name: 'cil-dot' },
       },
       {
         name: 'Manage Leave Employee',
         url: '/manageleave',
-        iconComponent: { name: 'cil-user' },
+        iconComponent: { name: 'cil-dot' },
       },
     ],
   },
@@ -129,7 +213,7 @@ export const navItems: INavData[] = [
       {
         name: 'Admin',
         url: '/admin',
-        iconComponent: { name: 'cil-shield-alt' },
+        iconComponent: { name: 'cil-dot' },
       },
     ],
   },

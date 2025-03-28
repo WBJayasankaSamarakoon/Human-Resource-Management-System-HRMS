@@ -97,6 +97,35 @@
     }
   }
 
+/* Filter Section Styles */
+.filter-box {
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+
+  select,
+  button {
+    min-width: 130px;
+    white-space: nowrap;
+  }
+
+  select {
+    border: 1px solid #ced4da;
+    &:hover {
+      border-color: #007bff;
+    }
+  }
+
+  button:hover {
+    background-color: #f8f9fa;
+  }
+
+  /* Keep horizontal scroll on very small screens */
+  overflow-x: auto;
+}
+
+
+
+
   // Custom Alert Box Styling
   #custom-alert {
     position: fixed;

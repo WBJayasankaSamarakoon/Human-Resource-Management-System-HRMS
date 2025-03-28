@@ -1,51 +1,37 @@
 .table {
+  width: 100%;
   font-size: 14px;
   word-wrap: break-word;
   text-align: center;
+  border-collapse: collapse;
 }
 
 .table thead th {
   background-color: #343a40;
   color: #fff;
   text-transform: capitalize;
+  font-size: 16px;
+  font-weight: 500;
+  padding: 12px;
+  white-space: nowrap;
+  border: 1px solid #50555a;
 }
 
 .table tbody td {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: 14px;
+  padding: 8px;
+  border: 1px solid #dee2e6;
 }
 
 .table-responsive {
   max-height: 70vh;
-  overflow-y: auto; /* For vertical scrolling */
-  overflow-x: auto; /* For horizontal scrolling */
+  overflow-y: auto;
+  overflow-x: auto;
 }
 
-.table th,
-.table td {
-  min-width: 120px; /* Minimum width to ensure columns are aligned */
-}
-
-.table th {
-  font-size: 16px; /* Larger text for headers */
-  padding: 12px;
-}
-
-.table td {
-  padding: 8px;
-}
-
-.pagination .page-link {
-  cursor: pointer;
-}
-
-.container {
-  max-width: 95%;
-  margin: auto;
-}
-
-/* Optional: Add styles for the table header to make it fixed at the top when scrolling */
 .table-wrapper {
   position: relative;
   overflow-x: auto;
@@ -56,5 +42,33 @@
   position: sticky;
   top: 0;
   background-color: #343a40;
-  z-index: 10; /* Keep the header on top of the table body */
+  z-index: 10;
+}
+
+.table th,
+.table td {
+  min-width: 120px;
+}
+
+.pagination .page-link {
+  cursor: pointer;
+}
+
+.container {
+  max-width: 100%;
+  margin: auto;
+}
+
+.table tbody tr:hover {
+  background-color: #f2f2f2;
+}
+
+th.col-action,
+td.col-action {
+  text-align: center;
+  width: 50px;
+}
+
+.table td {
+  vertical-align: middle;
 }

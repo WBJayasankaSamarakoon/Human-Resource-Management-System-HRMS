@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { apiBaseUrl } from 'src/app/app.config'; // Import apiBaseUrl from app.config
+import { apiBaseUrl } from '../../app.config';
 
 @Component({
   selector: 'app-upexcel',

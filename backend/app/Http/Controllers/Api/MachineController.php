@@ -26,8 +26,8 @@ class MachineController extends Controller
 
         $validated = $request->validate([
             'Name' => 'required|string|max:255',
-            'Model' => 'required|string|max:255',
-            'Brand' => 'required|string|max:255',
+            'Model' => 'nullable|string|max:255',
+            'Brand' => 'nullable|string|max:255',
         ]);
 
 
@@ -41,9 +41,9 @@ class MachineController extends Controller
 
 
         $validated = $request->validate([
-            'Name' => 'string|max:255',
-            'Model' => 'string|max:255',
-            'Brand' => 'string|max:255',
+            'Name' => 'required|string|max:255',
+            'Model' => 'nullable|string|max:255',
+            'Brand' => 'nullable|string|max:255',
         ]);
 
 

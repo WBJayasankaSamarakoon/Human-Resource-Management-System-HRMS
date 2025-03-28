@@ -60,7 +60,8 @@ export class DepartmentComponent {
   }
 
   save() {
-    this.showDepartmentNameError = !this.currentDepartment.DepartmentName?.trim();
+    this.showDepartmentNameError =
+      !this.currentDepartment.DepartmentName?.trim();
     // this.showShortNameError = !this.currentDepartment.DepartmentShortName?.trim();
     // this.showDepartmentCodeError = !this.currentDepartment.DepartmentCode?.trim();
 
@@ -78,37 +79,40 @@ export class DepartmentComponent {
   }
 
   register() {
-    this.http.post(`${apiBaseUrl}api/tbldepartments`, this.currentDepartment)
-    .subscribe(
-      () => {
-        this.alertSuccess('Department added successfully!');
-        this.getAllDepartments();
-        this.resetForm();
-        this.closeModal(); // Close the modal after save
-      },
-      (error) => {
-        console.error('Error adding department:', error);
-        this.alertError('Failed to add department!');
-      }
-    );
+    this.http
+      .post(`${apiBaseUrl}api/tbldepartments`, this.currentDepartment)
+      .subscribe(
+        () => {
+          this.alertSuccess('Department added successfully!');
+          this.getAllDepartments();
+          this.resetForm();
+          this.closeModal(); // Close the modal after save
+        },
+        (error) => {
+          console.error('Error adding department:', error);
+          this.alertError('Failed to add department!');
+        }
+      );
   }
 
   updateRecords() {
-    this.http.put(
-      `${apiBaseUrl}api/tbldepartments/${this.currentDepartment.id}`,
-      this.currentDepartment
-    ).subscribe(
-      () => {
-        this.alertSuccess('Department updated successfully!');
-        this.getAllDepartments();
-        this.resetForm();
-        this.closeModal(); // Close the modal after save
-      },
-      (error) => {
-        console.error('Error updating department:', error);
-        this.alertError('Failed to update department!');
-      }
-    );
+    this.http
+      .put(
+        `${apiBaseUrl}api/tbldepartments/${this.currentDepartment.id}`,
+        this.currentDepartment
+      )
+      .subscribe(
+        () => {
+          this.alertSuccess('Department updated successfully!');
+          this.getAllDepartments();
+          this.resetForm();
+          this.closeModal(); // Close the modal after save
+        },
+        (error) => {
+          console.error('Error updating department:', error);
+          this.alertError('Failed to update department!');
+        }
+      );
   }
 
   confirmDelete(department: any) {
@@ -127,16 +131,18 @@ export class DepartmentComponent {
   }
 
   deleteRecord(department: any) {
-    this.http.delete(`${apiBaseUrl}api/tbldepartments/${department.id}`).subscribe(
-      () => {
-        this.alertSuccess('Department deleted successfully!');
-        this.getAllDepartments();
-      },
-      (error) => {
-        console.error('Error deleting department:', error);
-        this.alertError('Failed to delete department!');
-      }
-    );
+    this.http
+      .delete(`${apiBaseUrl}api/tbldepartments/${department.id}`)
+      .subscribe(
+        () => {
+          this.alertSuccess('Department deleted successfully!');
+          this.getAllDepartments();
+        },
+        (error) => {
+          console.error('Error deleting department:', error);
+          this.alertError('Failed to delete department!');
+        }
+      );
   }
 
   closeConfirmationModal() {

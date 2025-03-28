@@ -20,8 +20,16 @@
         </p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeConfirmationModal()">Cancel</button>
-        <button type="button" class="btn btn-danger" (click)="deletePayroll()">OK</button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="closeConfirmationModal()"
+        >
+          Cancel
+        </button>
+        <button type="button" class="btn btn-danger" (click)="deletePayroll()">
+          OK
+        </button>
       </div>
     </div>
   </div>
@@ -38,7 +46,7 @@
         data-toggle="modal"
         data-target="#addPayrollModal"
       >
-        <i class="fas fa-plus fa-sm"></i> Add Payroll
+        <i class="fas fa-plus fa-sm"></i> Add
       </button>
     </div>
     <div class="card-body">
@@ -53,14 +61,16 @@
         <table class="table table-bordered table-striped">
           <thead>
             <tr>
-              <th>EmpId</th>
+              <th>Employee Id</th>
               <th>Employee Name</th>
               <th>Basic Salary</th>
               <th *ngFor="let field of incentiveFields">{{ field }}</th>
-              <th>Deductions</th>
+              <!-- <th>Salary Advance</th>
+              <th>Telephone Expenses</th> -->
+              <!-- <th>Deductions</th> -->
               <th>Net Salary</th>
-              <th>Payment Year</th>
-              <th>Payment Month</th>
+              <th>Month</th>
+              <th>Active</th>
               <th class="col-action">Actions</th>
             </tr>
           </thead>
@@ -72,10 +82,32 @@
               <td *ngFor="let field of incentiveFields">
                 {{ payroll[field] || 0 }}
               </td>
-              <td>{{ payroll.deductions || 0 }}</td>
+              <!-- <td>{{ payroll.s_advance || 0 }}</td>
+              <td>{{ payroll.t_expenses || 0 }}</td> -->
+              <!-- <td>{{ payroll.deductions || 0 }}</td> -->
               <td>{{ payroll.net_salary }}</td>
-              <td>{{ payroll.payment_year }}</td>
-              <td>{{ payroll.payment_month }}</td>
+              <td>{{ payroll.payment_date | date : "yyyy-MM" }}</td>
+              <td>
+                <label class="form-check-label">
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    [checked]="payroll.is_active"
+                    (change)="toggleStatus(payroll)"
+                  />
+                  {{ payroll.is_active ? "Active" : "Inactive" }}
+                </label>
+              </td>
+              <!-- <td>
+                <span
+                  [ngClass]="{
+                    'badge badge-success': payroll.is_active,
+                    'badge badge-danger': !payroll.is_active
+                  }"
+                >
+                  {{ payroll.is_active ? "Active" : "Inactive" }}
+                </span>
+              </td> -->
               <td class="col-action">
                 <button
                   type="button"
@@ -83,7 +115,7 @@
                   (click)="openEditModal(payroll)"
                   aria-label="Edit Payroll"
                   data-toggle="modal"
-                  data-target="#addPayrollModal"
+                  data-target="#editPayrollModal"
                 >
                   <i class="fas fa-edit fa-sm text-white"></i>
                 </button>
@@ -106,7 +138,7 @@
 
 <!-- Add Payroll Modal -->
 <div class="modal fade" id="addPayrollModal" tabindex="-1" role="dialog">
-  <div class="modal-dialog modal-lg" role="document">
+  <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Add Payroll</h5>
@@ -116,93 +148,134 @@
       </div>
       <div class="modal-body">
         <div class="container-fluid">
-          <div class="row g-3">
-            <!-- Column 1 -->
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="emp_id">Employee ID</label>
-                <select
-                  id="emp_id"
-                  class="form-control"
-                  [(ngModel)]="currentPayroll.emp_id"
-                  name="emp_id"
-                  required
-                >
-                  <option
-                    *ngFor="let employee of employees"
-                    [value]="employee.EmpId"
+          <form>
+            <div class="row g-3">
+              <!-- Column 1 -->
+              <div class="col-md-6">
+                <div class="form-group mt-3">
+                  <label for="emp_id">Employee ID<span class="text-danger">*</span></label>
+                  <select
+                    id="emp_id"
+                    class="form-control"
+                    [(ngModel)]="currentPayroll.emp_id"
+                    name="emp_id"
+                    required
                   >
-                    {{ employee.NameWithInitials }}
-                  </option>
-                </select>
-              </div>
-              <div class="form-group mt-3">
-                <label for="basic_salary">Basic Salary</label>
-                <input
-                  type="number"
-                  id="basic_salary"
-                  class="form-control"
-                  [(ngModel)]="currentPayroll.basic_salary"
-                  name="basic_salary"
-                  required
-                />
-                <small *ngIf="showBasicSalaryError" class="text-danger">
-                  Basic Salary is required
-                </small>
-              </div>
-              <div class="form-group mt-3" *ngFor="let field of incentiveFields">
-                <label [for]="field">{{ field }}</label>
-                <input
-                  type="number"
-                  [id]="field"
-                  class="form-control"
-                  [(ngModel)]="currentPayroll[field]"
-                  [name]="field"
-                />
-              </div>
-            </div>
+                    <option
+                      *ngFor="let employee of employees"
+                      [value]="employee.EmpId"
+                    >
+                      {{ employee.NameWithInitials }}
+                    </option>
+                  </select>
+                  <small
+                    *ngIf="showEmployeeError && !currentPayroll.emp_id"
+                    class="text-danger"
+                  >
+                    Name is required
+                  </small>
+                </div>
+                <div class="form-group mt-3">
+                  <label for="basic_salary">Basic Salary<span class="text-danger">*</span></label>
+                  <input
+                    type="number"
+                    id="basic_salary"
+                    class="form-control"
+                    [(ngModel)]="currentPayroll.basic_salary"
+                    name="basic_salary"
+                    required
+                  />
+                  <small
+                    *ngIf="showBasicSalaryError && !currentPayroll.basic_salary"
+                    class="text-danger"
+                  >
+                    Basic Salary is required
+                  </small>
+                </div>
+                <!-- <div class="form-group mt-3">
+                  <label for="s_advance">Salary Advance</label>
+                  <input
+                    type="number"
+                    id="s_advance"
+                    class="form-control"
+                    [(ngModel)]="currentPayroll.s_advance"
+                    name="s_advance"
+                    required
+                  />
+                </div>
+                <div class="form-group mt-3">
+                  <label for="t_expenses">Telephone Expenses</label>
+                  <input
+                    type="number"
+                    id="t_expenses"
+                    class="form-control"
+                    [(ngModel)]="currentPayroll.t_expenses"
+                    name="t_expenses"
+                    required
+                  />
+                </div> -->
+                <!-- <div class="form-group mt-3">
+                  <label for="deductions">Deductions</label>
+                  <input
+                    type="number"
+                    id="deductions"
+                    class="form-control"
+                    [(ngModel)]="currentPayroll.deductions"
+                    name="deductions"
+                  />
+                </div> -->
 
-            <!-- Column 2 -->
-            <div class="col-md-6">
-              <div class="form-group mt-3">
-                <label for="deductions">Deductions</label>
-                <input
-                  type="number"
-                  id="deductions"
-                  class="form-control"
-                  [(ngModel)]="currentPayroll.deductions"
-                  name="deductions"
-                />
+                <!-- Status Dropdown -->
+                <div class="form-group mt-3">
+                  <label for="status">Status</label>
+                  <select
+                    id="status"
+                    class="form-control"
+                    [(ngModel)]="currentPayroll.status"
+                    name="status"
+                  >
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                </div>
+
+                <div class="form-group mt-3">
+                  <label for="payment_date">Payment Date<span class="text-danger">*</span></label>
+                  <input
+                    type="date"
+                    id="payment_date"
+                    class="form-control"
+                    [(ngModel)]="currentPayroll.payment_date"
+                    name="payment_date"
+                    required
+                  />
+                  <small *ngIf="showDateError" class="text-danger">
+                    Date is required
+                  </small>
+                </div>
               </div>
-              <div class="form-group mt-3">
-                <label for="payment_year">Payment Year</label>
-                <input
-                  type="number"
-                  id="payment_year"
-                  class="form-control"
-                  [(ngModel)]="currentPayroll.payment_year"
-                  name="payment_year"
-                  required
-                />
-              </div>
-              <div class="form-group mt-3">
-                <label for="payment_month">Payment Month</label>
-                <select
-                  id="payment_month"
-                  class="form-control"
-                  [(ngModel)]="currentPayroll.payment_month"
-                  name="payment_month"
-                  required
+
+              <!-- Column 2 -->
+              <div class="col-md-6">
+                <div
+                  class="form-group mt-3"
+                  *ngFor="let field of incentiveFields"
                 >
-                  <option *ngFor="let month of months" [value]="month.value">
-                    {{ month.name }}
-                  </option>
-                </select>
+                  <label [for]="field">{{ field }}</label>
+                  <input
+                    type="number"
+                    [id]="field"
+                    class="form-control"
+                    [(ngModel)]="currentPayroll[field]"
+                    [name]="field"
+                  />
+                </div>
               </div>
             </div>
-          </div>
+          </form>
         </div>
       </div>
+
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">
           Cancel
@@ -217,7 +290,7 @@
 
 <!-- Edit Payroll Modal -->
 <div class="modal fade" id="editPayrollModal" tabindex="-1" role="dialog">
-  <div class="modal-dialog modal-lg" role="document">
+  <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Edit Payroll</h5>
@@ -227,90 +300,121 @@
       </div>
       <div class="modal-body">
         <div class="container-fluid">
-          <div class="row g-3">
-            <!-- Column 1 -->
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="emp_id">Employee ID</label>
-                <select
-                  id="emp_id"
-                  class="form-control"
-                  [(ngModel)]="currentPayroll.emp_id"
-                  name="emp_id"
-                  required
-                >
-                  <option
-                    *ngFor="let employee of employees"
-                    [value]="employee.EmpId"
+          <form>
+            <div class="row g-3">
+              <!-- Column 1 -->
+              <div class="col-md-6">
+                <div class="form-group mt-3">
+                  <label for="emp_id">Employee ID</label>
+                  <select
+                    id="emp_id"
+                    class="form-control"
+                    [(ngModel)]="currentPayroll.emp_id"
+                    name="emp_id"
+                    required
                   >
-                    {{ employee.NameWithInitials }}
-                  </option>
-                </select>
-              </div>
-              <div class="form-group mt-3">
-                <label for="basic_salary">Basic Salary</label>
-                <input
-                  type="number"
-                  id="basic_salary"
-                  class="form-control"
-                  [(ngModel)]="currentPayroll.basic_salary"
-                  name="basic_salary"
-                  required
-                />
-              </div>
-              <div class="form-group mt-3" *ngFor="let field of incentiveFields">
-                <label [for]="field">{{ field }}</label>
-                <input
-                  type="number"
-                  [id]="field"
-                  class="form-control"
-                  [(ngModel)]="currentPayroll[field]"
-                  [name]="field"
-                />
-              </div>
-            </div>
+                    <option
+                      *ngFor="let employee of employees"
+                      [value]="employee.EmpId"
+                    >
+                      {{ employee.NameWithInitials }}
+                    </option>
+                  </select>
+                </div>
+                <div class="form-group mt-3">
+                  <label for="basic_salary">Basic Salary</label>
+                  <input
+                    type="number"
+                    id="basic_salary"
+                    class="form-control"
+                    [(ngModel)]="currentPayroll.basic_salary"
+                    name="basic_salary"
+                    required
+                  />
+                  <small *ngIf="showBasicSalaryError" class="text-danger">
+                    Basic Salary is required
+                  </small>
+                </div>
+                <!-- <div class="form-group mt-3">
+                  <label for="s_advance">Salary Advance	</label>
+                  <input
+                    type="number"
+                    id="s_advance"
+                    class="form-control"
+                    [(ngModel)]="currentPayroll.s_advance"
+                    name="s_advance"
+                    required
+                  />
+                </div>
+                <div class="form-group mt-3">
+                  <label for="t_expenses">Telephone Expenses</label>
+                  <input
+                    type="number"
+                    id="t_expenses"
+                    class="form-control"
+                    [(ngModel)]="currentPayroll.t_expenses"
+                    name="t_expenses"
+                    required
+                  />
+                </div> -->
+                <!-- <div class="form-group mt-3">
+                  <label for="deductions">Deductions</label>
+                  <input
+                    type="number"
+                    id="deductions"
+                    class="form-control"
+                    [(ngModel)]="currentPayroll.deductions"
+                    name="deductions"
+                  />
+                </div> -->
 
-            <!-- Column 2 -->
-            <div class="col-md-6">
-              <div class="form-group mt-3">
-                <label for="deductions">Deductions</label>
-                <input
-                  type="number"
-                  id="deductions"
-                  class="form-control"
-                  [(ngModel)]="currentPayroll.deductions"
-                  name="deductions"
-                />
+                <div class="form-group mt-3">
+                  <label for="status">Status</label>
+                  <select
+                    id="status"
+                    class="form-control"
+                    [(ngModel)]="currentPayroll.is_active"
+                    name="status"
+                  >
+                    <option [value]="1">Active</option>
+                    <option [value]="0">Inactive</option>
+                  </select>
+                </div>
+
+                <div class="form-group mt-3">
+                  <label for="payment_date">Payment Date</label>
+                  <input
+                    type="date"
+                    id="payment_date"
+                    class="form-control"
+                    [(ngModel)]="currentPayroll.payment_date"
+                    name="payment_date"
+                    required
+                  />
+                </div>
               </div>
-              <div class="form-group mt-3">
-                <label for="payment_year">Payment Year</label>
-                <input
-                  type="number"
-                  id="payment_year"
-                  class="form-control"
-                  [(ngModel)]="currentPayroll.payment_year"
-                  name="payment_year"
-                  required
-                />
-              </div>
-              <div class="form-group mt-3">
-                <label for="payment_month">Payment Month</label>
-                <select
-                  id="payment_month"
-                  class="form-control"
-                  [(ngModel)]="currentPayroll.payment_month"
-                  name="payment_month"
-                  required
+
+              <!-- Column 2 -->
+              <div class="col-md-6">
+                <div
+                  class="form-group mt-3"
+                  *ngFor="let field of incentiveFields"
                 >
-                  <option *ngFor="let month of months" [value]="month.value">
-                    {{ month.name }}
-                  </option>
-                </select>
+                  <label [for]="field">{{ field }}</label>
+                  <input
+                    type="number"
+                    [id]="field"
+                    class="form-control"
+                    [(ngModel)]="currentPayroll[field]"
+                    [name]="field"
+                  />
+                </div>
               </div>
             </div>
-          </div>
+          </form>
         </div>
       </div>
+
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">
           Cancel

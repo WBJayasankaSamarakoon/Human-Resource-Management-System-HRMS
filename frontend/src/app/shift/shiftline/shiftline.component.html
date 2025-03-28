@@ -1,0 +1,362 @@
+<div class="container-fluid">
+  <h2 class="mb-4">Manage Shift Line</h2>
+
+  <!-- Custom Alert Box -->
+  <div id="custom-alert" class="alert-box"></div>
+
+  <!-- Custom Confirmation Modal -->
+  <div id="confirmationModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete ShiftLine</h5>
+        <button type="button" class="close" (click)="closeConfirmationModal()">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>
+          Are you sure you want to delete the Shift Line for
+          {{ currentShiftLine.Day }}?
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="closeConfirmationModal()"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn btn-danger"
+          (click)="deleteShiftLine()"
+        >
+          OK
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div
+      class="card-header bg-primary text-white d-flex justify-content-between align-items-center"
+    >
+      <button
+        type="button"
+        class="btn btn-light"
+        (click)="openAddModal()"
+        aria-label="Add ShiftLine"
+        data-toggle="modal"
+        data-target="#addShiftLineModal"
+      >
+        <i class="fas fa-plus fa-sm"></i> Add
+      </button>
+    </div>
+    <div class="card-body">
+      <!-- Loading Spinner -->
+      <div *ngIf="isLoading" class="text-center">
+        <div class="spinner-border text-primary" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+
+      <div class="table-responsive" *ngIf="!isLoading">
+        <table id="shiftLineTable" class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th class="col-id">ID</th>
+              <th>Shift Name</th>
+              <th>Start Time</th>
+              <th>Half Time</th>
+              <th>End Time</th>
+              <th>Day</th>
+              <th>Shift Type</th>
+              <th class="col-action">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let shift of groupedShiftLines">
+              <tr class="table-primary">
+                <td colspan="8">
+                  <strong>{{ shift.empshift.Name }}</strong>
+                </td>
+              </tr>
+              <tr *ngFor="let shiftLine of shift.lines">
+                <td>{{ shiftLine.id }}</td>
+                <td>{{ shiftLine.empshift.Name }}</td>
+                <td>{{ shiftLine.StartTime }}</td>
+                <td>{{ shiftLine.HalfTime || '-' }}</td>
+                <td>{{ shiftLine.EndTime }}</td>
+                <td>{{ shiftLine.week.Day }}</td>
+                <td>{{ shiftLine.typeshift.Name }}</td>
+                <td class="col-action">
+                  <button
+                    type="button"
+                    class="btn btn-success btn-sm"
+                    (click)="openEditModal(shiftLine)"
+                    data-toggle="modal"
+                    data-target="#editShiftLineModal"
+                  >
+                    <i class="fas fa-edit fa-sm text-white"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-danger btn-sm"
+                    (click)="confirmDelete(shiftLine)"
+                  >
+                    <i class="fas fa-trash fa-sm text-white"></i>
+                  </button>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Add Shift Line Modal -->
+      <div class="modal fade" id="addShiftLineModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Add Shift Line</h5>
+              <button
+                type="button"
+                class="close"
+                data-dismiss="modal"
+                (click)="closeModal()"
+              >
+                <span>&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form>
+                <div class="form-group mt-3">
+                  <label for="empshift_id">Shift Name</label>
+                  <select
+                    class="form-control"
+                    [(ngModel)]="currentShiftLine.empshift_id"
+                    name="empshift_id"
+                    id="empshift_id"
+                    required
+                    aria-label="Select Shift"
+                  >
+                    <option *ngFor="let shift of shiftArray" [value]="shift.id">
+                      {{ shift.Name }}
+                    </option>
+                  </select>
+                  <small
+                    *ngIf="showNameError && !currentShiftLine.empshift_id"
+                    class="text-danger"
+                  >
+                    Shift name is required
+                  </small>
+                </div>
+                <div class="form-group mt-3">
+                  <label for="startTime">Start Time</label>
+                  <input
+                    type="time"
+                    class="form-control"
+                    [(ngModel)]="currentShiftLine.StartTime"
+                    name="startTime"
+                    id="startTime"
+                    required
+                  />
+                  <small
+                    *ngIf="showStartTimeError && !currentShiftLine.StartTime"
+                    class="text-danger"
+                  >
+                    Start time is required
+                  </small>
+                </div>
+                <div class="form-group mt-3">
+                  <label for="halfTime">Half Time (Optional)</label>
+                  <input
+                    type="time"
+                    class="form-control"
+                    [(ngModel)]="currentShiftLine.HalfTime"
+                    name="halfTime"
+                    id="halfTime"
+                  />
+                </div>
+                <div class="form-group mt-3">
+                  <label for="endTime">End Time</label>
+                  <input
+                    type="time"
+                    class="form-control"
+                    [(ngModel)]="currentShiftLine.EndTime"
+                    name="endTime"
+                    id="endTime"
+                    required
+                  />
+                  <small
+                    *ngIf="showEndTimeError && !currentShiftLine.EndTime"
+                    class="text-danger"
+                  >
+                    End time is required
+                  </small>
+                </div>
+                <div class="form-group mt-3">
+                  <label for="day">Day</label>
+                  <select
+                    class="form-control"
+                    [(ngModel)]="currentShiftLine.Day"
+                    name="day"
+                    id="day"
+                    required
+                    aria-label="Select Day"
+                  >
+                    <option *ngFor="let week of weekArray" [value]="week.id">
+                      {{ week.Day }}
+                    </option>
+                  </select>
+                  <small
+                    *ngIf="showDayError && !currentShiftLine.Day"
+                    class="text-danger"
+                  >
+                    Day is required
+                  </small>
+                </div>
+                <div class="form-group mt-3">
+                  <label for="typeshift">Shift Type</label>
+                  <select
+                    class="form-control"
+                    [(ngModel)]="currentShiftLine.Name"
+                    name="typeshift"
+                    id="typeshift"
+                    required
+                  >
+                    <option
+                      *ngFor="let typeshift of typeshiftArray"
+                      [value]="typeshift.id"
+                    >
+                      {{ typeshift.Name }}
+                    </option>
+                  </select>
+                  <small
+                    *ngIf="showShiftTypeError && !currentShiftLine.Name"
+                    class="text-danger"
+                  >
+                    Shift type is required
+                  </small>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                Cancel
+              </button>
+              <button type="button" class="btn btn-primary" (click)="save()">
+                Add
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Edit Shift Line Modal -->
+      <div class="modal fade" id="editShiftLineModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Edit Shift Line</h5>
+              <button type="button" class="close" data-dismiss="modal">
+                <span>&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="form-group">
+                <label for="empshift_id">Shift Name</label>
+                <select
+                  class="form-control"
+                  [(ngModel)]="currentShiftLine.empshift_id"
+                  name="empshift_id"
+                  id="empshift_id"
+                  required
+                >
+                  <option *ngFor="let shift of shiftArray" [value]="shift.id">
+                    {{ shift.Name }}
+                  </option>
+                </select>
+              </div>
+              <div class="form-group mt-3">
+                <label for="startTimeEdit">Start Time</label>
+                <input
+                  type="time"
+                  class="form-control"
+                  [(ngModel)]="currentShiftLine.StartTime"
+                  name="startTimeEdit"
+                  id="startTimeEdit"
+                  required
+                />
+              </div>
+              <div class="form-group mt-3">
+                <label for="halfTimeEdit">Half Time (Optional)</label>
+                <input
+                  type="time"
+                  class="form-control"
+                  [(ngModel)]="currentShiftLine.HalfTime"
+                  name="halfTimeEdit"
+                  id="halfTimeEdit"
+                />
+              </div>
+              <div class="form-group mt-3">
+                <label for="endTimeEdit">End Time</label>
+                <input
+                  type="time"
+                  class="form-control"
+                  [(ngModel)]="currentShiftLine.EndTime"
+                  name="endTimeEdit"
+                  id="endTimeEdit"
+                  required
+                />
+              </div>
+              <div class="form-group mt-3">
+                <label for="dayEdit">Day</label>
+                <select
+                  class="form-control"
+                  [(ngModel)]="currentShiftLine.Day"
+                  name="dayEdit"
+                  id="dayEdit"
+                  required
+                  aria-label="Select Day"
+                >
+                  <option *ngFor="let week of weekArray" [value]="week.id">
+                    {{ week.Day }}
+                  </option>
+                </select>
+              </div>
+              <div class="form-group mt-3">
+                <label for="typeshiftEdit">Shift Type</label>
+                <select
+                  class="form-control"
+                  [(ngModel)]="currentShiftLine.Name"
+                  name="typeshiftEdit"
+                  id="typeshiftEdit"
+                  required
+                >
+                  <option
+                    *ngFor="let typeshift of typeshiftArray"
+                    [value]="typeshift.id"
+                  >
+                    {{ typeshift.Name }}
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                Cancel
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary"
+                (click)="save()"
+                data-dismiss="modal"
+              >
+                Update
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>

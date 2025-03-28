@@ -2,12 +2,13 @@ import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { apiBaseUrl } from '../../app.config';
 
 @Component({
   selector: 'app-company',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, ReactiveFormsModule, CommonModule],
   templateUrl: './company.component.html',
   styleUrls: ['./company.component.scss'],
 })
@@ -20,19 +21,37 @@ export class CompanyComponent {
     Email: '',
     Telephone: '',
     Fax: '',
+    Logo: ''
   };
   isLoading: boolean = false;
   showNameError: boolean = false;
+  selectedFile: File | null = null;
+  previewLogo: string | null = null;
 
   constructor(private http: HttpClient) {
     this.getAllCompanies();
   }
+
+  onFileSelected(event: any) {
+    const file: File = event.target.files[0];
+    if (file) {
+        this.selectedFile = file;
+        // Preview logo
+        const reader = new FileReader();
+        reader.onload = e => {
+            this.previewLogo = reader.result as string;
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
 
   getAllCompanies() {
     this.isLoading = true;
     this.http.get(`${apiBaseUrl}api/company`).subscribe(
       (resultData: any) => {
         this.CompanyArray = Array.isArray(resultData) ? resultData : [];
+
         this.isLoading = false;
       },
       () => {
@@ -48,18 +67,20 @@ export class CompanyComponent {
     this.removeModalFade();
   }
 
-  openEditModal(companyItem: any) {
-    this.currentCompany = { ...companyItem };
-    this.showNameError = false;
-    this.removeModalFade();
-  }
+openEditModal(companyItem: any) {
+  this.currentCompany = { ...companyItem };
+  this.showNameError = false;
+  this.previewLogo = this.currentCompany.Logo;
+  this.removeModalFade();
+}
 
   save() {
-    this.showNameError = !this.currentCompany.Name?.trim();
-
-    if (this.showNameError) {
+    if (!this.currentCompany.Name?.trim()) {
+      this.showNameError = true;
       return;
     }
+
+    this.showNameError = false;
 
     if (!this.currentCompany.id) {
       this.register();
@@ -69,39 +90,59 @@ export class CompanyComponent {
   }
 
   register() {
-    this.http.post(`${apiBaseUrl}api/company`, this.currentCompany).subscribe(
-      () => {
-        this.alertSuccess('Company added successfully!');
-        this.getAllCompanies();
-        this.resetForm();
-        this.closeModal(); // Close modal after save
-      },
-      (error) => {
-        console.error('Error adding company:', error);
-        this.alertError('Failed to add company!');
-      }
-    );
-  }
+    const formData = new FormData();
+    formData.append('Name', this.currentCompany.Name);
+    formData.append('Address', this.currentCompany.Address);
+    formData.append('Email', this.currentCompany.Email);
+    formData.append('Telephone', this.currentCompany.Telephone);
+    formData.append('Fax', this.currentCompany.Fax);
+    if (this.selectedFile) {
+        formData.append('Logo', this.selectedFile);
+    }
 
-  updateRecords() {
-    this.http
-      .put(
-        `${apiBaseUrl}api/company/${this.currentCompany.id}`,
-        this.currentCompany
-      )
-      .subscribe(
+    this.http.post(`${apiBaseUrl}api/company`, formData).subscribe(
         () => {
-          this.alertSuccess('Company updated successfully!');
-          this.getAllCompanies();
-          this.resetForm();
-          this.closeModal(); // Close modal after update
+            this.alertSuccess('Company added successfully!');
+            this.getAllCompanies();
+            this.resetForm();
+            this.closeModal();
         },
         (error) => {
-          console.error('Error updating company:', error);
-          this.alertError('Failed to update company!');
+            console.error('Error adding company:', error);
+            this.alertError('Failed to add company!');
         }
-      );
+    );
+}
+
+updateRecords() {
+  const formData = new FormData();
+  formData.append('Name', this.currentCompany.Name);
+  formData.append('Address', this.currentCompany.Address);
+  formData.append('Email', this.currentCompany.Email);
+  formData.append('Telephone', this.currentCompany.Telephone);
+  formData.append('Fax', this.currentCompany.Fax);
+
+  if (this.selectedFile) {
+    formData.append('Logo', this.selectedFile);
   }
+
+  this.http
+    .post(`${apiBaseUrl}api/company/update/${this.currentCompany.id}`, formData)
+    .subscribe(
+      () => {
+        this.alertSuccess('Company updated successfully!');
+        this.getAllCompanies();
+        this.resetForm();
+        this.closeModal();
+      },
+      (error) => {
+        console.error('Error updating company:', error);
+        this.alertError('Failed to update company!');
+      }
+    );
+}
+
+
 
   confirmDelete(company: any) {
     this.currentCompany = { ...company };
@@ -114,9 +155,6 @@ export class CompanyComponent {
   deleteCompany() {
     if (this.currentCompany.id) {
       this.deleteRecord(this.currentCompany);
-      this.alertSuccess(
-        `Company ${this.currentCompany.Name} deleted successfully!`
-      );
       this.closeConfirmationModal();
     }
   }
@@ -156,13 +194,25 @@ export class CompanyComponent {
 
   resetForm() {
     this.currentCompany = {
-      id: '',
-      Name: '',
-      Address: '',
-      Email: '',
-      Telephone: '',
-      Fax: '',
+        id: '',
+        Name: '',
+        Address: '',
+        Email: '',
+        Telephone: '',
+        Fax: '',
+        Logo: ''
     };
+    this.selectedFile = null;
+    this.previewLogo = null;
+}
+
+  clearValidationErrors() {
+    const formElements = document.querySelectorAll(
+      '.form-control.ng-dirty, .form-control.ng-touched'
+    );
+    formElements.forEach((element) => {
+      element.classList.remove('ng-dirty', 'ng-touched');
+    });
   }
 
   trackById(index: number, companyItem: any): number {
@@ -174,6 +224,7 @@ export class CompanyComponent {
     if (modal) {
       modal.classList.remove('show');
       modal.style.display = 'none';
+      // this.resetForm();
       this.removeModalFade();
     }
   }

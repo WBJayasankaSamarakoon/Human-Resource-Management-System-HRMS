@@ -1,133 +1,209 @@
 <div class="container mt-4">
   <div class="payslip-container">
-    <!-- Company Information -->
-    <div class="header">
-      <h2 class="text-center">ULTIMATE ENGINEERING SOLUTIONS (PVT) LTD</h2>
-      <p><strong>Month:</strong> {{ slipData.month || "Not Available" }}</p>
-      <p><strong>Name:</strong> {{ slipData.name }}</p>
-      <p><strong>Employee No.:</strong> {{ slipData.empId }}</p>
+    <!-- Company Header -->
+    <div class="header" *ngIf="company">
+      <div class="company-logo">
+        <img *ngIf="company.Logo; else noLogo" [src]="company.Logo" alt="Company Logo" style="width: 80px; height: auto;">
+        <ng-template #noLogo>
+          <span>No Logo</span>
+        </ng-template>
+      </div>
+      <div class="company-info">
+        <h1 class="company-name">{{ company.Name }}</h1>
+        <p class="company-address">{{ company.Address }}</p>
+        <p class="company-contact">
+          Tel: {{ company.Telephone }}
+          <span *ngIf="company.Fax"> | Fax: {{ company.Fax }}</span>
+          <br>
+          Email: {{ company.Email }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Employee Information -->
+    <div class="employee-info">
+      <h3 class="section-title"></h3>
+      <div class="employee-details">
+        <p><strong>Name:</strong> {{ slipData.name }}</p>
+        <p><strong>Employee No:</strong> {{ slipData.empId }}</p>
+        <p><strong>Month:</strong> {{ slipData.month }} - {{ slipData.year }} </p>
+      </div>
     </div>
 
     <!-- Salary Details Table -->
-    <table>
-      <tr>
-        <th>Description</th>
-        <th>Amount (LKR)</th>
-      </tr>
-      <tr>
-        <td>Basic Salary</td>
-        <td>{{ slipData.basicSalary }}</td>
-      </tr>
-      <tr>
-        <td>B.R.A. 1</td>
-        <td>{{ slipData.bra1 }}</td>
-      </tr>
-      <tr>
-        <td>B.R.A. 2</td>
-        <td>{{ slipData.bra2 }}</td>
-      </tr>
-      <tr>
-        <td>B.R.A. 3</td>
-        <td>{{ slipData.bra3 }}</td>
-      </tr>
-      <tr>
-        <th>Gross Salary</th>
-        <td>
-          <!--
-          {{
-            (slipData.basicSalary || 0) +
-              (slipData.bra1 || 0) +
-              (slipData.bra2 || 0) +
-              (slipData.bra3 || 0)
-          }} -->
+    <div class="section">
+      <h5 class="section-title">Salary Details</h5>
+      <table class="table">
+        <tr>
+          <th>Description</th>
+          <th>Amount (LKR)</th>
+          <th>Total Amount (LKR)</th>
+        </tr>
+        <tr>
+          <td>Basic Salary</td>
+          <td>{{ slipData.basicSalary }}</td>
+          <td class="text-end" ></td>
+        </tr>
+        <tr>
+          <td>B.R.A. 1</td>
+          <td>{{ slipData.bra1 }}</td>
+          <td class="text-end"></td>
+        </tr>
+        <tr>
+          <td>B.R.A. 2</td>
+          <td>{{ slipData.bra2 }}</td>
+          <td class="text-end" ></td>
+        </tr>
+        <tr>
+          <th>Gross Salary</th>
+          <td></td>
+          <td class="text-end">{{ slipData.grossSalary }}</td>
+        </tr>
+        <tr>
+          <td>No Pay - {{ slipData.no_pay_count }} Days</td>
+          <td>{{ slipData.noPayAmount }}</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Late - {{ slipData.late_hours }} Hours</td>
+          <td>{{ slipData.lateDeduction }}</td>
+          <td class="text-end"></td>
+        </tr>
+        <tr>
+          <th>Salary for EPF</th>
+          <td></td>
+          <td class="text-end">{{ slipData.salaryForEPF }}</td>
+        </tr>
+        <div> <br></div>
+
+        <!-- Additions Section -->
+        <h5 class="section-title">Additions</h5>
+        <tr>
+          <td>Attendance Incentive</td>
+          <td>{{ slipData.attendanceIncentive }}</td>
+          <td class="text-end"></td>
+        </tr>
+        <tr>
+          <td>Performance Incentive</td>
+          <td>{{ slipData.performanceIncentive }}</td>
+          <td class="text-end" ></td>
+        </tr>
+
+        <!-- Dynamic Allowances -->
+       <tr *ngIf="allowancesArray.length > 0; else noAllowances">
+        <td *ngFor="let allowance of allowancesArray">
+          {{ allowance.Name }}
         </td>
-      </tr>
-      <tr>
-        <td>Late - {{ slipData.lateHours }} Hours</td>
-        <td>{{ slipData.lateHours * 0 }} LKR</td>
-      </tr>
-      <tr>
-        <th>Salary for EPF</th>
-        <td>{{ slipData.basicSalary }}</td>
-      </tr>
-    </table>
+          <td *ngFor="let allowance of allowancesArray">
+            {{ slipData.dynamicAllowances[allowance.id] || 0 }}
+          </td>
+          <td></td>
+        </tr>
+        <ng-template #noAllowances>
+          <tr>
+            <td colspan="3">No allowances found.</td>
+          </tr>
+        </ng-template>
 
-    <!-- Additions Section -->
-    <h5 class="section-title">Additions</h5>
-    <table>
-      <tr>
-        <td>Attendance Incentive</td>
-        <td>{{ slipData.attendanceIncentive }}</td>
-      </tr>
-      <tr>
-        <td>Super Attendance</td>
-        <td>{{ slipData.superAttendance }}</td>
-      </tr>
-      <tr>
-        <td>Performance Incentive</td>
-        <td>{{ slipData.performanceIncentive }}</td>
-      </tr>
-      <tr>
-        <td>Sales Incentive</td>
-        <td>{{ slipData.salesIncentive || "0.00" }}</td>
-      </tr>
-      <tr>
-        <td>OT - {{ slipData.otHours }} Hrs</td>
-        <td>{{ slipData.otAmount || "0" }}</td>
-      </tr>
-    </table>
+        <tr>
+          <td>OT - {{ slipData.otHours }} Hrs</td>
+          <td>{{ slipData.otAmount || "0" }}</td>
+          <td class="text-end"></td>
+        </tr>
+        <tr>
+          <td>Total Allowances</td>
+          <td></td>
+          <td class="text-end">{{ slipData.total_allowances }}</td>
+        </tr>
+        <div> <br></div>
 
-    <!-- Deductions Section -->
-    <h5 class="section-title">Deductions</h5>
-    <table>
-      <tr>
-        <td>EPF 8%</td>
-        <td>{{ slipData.epf || "0" }}</td>
-      </tr>
-      <tr>
-        <td>Advanced</td>
-        <td>{{ slipData.advanced || "0" }}</td>
-      </tr>
-      <tr>
-        <td>Deduction</td>
-        <td>{{ slipData.deductions }}</td>
-      </tr>
-      <tr>
-        <td>Telephone Expenses</td>
-        <td>{{ slipData.telephoneExpenses || "0.00" }}</td>
-      </tr>
-      <tr>
-        <td>API Tax</td>
-        <td>{{ slipData.apiTax || "0.00" }}</td>
-      </tr>
-    </table>
+        <!-- Deductions Section -->
+        <h5 class="section-title">Deductions</h5>
+        <tr>
+          <td>EPF {{ slipData.epfEmp || "0" }} %</td>
+          <!-- <td>{{ slipData.epf || "0" }}</td> -->
+          <td>{{ slipData.epfEmpAmount || "0" }}</td>
+          <td class="text-end"></td>
+        </tr>
 
-    <!-- Leave Balance Section -->
-    <h5 class="section-title">Leave Balance</h5>
-    <table>
-      <tr>
-        <td>Approved Leaves - {{ slipData.leaveDays }}</td>
-        <td>{{ slipData.leaveDays }}</td>
-      </tr>
-      <tr>
-        <td>Balance Leaves - {{ slipData.balanceLeaves || "0" }}</td>
-        <td>{{ slipData.balanceLeaves || "0" }}</td>
-      </tr>
-    </table>
-
-    <!-- Summary Section -->
-    <h5 class="section-title">Summary</h5>
-    <table>
-      <tr>
-        <td><strong>Total Deductions</strong></td>
-        <td>{{ slipData.totalDeductions || "0.00" }}</td>
-      </tr>
-      <tr>
-        <td><strong>Net Salary</strong></td>
-        <td>
-          <strong>{{ slipData.netSalary }}</strong>
+       <!-- Dynamic Deductions -->
+       <tr *ngIf="deductionsArray.length > 0; else noDeductions">
+        <td *ngFor="let deduction of deductionsArray">
+          {{ deduction.Name }}
         </td>
-      </tr>
-    </table>
+          <td *ngFor="let deduction of deductionsArray">
+            {{ slipData.dynamicDeductions[deduction.id] || 0 }}
+          </td>
+          <td></td>
+        </tr>
+        <ng-template #noDeductions>
+          <tr>
+            <td colspan="3">No deductions found.</td>
+          </tr>
+       </ng-template>
+        <tr>
+          <td>Total Deductions</td>
+          <td></td>
+          <td class="text-end">{{ slipData.total_deductions || "0.00" }}</td>
+        </tr>
+        <div> <br></div>
+
+        <!-- Leave Balance Section -->
+        <h5 class="section-title">Leave Balance</h5>
+        <tr>
+          <td>Approved Leaves - {{ slipData.leaveDays }} Days</td>
+          <td>EPF {{ slipData.epfCom || "0" }} %</td>
+          <td class="text-end">{{ slipData.epfComAmount || "0.00" }}</td>
+          <!-- <td class="text-end">{{ 0.00 }}</td> -->
+        </tr>
+        <tr>
+          <td>Unapproved Leaves - {{ slipData.unApproveLeave }} Days</td>
+          <td>ETF {{ slipData.etfCom || "0" }} %</td>
+          <td class="text-end">{{ slipData.etfComAmount || "0.00" }}</td>
+          <!-- <td class="text-end">{{ 0.00 }}</td> -->
+        </tr>
+        <!-- <tr>
+          <td>Holidays - {{ slipData.holidays }} Days</td>
+          <td>{{ slipData.holidays }}</td>
+          <td class="text-end"></td>
+        </tr> -->
+        <tr>
+          <td>Post Approve Leaves - {{ slipData.postApproveLeave }}</td>
+          <td></td>
+          <td class="text-end">{{ 0.00 }}</td>
+        </tr>
+        <tr>
+          <td>Pre Approve Leaves - {{ slipData.preApproveLeave }}</td>
+          <td></td>
+          <td class="text-end">{{ 0.00 }}</td>
+        </tr>
+        <div> <br></div>
+
+        <!-- Summary Section -->
+        <h5 class="section-title">Summary</h5>
+        <tr>
+          <td><strong>Net Salary</strong></td>
+          <td></td>
+          <td class="text-end"><strong>{{ slipData.netSalary }}</strong></td>
+        </tr>
+      </table>
+
+      <!-- Footer -->
+      <div class="footer">
+        <p>This is a system-generated payslip. No signature is required.</p>
+        <p>Thank you for being a valued employee!</p>
+      </div>
+    </div>
   </div>
+</div>
+
+<!-- Button Section -->
+<div class="text-center mt-4">
+  <button class="btn btn-secondary me-2" (click)="goBack()">Back</button>
+  <button class="btn btn-primary me-2" (click)="generatePdf()">
+    Generate Payslip PDF
+  </button>
+  <button class="btn btn-success me-2" (click)="sendSlipByEmail()">
+    Send Payslip
+  </button>
 </div>

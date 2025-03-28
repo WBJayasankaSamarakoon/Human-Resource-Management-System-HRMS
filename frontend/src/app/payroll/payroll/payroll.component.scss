@@ -142,8 +142,8 @@
 
 /* ----------------------------- */
 
- // Custom Alert Box Styling
- #custom-alert {
+// Custom Alert Box Styling
+#custom-alert {
   position: fixed;
   top: 20px;
   right: 20px;
@@ -184,27 +184,25 @@
   }
 }
 
-
 /* ----------------------------- */
 
 /* Custom Modal Styles */
 #confirmationModal {
-display: none;
-position: fixed;
-top: 0;
-left: 0;
-height: 100%;
-width: 100%;
-background-color: rgba(0, 0, 0, 0.5);
-z-index: 9999;
-justify-content: center;
-align-items: center;
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
 }
 
 #confirmationModal.visible {
-display: flex;
+  display: flex;
 }
-
 
 .modal-contentt {
   background-color: white;
@@ -212,75 +210,75 @@ display: flex;
   border-radius: 8px;
   width: 400px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  }
+}
 
 .modal-header {
-display: flex;
-justify-content: space-between;
-align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .modal-title {
-font-size: 18px;
-font-weight: bold;
+  font-size: 18px;
+  font-weight: bold;
 }
 
 .close {
-background: transparent;
-border: none;
-font-size: 1.5rem;
-cursor: pointer;
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
 }
 
 .modal-body {
-margin-top: 10px;
-font-size: 16px;
+  margin-top: 10px;
+  font-size: 16px;
 }
 
 .modal-footer {
-display: flex;
-justify-content: flex-end;
-margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
 }
 
 .modal-footer button {
-margin-left: 10px;
+  margin-left: 10px;
 }
 
 .modal-footer .btn-danger {
-background-color: #f44336;
-border-color: #f44336;
+  background-color: #f44336;
+  border-color: #f44336;
 }
 
 .modal-footer .btn-secondary {
-background-color: #6c757d;
-border-color: #6c757d;
+  background-color: #6c757d;
+  border-color: #6c757d;
 }
 
 /* Custom Alert Box Styles */
 .alert-box {
-position: fixed;
-top: 20px;
-right: 20px;
-padding: 10px 20px;
-border-radius: 5px;
-font-size: 16px;
-color: white;
-opacity: 0;
-visibility: hidden;
-z-index: 9999;
-transition: opacity 0.3s ease, visibility 0.3s ease;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  color: white;
+  opacity: 0;
+  visibility: hidden;
+  z-index: 9999;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
 
-&.visible {
-  opacity: 1;
-  visibility: visible;
-}
+  &.visible {
+    opacity: 1;
+    visibility: visible;
+  }
 
-&.success {
-  background-color: #28a745;
-}
+  &.success {
+    background-color: #28a745;
+  }
 
-&.error {
-  background-color: #dc3545;
-}
+  &.error {
+    background-color: #dc3545;
+  }
 }

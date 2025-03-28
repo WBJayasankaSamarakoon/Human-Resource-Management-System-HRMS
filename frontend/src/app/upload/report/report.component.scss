@@ -18,17 +18,17 @@
 
 .table-responsive {
   max-height: 70vh;
-  overflow-y: auto; /* For vertical scrolling */
-  overflow-x: auto; /* For horizontal scrolling */
+  overflow-y: auto;
+  overflow-x: auto;
 }
 
 .table th,
 .table td {
-  min-width: 120px; /* Minimum width to ensure columns are aligned */
+  min-width: 120px;
 }
 
 .table th {
-  font-size: 16px; /* Larger text for headers */
+  font-size: 16px;
   padding: 12px;
 }
 
@@ -45,7 +45,6 @@
   margin: auto;
 }
 
-/* Optional: Add styles for the table header to make it fixed at the top when scrolling */
 .table-wrapper {
   position: relative;
   overflow-x: auto;
@@ -56,5 +55,5 @@
   position: sticky;
   top: 0;
   background-color: #343a40;
-  z-index: 10; /* Keep the header on top of the table body */
+  z-index: 10;
 }

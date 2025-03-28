@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
-import { apiBaseUrl } from 'src/app/app.config';
+import { apiBaseUrl } from '../../app.config';
 import { FormsModule } from '@angular/forms';
 import * as XLSX from 'xlsx';
 

@@ -31,6 +31,12 @@ export class CalendarComponent implements OnInit {
     selectable: true,
     events: [],
     dateClick: this.handleDateClick.bind(this),
+    dayHeaderFormat: { weekday: 'long' },
+    titleFormat: { year: 'numeric', month: 'long' },
+    buttonText: {
+      today: 'Today',
+      month: 'Month',
+    },
   };
 
   showModal = false;
@@ -39,7 +45,7 @@ export class CalendarComponent implements OnInit {
 
   constructor(private http: HttpClient, private router: Router) {}
 
-  //Navigation Holiday
+  // Navigation Holiday
   navigateToHoliday(): void {
     this.router.navigate(['/holiday']);
   }

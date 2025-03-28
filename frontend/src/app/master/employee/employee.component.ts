@@ -14,12 +14,14 @@ import { apiBaseUrl } from '../../app.config';
 export class EmployeeComponent {
   EmployeeArray: any[] = [];
   CompanyArray: any[] = [];
-  ShiftArray: any[] = [];
+  shiftArray: any[] = [];
+  DepartmentArray: any[] = [];
   currentEmployee: any = {
     id: '',
     EmpId: null,
     NameWithInitials: '',
     EPFNumber: '',
+    EpfEligible: false,
     Phone: '',
     CurrentAddress: '',
     PermanentAddress: '',
@@ -29,17 +31,21 @@ export class EmployeeComponent {
     Status: '',
     Designation: '',
     Branch: '',
+    Department: '',
     Company: '',
     DefaultShift: '',
   };
 
   isLoading: boolean = false;
-  showNameError: boolean = false;
+  showEmployeeEmpIdError: boolean = false;
+  showEmployeeNameWithInitialsError: boolean = false;
+  showDefaultShiftError: boolean = false;
 
   constructor(private http: HttpClient) {
     this.getAllEmployees();
     this.getAllCompanies();
-    this.loadShifts();
+    this.getAllDepartments();
+    this.getAllEmpShifts();
   }
 
   // Fetch all companies
@@ -54,14 +60,27 @@ export class EmployeeComponent {
     );
   }
 
-   // Load shifts from service
-   loadShifts() {
-    this.http.get(`${apiBaseUrl}api/shift`).subscribe(
+  // Fetch all companies
+  getAllDepartments() {
+    this.http.get(`${apiBaseUrl}api/tbldepartments`).subscribe(
       (resultData: any) => {
-        this.ShiftArray = Array.isArray(resultData) ? resultData : [];
+        this.DepartmentArray = Array.isArray(resultData) ? resultData : [];
+        console.log('Fetched departments:', this.DepartmentArray);
       },
       (error) => {
-        console.error('Error loading companies:', error);
+        console.error('Error loading departments:', error);
+      }
+    );
+  }
+
+  // Load shifts from service
+  getAllEmpShifts() {
+    this.http.get(`${apiBaseUrl}api/empshift`).subscribe(
+      (data: any) => {
+        this.shiftArray = Array.isArray(data) ? data : [];
+      },
+      (error) => {
+        console.error('Error loading employee shifts:', error);
       }
     );
   }
@@ -84,22 +103,28 @@ export class EmployeeComponent {
   // Open Add Modal
   openAddModal() {
     this.resetForm();
-    this.showNameError = false;  // Reset error when opening the modal
+    this.showEmployeeEmpIdError = false;
+    this.showEmployeeNameWithInitialsError = false;
+    this.showDefaultShiftError = false;
     this.removeModalFade();
   }
 
   // Open Edit Modal
   openEditModal(employeeItem: any) {
     this.currentEmployee = { ...employeeItem };
-    this.showNameError = false;  // Reset error when opening the modal
+    this.showEmployeeEmpIdError = false;
+    this.showEmployeeNameWithInitialsError = false;
+    this.showDefaultShiftError = false;
     this.removeModalFade();
   }
 
   // Save action based on current mode (Add or Edit)
   save() {
     if (!this.currentEmployee.NameWithInitials?.trim()) {
-      this.showNameError = true;  // Show error for name if it's empty
-      return;  // Prevent closing the modal
+      this.showEmployeeEmpIdError = true;
+      this.showEmployeeNameWithInitialsError = true;
+      this.showDefaultShiftError = true;
+      return;
     }
 
     if (!this.currentEmployee.id) {
@@ -130,7 +155,10 @@ export class EmployeeComponent {
   // Update employee details
   updateRecords() {
     this.http
-      .put(`${apiBaseUrl}api/tblemployees/${this.currentEmployee.id}`, this.currentEmployee)
+      .put(
+        `${apiBaseUrl}api/tblemployees/${this.currentEmployee.id}`,
+        this.currentEmployee
+      )
       .subscribe(
         () => {
           this.alertSuccess('Employee updated successfully!');
@@ -210,9 +238,10 @@ export class EmployeeComponent {
   resetForm() {
     this.currentEmployee = {
       id: '',
-      EmpId: null, // Ensure EmpId is reset to null
+      EmpId: null,
       NameWithInitials: '',
       EPFNumber: '',
+      EpfEligible: false,
       Phone: '',
       CurrentAddress: '',
       PermanentAddress: '',
@@ -222,8 +251,13 @@ export class EmployeeComponent {
       Status: '',
       Designation: '',
       Branch: '',
+      Department: '',
+      Company: '',
+      DefaultShift: '',
     };
-    this.showNameError = false;
+    this.showEmployeeEmpIdError = false;
+    this.showEmployeeNameWithInitialsError = false;
+    this.showDefaultShiftError = false;
   }
 
   // Track by ID for ngFor

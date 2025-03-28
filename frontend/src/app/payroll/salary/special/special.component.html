@@ -1,0 +1,260 @@
+<div class="container-fluid">
+  <h2 class="mb-4">Manage Special Instructions</h2>
+
+  <!-- Custom Alert Box -->
+  <div id="custom-alert" class="alert-box"></div>
+
+  <!-- Custom Confirmation Modal -->
+  <div id="confirmationModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete Special Instructions</h5>
+        <button type="button" class="close" (click)="closeConfirmationModal()">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete the record for {{ currentRecord.emp_id }}?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeConfirmationModal()">Cancel</button>
+        <button type="button" class="btn btn-danger" (click)="deleteRecord()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+      <button type="button" class="btn btn-light" (click)="openAddModal()" data-toggle="modal" data-target="#addSpecialModal">
+        <i class="fas fa-plus fa-sm"></i> Add
+      </button>
+    </div>
+    <div class="card-body">
+      <!-- Loading Spinner -->
+      <div *ngIf="isLoading" class="text-center">
+        <div class="spinner-border text-primary" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+
+      <div class="table-responsive" *ngIf="!isLoading">
+        <table class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>Employee ID</th>
+              <th>Employee Name</th>
+              <th>Payment Date</th>
+              <th>Allow</th>
+              <!-- <th>Leave Count</th> -->
+              <th>Attendance Incentive</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let record of specialRecords; trackBy: trackById">
+              <td>{{ record.emp_id }}</td>
+              <td>{{ record.employee?.NameWithInitials }}</td>
+              <td>{{ record.payment_date | date: 'yyyy-MM' }}</td>
+              <td>
+
+                  <span *ngIf="record.type=='full'"><i class="fa-regular fa-square"></i></span>
+                  <span *ngIf="record.type=='partial'"><i class="fa-regular fa-square-check"></i></span>
+
+
+              </td>
+              <!-- <td>{{ record.leave_count }}</td> -->
+              <td>{{ record.AttendanceIncentive  }}</td>
+              <td class="col-action">
+                <button type="button" class="btn btn-success btn-sm" (click)="openEditModal(record)" data-toggle="modal" data-target="#editSpecialModal">
+                  <i class="fas fa-edit fa-sm text-white"></i>
+                </button>
+                <button type="button" class="btn btn-danger btn-sm" (click)="confirmDelete(record)">
+                  <i class="fas fa-trash fa-sm text-white"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Special Record Modal -->
+<div class="modal fade" id="addSpecialModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Special Instructions</h5>
+        <button type="button" class="close" data-dismiss="modal">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Employee Selection -->
+        <div class="form-group">
+          <label for="emp_id">Employee</label>
+          <select
+            id="emp_id"
+            class="form-control"
+            [(ngModel)]="newRecord.emp_id"
+            name="emp_id"
+            required
+            (change)="onEmployeeChange()"
+          >
+            <option *ngFor="let employee of employees" [value]="employee.EmpId">{{ employee.NameWithInitials }}</option>
+          </select>
+        </div>
+
+        <!-- Payment Date Selection -->
+        <div class="form-group mt-3">
+          <label for="payment_date">Payment Date</label>
+          <input
+            type="month"
+            id="payment_date"
+            class="form-control"
+            [(ngModel)]="newRecord.payment_date"
+            name="payment_date"
+            (change)="onPaymentDateChange()"
+            required
+          />
+        </div>
+
+        <!-- Type Selection -->
+        <div class="form-group mt-3">
+          <label for="type">Type</label>
+          <select
+            id="type"
+            class="form-control"
+            [(ngModel)]="newRecord.type"
+            name="type"
+            required
+            (change)="onTypeChange()"
+          >
+            <option value="full">Allow Full Attendance Incentive</option>
+            <option value="partial">Allow Partial Attendance Incentive</option>
+          </select>
+        </div>
+
+        <!-- Attendance Incentive and Leave Count Display -->
+        <div class="form-group mt-3">
+          <label for="attendanceIncentive">Attendance Incentive</label>
+          <input
+            type="number"
+            id="attendanceIncentive"
+            class="form-control"
+            [ngModel]="newRecord.AttendanceIncentive"
+            disabled
+          />
+        </div>
+        <div class="form-group mt-3">
+          <label for="leaveCount">Leave Count</label>
+          <input
+            type="number"
+            id="leaveCount"
+            class="form-control"
+            [ngModel]="newRecord.leave_count"
+            disabled
+          />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="save()">Add</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Special Record Modal -->
+<div class="modal fade" id="editSpecialModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Special Instructions</h5>
+        <button type="button" class="close" data-dismiss="modal">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Employee Selection -->
+        <div class="form-group">
+          <label for="emp_id">Employee</label>
+          <select
+            id="emp_id"
+            class="form-control"
+            [(ngModel)]="currentRecord.emp_id"
+            name="emp_id"
+            required
+          >
+            <option *ngFor="let emp of employees" [value]="emp.EmpId">{{ emp.NameWithInitials }}</option>
+          </select>
+        </div>
+
+        <!-- Payment Date Selection -->
+        <div class="form-group mt-3">
+          <label for="payment_date">Payment Date</label>
+          <input
+            type="month"
+            id="payment_date"
+            class="form-control"
+            [(ngModel)]="currentRecord.payment_date"
+            name="payment_date"
+            (change)="onPaymentDateChange()"
+            required
+          />
+        </div>
+
+        <!-- Type Selection -->
+        <div class="form-group mt-3">
+          <label for="type">Type</label>
+          <select
+            id="type"
+            class="form-control"
+            [(ngModel)]="currentRecord.type"
+            name="type"
+            required
+          >
+          <option value="full">Allow Full Attendance Incentive</option>
+          <option value="partial">Allow Partial Attendance Incentive</option>
+          </select>
+        </div>
+
+        <!-- Attendance Incentive and Leave Count Display -->
+        <div class="form-group mt-3">
+          <label for="attendanceIncentive">Attendance Incentive</label>
+          <input
+            type="number"
+            id="attendanceIncentive"
+            class="form-control"
+            [(ngModel)]="currentRecord.AttendanceIncentive"
+            disabled
+          />
+        </div>
+        <div class="form-group mt-3">
+          <label for="leaveCount">Leave Count</label>
+          <input
+            type="number"
+            id="leaveCount"
+            class="form-control"
+            [(ngModel)]="currentRecord.leave_count"
+            disabled
+          />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="save()"
+          data-dismiss="modal"
+        >
+          Update
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

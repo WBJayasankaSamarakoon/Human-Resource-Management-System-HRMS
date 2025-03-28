@@ -15,14 +15,22 @@ class Payroll extends Model
         'emp_id',
         'basic_salary',
         'AttendanceIncentive',
+        // 'D_AttendanceIncentive',
         'SuperAttendance',
         'PerformanceIncentive',
         'BRA1',
         'BRA2',
-        'BRA3',
-        'deductions',
-        'payment_year',
-        'payment_month',
+        // 'BRA3',
+        'commission',
+        // 'deductions',
+        // 's_advance',
+        // 't_expenses',
+        'payment_date',
+        'is_active',
+    ];
+
+    protected $casts = [
+        'payment_date' => 'datetime',
     ];
 
     // Define the relationship with Tblemployee
@@ -40,7 +48,8 @@ class Payroll extends Model
             'PerformanceIncentive' => $this->PerformanceIncentive,
             'BRA1' => $this->BRA1,
             'BRA2' => $this->BRA2,
-            'BRA3' => $this->BRA3,
+            // 'BRA3' => $this->BRA3,
+            // 'commission' => $this->BRA3,
         ];
     }
 }

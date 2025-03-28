@@ -13,16 +13,20 @@ return new class extends Migration {
             $table->unsignedBigInteger('emp_id');
             $table->decimal('basic_salary', 10, 2)->notNullable();
             $table->decimal('AttendanceIncentive', 10, 2)->default(0.00);
+            // $table->decimal('D_AttendanceIncentive', 10, 2)->default(0.00);
             $table->decimal('SuperAttendance', 10, 2)->default(0.00);
             $table->decimal('PerformanceIncentive', 10, 2)->default(0.00);
             $table->decimal('BRA1', 10, 2)->default(0.00);
             $table->decimal('BRA2', 10, 2)->default(0.00);
-            $table->decimal('BRA3', 10, 2)->default(0.00);
-            $table->decimal('deductions', 10, 2)->default(0.00);
+            // $table->decimal('BRA3', 10, 2)->default(0.00);
+            // $table->decimal('deductions', 10, 2)->default(0.00);
+            // $table->decimal('s_advance', 10, 2)->default(0.00);
+            // $table->decimal('t_expenses', 10, 2)->default(0.00);
+            // $table->decimal('commission', 10, 2)->default(0.00);
+            $table->boolean('is_active')->default(true);
             $table->decimal('net_salary', 10, 2)
-                  ->storedAs('basic_salary + AttendanceIncentive + SuperAttendance + PerformanceIncentive + BRA1 + BRA2 + BRA3 - deductions');
-            $table->integer('payment_year');
-            $table->integer('payment_month');
+                  ->storedAs('basic_salary + AttendanceIncentive + SuperAttendance + PerformanceIncentive + BRA1 + BRA2 '); //- (deductions)
+            $table->date('payment_date');
             $table->timestamps();
 
             // Add foreign key constraint

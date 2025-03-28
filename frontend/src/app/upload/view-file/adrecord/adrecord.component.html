@@ -1,0 +1,39 @@
+<!-- Add Record Modal -->
+<div class="modal-overlay" *ngIf="isModalOpen">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Employee Record</h5>
+        <button type="button" class="close" (click)="closeAddRecordModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group mt-3">
+            <label for="emp_id">Employee ID<span class="text-danger">*</span></label>
+            <select id="emp_id" class="form-control" [(ngModel)]="currentRecord.emp_id" name="emp_id" required>
+              <option *ngFor="let employee of employees" [value]="employee.EmpId">
+                {{ employee.NameWithInitials }}
+              </option>
+            </select>
+          </div>
+          <div class="form-group mt-3">
+            <label>Date</label>
+            <input type="date" class="form-control" [(ngModel)]="currentRecord.date" name="date" required />
+          </div>
+          <div class="form-group mt-3">
+            <label>Check-in Time</label>
+            <input type="time" class="form-control" [(ngModel)]="currentRecord.check_in" name="check_in" required />
+          </div>
+          <div class="form-group mt-3">
+            <label>Check-out Time</label>
+            <input type="time" class="form-control" [(ngModel)]="currentRecord.check_out" name="check_out" required />
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeAddRecordModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="saveRecord()">Add</button>
+      </div>
+    </div>
+  </div>
+</div>

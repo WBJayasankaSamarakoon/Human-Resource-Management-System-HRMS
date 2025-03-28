@@ -1,22 +1,37 @@
-<div class="container mt-5">
+<div class="container">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h4>File Data: {{ fileName }}</h4>
+    <h4>File Data</h4>
+
+    <!-- Custom Alert Box -->
+    <div id="custom-alert" class="alert-box"></div>
+
     <!-- Buttons for Navigation and Processing -->
     <div>
-      <button class="btn btn-secondary me-2" (click)="goBack()">Back</button>
-      <button class="btn btn-primary" (click)="processData()">Process</button>
+      <button class="btn btn-outline-secondary me-2" (click)="goBack()">Back</button>
+      <button class="btn btn-outline-info me-2" (click)="openAddMonthRecordModal()">+ Add - Month</button>
+      <button class="btn btn-outline-success me-2" (click)="openAddSingleRecordModal()">+ Add - Single Date</button>
+      <button class="btn btn-outline-danger me-2" (click)="deleteSelectedRecords()">Delete Selected</button>
+      <button class="btn btn-outline-primary" (click)="processData()">Process</button>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading" class="text-center my-4">
+    <div class="spinner-border text-primary" role="status">
+      <span class="sr-only">Loading...</span>
     </div>
   </div>
 
   <!-- Table with Pagination -->
-  <div class="table-responsive">
+  <div class="table-responsive" *ngIf="!isLoading">
     <table
       *ngIf="pagedData.length > 0"
       class="table table-hover table-striped table-bordered text-center"
     >
       <thead class="table-dark">
         <tr>
-          <th>#</th>
+          <th><input type="checkbox" (change)="selectAll($event)"></th>
+          <th>Index</th>
           <th>Name</th>
           <th>Department</th>
           <th>Position</th>
@@ -26,19 +41,20 @@
           <th>Timetable</th>
           <th>Check-in</th>
           <th>Check-out</th>
-          <th>Work</th>
-          <th>OT</th>
-          <th>Attended</th>
-          <th>Late</th>
-          <th>Early</th>
-          <th>Absent</th>
-          <th>Leave</th>
-          <th>Status</th>
-          <th>Records</th>
+          <th *ngIf="isColumnDataAvailable('work')">Work</th>
+          <th *ngIf="isColumnDataAvailable('ot')">OT</th>
+          <th *ngIf="isColumnDataAvailable('attended')">Attended</th>
+          <th *ngIf="isColumnDataAvailable('late')">Late</th>
+          <th *ngIf="isColumnDataAvailable('early')">Early</th>
+          <th *ngIf="isColumnDataAvailable('absent')">Absent</th>
+          <th *ngIf="isColumnDataAvailable('leave')">Leave</th>
+          <th *ngIf="isColumnDataAvailable('status')">Status</th>
+          <th *ngIf="isColumnDataAvailable('records')">Records</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let data of pagedData; let i = index">
+          <td><input type="checkbox" [checked]="isSelected(data)" (change)="toggleSelection(data)"></td>
           <td>{{ (currentPage - 1) * pageSize + i + 1 }}</td>
           <td>{{ data.name }}</td>
           <td>{{ data.department }}</td>
@@ -49,15 +65,15 @@
           <td>{{ data.timetable }}</td>
           <td>{{ data.check_in }}</td>
           <td>{{ data.check_out }}</td>
-          <td>{{ data.work }}</td>
-          <td>{{ data.ot }}</td>
-          <td>{{ data.attended }}</td>
-          <td>{{ data.late }}</td>
-          <td>{{ data.early }}</td>
-          <td>{{ data.absent }}</td>
-          <td>{{ data.leave }}</td>
-          <td>{{ data.status }}</td>
-          <td>{{ data.records }}</td>
+          <td *ngIf="isColumnDataAvailable('work')">{{ data.work }}</td>
+          <td *ngIf="isColumnDataAvailable('ot')">{{ data.ot }}</td>
+          <td *ngIf="isColumnDataAvailable('attended')">{{ data.attended }}</td>
+          <td *ngIf="isColumnDataAvailable('late')">{{ data.late }}</td>
+          <td *ngIf="isColumnDataAvailable('early')">{{ data.early }}</td>
+          <td *ngIf="isColumnDataAvailable('absent')">{{ data.absent }}</td>
+          <td *ngIf="isColumnDataAvailable('leave')">{{ data.leave }}</td>
+          <td *ngIf="isColumnDataAvailable('status')">{{ data.status }}</td>
+          <td *ngIf="isColumnDataAvailable('records')">{{ data.records }}</td>
         </tr>
       </tbody>
     </table>
@@ -67,7 +83,7 @@
   </div>
 
   <!-- Pagination Controls -->
-  <nav *ngIf="fileData.length > pageSize" class="mt-4">
+  <nav *ngIf="fileData.length > pageSize && !isLoading" class="mt-4">
     <ul class="pagination justify-content-center">
       <li class="page-item" [class.disabled]="currentPage === 1">
         <button class="page-link" (click)="changePage(currentPage - 1)">
@@ -89,3 +105,198 @@
     </ul>
   </nav>
 </div>
+
+<!-- Single Data Entry Modal -->
+<div *ngIf="isSingleModalOpen" class="modal fade show d-block" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Single Attendance Record</h5>
+        <button type="button" class="close" (click)="closeSingleModal()">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">
+        <form>
+          <div class="row">
+            <!-- Column 1 -->
+            <div class="col-md-6">
+              <div class="form-group mt-3">
+                <label for="emp_id">Employee ID<span class="text-danger">*</span></label>
+                <select
+                  id="emp_id"
+                  class="form-control"
+                  [(ngModel)]="newRecord.emp_id"
+                  name="emp_id"
+                  required
+                  (change)="onEmployeeSelect()"
+                >
+                  <option *ngFor="let employee of employees" [value]="employee.EmpId">
+                    {{ employee.NameWithInitials }}
+                  </option>
+                </select>
+              </div>
+              <div class="form-group mt-3">
+                <label for="checkIn">Check in</label>
+                <input
+                  type="time"
+                  class="form-control"
+                  [(ngModel)]="newRecord.check_in"
+                  name="checkIn"
+                  id="checkIn"
+                  required
+                />
+              </div>
+            </div>
+
+            <!-- Column 2 -->
+            <div class="col-md-6">
+              <div class="form-group mt-3">
+                <label for="date">Date</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  [(ngModel)]="newRecord.date"
+                  name="date"
+                  id="date"
+                />
+              </div>
+              <div class="form-group mt-3">
+                <label for="checkOut">Check Out</label>
+                <input
+                  type="time"
+                  class="form-control"
+                  [(ngModel)]="newRecord.check_out"
+                  name="checkOut"
+                  id="checkOut"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeSingleModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="addSingleRecord()">Add</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- Month Data Entry Modal -->
+<div *ngIf="isMonthModalOpen" class="modal fade show d-block" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="container-fluid">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Month Attendance Record</h5>
+        <button type="button" class="close" (click)="closeMonthModal()">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="row">
+            <!-- Employee ID -->
+            <div class="col-md-6">
+              <div class="form-group mt-3">
+                <label for="emp_id">Employee ID<span class="text-danger">*</span></label>
+                <select
+                  id="emp_id"
+                  class="form-control"
+                  [(ngModel)]="newRecord.emp_id"
+                  name="emp_id"
+                  required
+                  (change)="onEmployeeSelect()"
+                >
+                  <option *ngFor="let employee of employees" [value]="employee.EmpId">
+                    {{ employee.NameWithInitials }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Date Range -->
+            <div class="col-md-6">
+              <div class="form-group mt-3">
+                <label for="startDate">Start Date<span class="text-danger">*</span></label>
+                <input
+                  type="date"
+                  class="form-control"
+                  [(ngModel)]="newRecord.startDate"
+                  name="startDate"
+                  id="startDate"
+                  required
+                />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group mt-3">
+                <label for="endDate">End Date<span class="text-danger">*</span></label>
+                <input
+                  type="date"
+                  class="form-control"
+                  [(ngModel)]="newRecord.endDate"
+                  name="endDate"
+                  id="endDate"
+                  required
+                />
+              </div>
+            </div>
+
+            <!-- Check-in and Check-out Times -->
+            <!-- <div class="col-md-6">
+              <div class="form-group mt-3">
+                <label for="check_in">Check-in Time<span class="text-danger">*</span></label>
+                <input
+                  type="time"
+                  class="form-control"
+                  [(ngModel)]="newRecord.check_in"
+                  name="check_in"
+                  id="check_in"
+                  required
+                />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group mt-3">
+                <label for="check_out">Check-out Time<span class="text-danger">*</span></label>
+                <input
+                  type="time"
+                  class="form-control"
+                  [(ngModel)]="newRecord.check_out"
+                  name="check_out"
+                  id="check_out"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="form-group mt-3">
+                <label for="saturday_check_out">Saturday Check-out Time</label>
+                <input
+                  type="time"
+                  class="form-control"
+                  [(ngModel)]="newRecord.saturday_check_out"
+                  name="saturday_check_out"
+                  id="saturday_check_out"
+                />
+              </div>
+            </div> -->
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeMonthModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="addMonthRecord()">Add</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+

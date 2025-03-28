@@ -1,14 +1,14 @@
 <div class="container-fluid">
   <h2 class="mb-4">Manage Company</h2>
 
-<!-- Custom Alert Box -->
-<div id="custom-alert" class="alert-box"></div>
+  <!-- Custom Alert Box -->
+  <div id="custom-alert" class="alert-box"></div>
 
-<!-- Custom Confirmation Modal -->
-<div id="confirmationModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h5 class="modal-title">Delete Company</h5>
+  <!-- Custom Confirmation Modal -->
+  <div id="confirmationModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete Company</h5>
         <button type="button" class="close" (click)="closeConfirmationModal()">
           <span>&times;</span>
         </button>
@@ -64,17 +64,24 @@
               <th>Email</th>
               <th>Telephone</th>
               <th>Fax</th>
+              <th>Logo</th>
               <th class="col-action">Actions</th>
             </tr>
           </thead>
-          <tbody>
-            <tr *ngFor="let CompanyItem of CompanyArray; trackBy: trackById">
-              <td>{{ CompanyItem.id }}</td>
-              <td>{{ CompanyItem.Name }}</td>
-              <td>{{ CompanyItem.Address }}</td>
-              <td>{{ CompanyItem.Email }}</td>
-              <td>{{ CompanyItem.Telephone }}</td>
-              <td>{{ CompanyItem.Fax }}</td>
+            <tbody>
+              <tr *ngFor="let CompanyItem of CompanyArray; trackBy: trackById">
+                <td>{{ CompanyItem.id }}</td>
+                <td>{{ CompanyItem.Name }}</td>
+                <td>{{ CompanyItem.Address }}</td>
+                <td>{{ CompanyItem.Email }}</td>
+                <td>{{ CompanyItem.Telephone }}</td>
+                <td>{{ CompanyItem.Fax }}</td>
+                <td>
+                  <img *ngIf="CompanyItem.Logo; else noLogo" [src]="CompanyItem.Logo" alt="Company Logo" style="width: 80px; height: auto;">
+                  <ng-template #noLogo>
+                    <span>No Logo</span>
+                  </ng-template>
+                </td>
               <td class="col-action">
                 <button
                   type="button"
@@ -114,7 +121,7 @@
       <div class="modal-body">
         <form>
           <div class="form-group">
-            <label>Name</label>
+            <label>Name<span class="text-danger">*</span></label>
             <input
               type="text"
               class="form-control"
@@ -122,9 +129,13 @@
               [(ngModel)]="currentCompany.Name"
               name="Name"
               required
+              #Name="ngModel"
             />
-            <small *ngIf="showNameError" class="text-danger">
-              Name is required
+            <small
+              *ngIf="showNameError && !currentCompany.Name"
+              class="text-danger"
+            >
+              Company Name is required
             </small>
           </div>
           <div class="form-group mt-3">
@@ -136,9 +147,6 @@
               [(ngModel)]="currentCompany.Address"
               name="Address"
             />
-            <!-- <small *ngIf="showAddressError" class="text-danger">
-              Address is required
-            </small> -->
           </div>
           <div class="form-group mt-3">
             <label>Email</label>
@@ -149,9 +157,6 @@
               [(ngModel)]="currentCompany.Email"
               name="Email"
             />
-            <!-- <small *ngIf="showEmailError" class="text-danger">
-              Email is required
-            </small> -->
           </div>
           <div class="form-group mt-3">
             <label>Telephone</label>
@@ -162,9 +167,6 @@
               [(ngModel)]="currentCompany.Telephone"
               name="Telephone"
             />
-            <!-- <small *ngIf="showTelephoneError" class="text-danger">
-              Telephone is required
-            </small> -->
           </div>
           <div class="form-group mt-3">
             <label>Fax</label>
@@ -175,19 +177,39 @@
               [(ngModel)]="currentCompany.Fax"
               name="Fax"
             />
-            <!-- <small *ngIf="showFaxError" class="text-danger">
-              Fax is required
-            </small> -->
+          </div>
+          <!-- Logo Upload -->
+          <div class="form-group mt-3">
+            <label>Logo</label>
+            <input
+              type="file"
+              class="form-control"
+              (change)="onFileSelected($event)"
+              accept="image/*"
+            />
+          </div>
+          <!-- Preview uploaded logo -->
+          <div *ngIf="previewLogo" class="mt-2">
+            <img [src]="previewLogo" width="100" alt="Preview">
           </div>
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="closeModal()">Cancel</button>
-        <button type="button" class="btn btn-primary" (click)="save()">Add</button>
-      </div>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-dismiss="modal"
+          (click)="closeModal()"
+        >
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary" (click)="save()">
+          Add
+        </button>
       </div>
     </div>
   </div>
+</div>
 
 <!-- Edit Company Modal -->
 <div
@@ -223,6 +245,9 @@
             [(ngModel)]="currentCompany.Name"
             required
           />
+          <small *ngIf="!currentCompany.Name" class="text-danger">
+            Name is required
+          </small>
         </div>
         <div class="form-group mt-3">
           <label for="companyAddress">Address</label>
@@ -264,6 +289,22 @@
             [(ngModel)]="currentCompany.Fax"
           />
         </div>
+        <!-- Logo Upload -->
+        <div class="form-group mt-3">
+          <label>Logo</label>
+          <input
+            type="file"
+            class="form-control"
+            (change)="onFileSelected($event)"
+            accept="image/*"
+          />
+        </div>
+
+        <!-- Preview uploaded logo -->
+        <div *ngIf="previewLogo" class="mt-2">
+          <img [src]="previewLogo" width="100" alt="Preview">
+        </div>
+
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">

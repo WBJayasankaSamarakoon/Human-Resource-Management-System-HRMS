@@ -8,11 +8,11 @@ use Illuminate\Http\Request;
 
 class LeaveController extends Controller
 {
-    // Get all leaves along with related employee and leave type
+    // Get all leaves along with related employee, leave type, and leaveday
     public function index()
     {
-        // Eager load employee and leaveType relationships to include related data
-        $leaves = Leave::with(['employee', 'leaveType'])->get();
+        // Eager load employee, leaveType, leaveapprove, and leaveday relationships
+        $leaves = Leave::with(['employee', 'leaveType', 'leaveapprove', 'leaveday'])->get();
 
         return response()->json($leaves);
     }
@@ -26,6 +26,8 @@ class LeaveController extends Controller
             'leave_type_id' => 'required|exists:leave_types,id',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
+            'approve' => 'required|in:1,2,3',
+            'leaveday_id' => 'required|exists:leaveday,id',
         ]);
 
         // Create a new leave record
@@ -34,6 +36,8 @@ class LeaveController extends Controller
             'leave_type_id' => $request->leave_type_id,
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
+            'approve' => $request->approve,
+            'leaveday_id' => $request->leaveday_id,
         ]);
 
         // Return newly created leave record
@@ -55,6 +59,8 @@ class LeaveController extends Controller
             'leave_type_id' => 'required|exists:leave_types,id',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
+            'approve' => 'required|in:1,2,3',
+            'leaveday_id' => 'required|exists:leaveday,id',
         ]);
 
         // Update leave record
@@ -63,6 +69,8 @@ class LeaveController extends Controller
             'leave_type_id' => $request->leave_type_id,
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
+            'approve' => $request->approve,
+            'leaveday_id' => $request->leaveday_id,
         ]);
 
         // Return updated leave record
@@ -83,4 +91,29 @@ class LeaveController extends Controller
 
         return response()->json(['message' => 'Leave record deleted successfully']);
     }
-}
+
+     // New method to count approved leaves for a specific employee, year, and month
+     public function count(Request $request)
+     {
+         // Validate the request
+         $request->validate([
+             'employee_id' => 'required|exists:tblemployees,id',
+             'year' => 'required|integer',
+             'month' => 'required|integer|between:1,12',
+         ]);
+
+         // Get employee ID, year, and month from the request
+         $employeeId = $request->query('employee_id');
+         $year = $request->query('year');
+         $month = $request->query('month');
+
+         // Count approved leaves for the given employee, year, and month
+         $leaveCount = Leave::where('employee_id', $employeeId)
+             ->whereYear('start_date', $year)
+             ->whereMonth('start_date', $month)
+             ->where('approve', 1) // Only count approved leaves
+             ->count();
+
+         return response()->json(['leave_count' => $leaveCount], 200);
+     }
+ }

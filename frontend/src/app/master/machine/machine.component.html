@@ -1,27 +1,35 @@
 <div class="container-fluid">
   <h2 class="mb-4">Manage Machine</h2>
 
-<!-- Custom Alert Box -->
-<div id="custom-alert" class="alert-box"></div>
+  <!-- Custom Alert Box -->
+  <div id="custom-alert" class="alert-box"></div>
 
-<!-- Custom Confirmation Modal -->
-<div id="confirmationModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h5 class="modal-title">Delete Machine</h5>
-      <button type="button" class="close" (click)="closeConfirmationModal()">
-        <span>&times;</span>
-      </button>
-    </div>
-    <div class="modal-body">
-      <p>Are you sure you want to delete {{ currentMachine.Name }}?</p>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" (click)="closeConfirmationModal()">Cancel</button>
-      <button type="button" class="btn btn-danger" (click)="deleteMachine()">OK</button>
+  <!-- Custom Confirmation Modal -->
+  <div id="confirmationModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete Machine</h5>
+        <button type="button" class="close" (click)="closeConfirmationModal()">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete {{ currentMachine.Name }}?</p>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="closeConfirmationModal()"
+        >
+          Cancel
+        </button>
+        <button type="button" class="btn btn-danger" (click)="deleteMachine()">
+          OK
+        </button>
+      </div>
     </div>
   </div>
-</div>
 
   <div class="card">
     <div
@@ -104,7 +112,7 @@
       <div class="modal-body">
         <form>
           <div class="form-group">
-            <label>Name</label>
+            <label>Name<span class="text-danger">*</span></label>
             <input
               type="text"
               class="form-control"
@@ -113,7 +121,10 @@
               name="Name"
               required
             />
-            <small *ngIf="showNameError" class="text-danger">
+            <small
+              *ngIf="showNameError && !currentMachine.Name"
+              class="text-danger"
+            >
               Machine Name is required
             </small>
           </div>
@@ -148,13 +159,21 @@
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="closeModal()">Cancel</button>
-        <button type="button" class="btn btn-primary" (click)="save()">Add</button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-dismiss="modal"
+          (click)="closeModal()"
+        >
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary" (click)="save()">
+          Add
+        </button>
       </div>
     </div>
   </div>
 </div>
-
 
 <!-- Edit Machine Modal -->
 <div class="modal fade" id="editMachineModal" tabindex="-1" role="dialog">
@@ -177,6 +196,9 @@
             name="Name"
             required
           />
+          <small *ngIf="!currentMachine.Name" class="text-danger">
+            Machine Name is required
+          </small>
         </div>
         <div class="form-group mt-3">
           <label>Model</label>

@@ -1,18 +1,18 @@
 <div class="container-fluid">
   <h2 class="mb-4">Manage Position</h2>
 
-<!-- Custom Alert Box -->
-<div id="custom-alert" class="alert-box"></div>
+  <!-- Custom Alert Box -->
+  <div id="custom-alert" class="alert-box"></div>
 
-<!-- Custom Confirmation Modal -->
-<div id="confirmationModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h5 class="modal-title">Delete Position</h5>
-      <button type="button" class="close" (click)="closeConfirmationModal()">
-        <span>&times;</span>
-      </button>
-    </div>
+  <!-- Custom Confirmation Modal -->
+  <div id="confirmationModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete Position</h5>
+        <button type="button" class="close" (click)="closeConfirmationModal()">
+          <span>&times;</span>
+        </button>
+      </div>
       <div class="modal-body">
         <p>
           Are you sure you want to delete
@@ -20,8 +20,16 @@
         </p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeConfirmationModal()">Cancel</button>
-        <button type="button" class="btn btn-danger" (click)="deletePosition()">OK</button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="closeConfirmationModal()"
+        >
+          Cancel
+        </button>
+        <button type="button" class="btn btn-danger" (click)="deletePosition()">
+          OK
+        </button>
       </div>
     </div>
   </div>
@@ -103,7 +111,7 @@
       <div class="modal-body">
         <form>
           <div class="form-group">
-            <label>Position Title</label>
+            <label>Position Title<span class="text-danger">*</span></label>
             <input
               type="text"
               class="form-control"
@@ -112,15 +120,27 @@
               name="Name"
               required
             />
-            <small *ngIf="showNameError" class="text-danger">
+            <small
+              *ngIf="showNameError && !currentPosition.Name"
+              class="text-danger"
+            >
               Position Title is required
             </small>
           </div>
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="closeModal()">Cancel</button>
-        <button type="button" class="btn btn-primary" (click)="save()">Add</button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-dismiss="modal"
+          (click)="closeModal()"
+        >
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary" (click)="save()">
+          Add
+        </button>
       </div>
     </div>
   </div>

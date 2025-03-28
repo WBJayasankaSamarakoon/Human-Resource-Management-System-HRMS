@@ -19,40 +19,32 @@ export class PayrollComponent {
     emp_id: null,
     basic_salary: '',
     AttendanceIncentive: '',
+    // D_AttendanceIncentive: '',
     SuperAttendance: '',
     PerformanceIncentive: '',
     BRA1: '',
     BRA2: '',
-    BRA3: '',
-    deductions: '',
-    year: '',
-    month: '',
+    // BRA3: '',
+    // s_advance: '',
+    // t_expenses: '',
+    // deductions: '',
+    payment_date: '',
+    is_active: true,
   };
   isLoading: boolean = false;
+  showDateError: boolean = false;
+  showEmployeeError: boolean = false;
   showBasicSalaryError: boolean = false;
 
   incentiveFields = [
     'AttendanceIncentive',
+    // 'D_AttendanceIncentive',
     'SuperAttendance',
     'PerformanceIncentive',
     'BRA1',
     'BRA2',
-    'BRA3',
-  ];
-
-  months = [
-    { value: '01', name: 'January' },
-    { value: '02', name: 'February' },
-    { value: '03', name: 'March' },
-    { value: '04', name: 'April' },
-    { value: '05', name: 'May' },
-    { value: '06', name: 'June' },
-    { value: '07', name: 'July' },
-    { value: '08', name: 'August' },
-    { value: '09', name: 'September' },
-    { value: '10', name: 'October' },
-    { value: '11', name: 'November' },
-    { value: '12', name: 'December' }
+    // 'BRA3',
+    // 'commission',
   ];
 
   constructor(private http: HttpClient) {
@@ -71,7 +63,7 @@ export class PayrollComponent {
               employee_name: payroll.employee
                 ? payroll.employee.NameWithInitials
                 : 'Unknown',
-              EmpId: payroll.EmpId || 'Unknown', // Add EmpId to payrolls
+              EmpId: payroll.EmpId || 'Unknown',
             }))
           : [];
         this.isLoading = false;
@@ -101,22 +93,30 @@ export class PayrollComponent {
   // Open modal for adding a new payroll entry
   openAddModal() {
     this.resetForm();
-    this.showBasicSalaryError = false;  // Reset error when opening the modal
+    this.showEmployeeError = false;
+    this.showDateError = false;
+    this.showBasicSalaryError = false;
     this.removeModalFade();
   }
 
   // Open modal for editing a payroll entry
   openEditModal(payroll: any) {
     this.currentPayroll = { ...payroll };
-    this.showBasicSalaryError = false;  // Reset error when opening the modal
+    // this.currentPayroll.payment_date = payroll.payment_date;
+    // console.log(this.currentPayroll);
+    this.showEmployeeError = false;
+    this.showDateError = false;
+    this.showBasicSalaryError = false;
     this.removeModalFade();
   }
 
   // Save payroll (either add or update)
   save() {
     if (!this.currentPayroll.emp_id) {
-      this.showBasicSalaryError = true;  // Show error for employee if it's empty
-      return;  // Prevent closing the modal
+      this.showEmployeeError = true;
+      this.showDateError = true;
+      this.showBasicSalaryError = true;
+      return;
     }
 
     if (!this.currentPayroll.id) {
@@ -128,32 +128,35 @@ export class PayrollComponent {
 
   // Register a new payroll entry
   register() {
-    this.http
-      .post(`${apiBaseUrl}api/payrolls`, this.currentPayroll)
-      .subscribe(
-        () => {
-          this.alertSuccess('Payroll added successfully!');
-          this.getAllPayrolls();
-          this.resetForm();
-          this.closeModal(); // Close the modal after save
-        },
-        (error) => {
-          console.error('Error adding payroll:', error);
-          this.alertError('Failed to add payroll!');
-        }
-      );
+    this.http.post(`${apiBaseUrl}api/payrolls`, this.currentPayroll).subscribe(
+      () => {
+        this.alertSuccess('Payroll added successfully!');
+        this.getAllPayrolls();
+        this.resetForm();
+        this.closeModal(); // Close the modal after save
+      },
+      (error) => {
+        console.error('Error adding payroll:', error);
+        this.alertError('Failed to add payroll!');
+      }
+    );
   }
 
   // Update an existing payroll entry
   updateRecords() {
+    this.currentPayroll.is_active =
+      this.currentPayroll.is_active == '1' ? true : false;
     this.http
-      .put(`${apiBaseUrl}api/payrolls/${this.currentPayroll.id}`, this.currentPayroll)
+      .put(
+        `${apiBaseUrl}api/payrolls/${this.currentPayroll.id}`,
+        this.currentPayroll
+      )
       .subscribe(
         () => {
           this.alertSuccess('Payroll updated successfully!');
           this.getAllPayrolls();
           this.resetForm();
-          this.closeModal(); // Close the modal after save
+          this.closeModal();
         },
         (error) => {
           console.error('Error updating payroll:', error);
@@ -230,15 +233,20 @@ export class PayrollComponent {
       emp_id: null,
       basic_salary: '',
       AttendanceIncentive: '',
+      // D_AttendanceIncentive: '',
       SuperAttendance: '',
       PerformanceIncentive: '',
       BRA1: '',
       BRA2: '',
-      BRA3: '',
-      deductions: '',
-      year: '',
-      month: '',
+      // BRA3: '',
+      // s_advance: '',
+      // t_expenses: '',
+      // deductions: '',
+      payment_date: '',
+      is_active: '',
     };
+    this.showEmployeeError = false;
+    this.showDateError = false;
     this.showBasicSalaryError = false;
   }
 
@@ -263,5 +271,29 @@ export class PayrollComponent {
     if (modalBackdrop) {
       modalBackdrop.remove();
     }
+  }
+
+  // Toggle the active/inactive status
+  toggleStatus(payroll: any) {
+    const updatedStatus = !payroll.is_active; // Toggle the current status
+    const updatedPayroll = { ...payroll, is_active: updatedStatus };
+
+    // Update the status in the backend
+    this.http
+      .put(`${apiBaseUrl}api/payrolls/${payroll.id}`, updatedPayroll)
+      .subscribe(
+        () => {
+          this.alertSuccess(
+            `Payroll status updated to ${
+              updatedStatus ? 'Active' : 'Inactive'
+            }!`
+          );
+          this.getAllPayrolls(); // Refresh the payroll list after updating
+        },
+        (error) => {
+          console.error('Error updating payroll status:', error);
+          this.alertError('Failed to update payroll status!');
+        }
+      );
   }
 }

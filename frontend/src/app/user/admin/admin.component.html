@@ -1,211 +1,158 @@
-<div class="container-fluid">
-  <h2 class="mb-4">Manage Admins</h2>
+<div class="center">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-10 col-md-6 col-sm-6">
+        <div class="card-group">
+          <!-- Registration Form Section -->
+          <div class="card">
+            <div class="card-body">
+              <h1>Register</h1>
+              <p class="text-muted">Create your account</p>
 
-  <div class="card">
-    <div
-      class="card-header bg-primary text-white d-flex justify-content-between align-items-center"
-    >
-      <div><i class="fas fa-user-shield"></i> Admin Information</div>
-      <button
-        type="button"
-        class="btn btn-light"
-        (click)="openAddModal()"
-        aria-label="Add Admin"
-        data-toggle="modal"
-        data-target="#addAdminModal"
-      >
-        <i class="fas fa-plus fa-sm"></i> Add
-      </button>
-    </div>
-    <div class="card-body">
-      <div class="table-responsive">
-        <table id="adminsTable" class="table table-bordered table-striped">
-          <thead>
-            <tr>
-              <th class="col-id">ID</th>
-              <th>Username</th>
-              <th>Email</th>
-              <th>Password</th>
-              <th class="col-action">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let adminItem of adminArray; trackBy: trackById">
-              <td>{{ adminItem.id }}</td>
-              <td>{{ adminItem.username }}</td>
-              <td>{{ adminItem.email }}</td>
-              <td>******</td>
-              <td class="col-action">
+              <form (ngSubmit)="register()">
+                <!-- Name Field -->
+                <div class="form-group">
+                  <label for="name" class="form-label">Name</label>
+                  <div class="input-group">
+                    <div class="input-group-text">
+                      <svg
+                        class="bi bi-person"
+                        width="16"
+                        height="16"
+                        fill="currentColor"
+                      >
+                        <use xlink:href="#bi-person" />
+                      </svg>
+                    </div>
+                    <input
+                      type="text"
+                      id="name"
+                      [(ngModel)]="user.name"
+                      name="name"
+                      class="form-control"
+                      placeholder="Enter your name"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <!-- Email Field -->
+                <div class="form-group mb-3">
+                  <label for="email" class="form-label">Email</label>
+                  <div class="input-group">
+                    <div class="input-group-text">
+                      <svg
+                        class="bi bi-envelope"
+                        width="16"
+                        height="16"
+                        fill="currentColor"
+                      >
+                        <use xlink:href="#bi-envelope" />
+                      </svg>
+                    </div>
+                    <input
+                      type="email"
+                      id="email"
+                      [(ngModel)]="user.email"
+                      name="email"
+                      class="form-control"
+                      placeholder="Enter your email"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <!-- Password Field -->
+                <div class="form-group mb-3">
+                  <label for="password" class="form-label">Password</label>
+                  <div class="input-group">
+                    <div class="input-group-text">
+                      <svg
+                        class="bi bi-lock"
+                        width="16"
+                        height="16"
+                        fill="currentColor"
+                      >
+                        <use xlink:href="#bi-lock" />
+                      </svg>
+                    </div>
+                    <input
+                      type="password"
+                      id="password"
+                      [(ngModel)]="user.password"
+                      name="password"
+                      class="form-control"
+                      placeholder="Enter your password"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <!-- Confirm Password Field -->
+                <div class="form-group mb-3">
+                  <label for="c_password" class="form-label"
+                    >Confirm Password</label
+                  >
+                  <div class="input-group">
+                    <div class="input-group-text">
+                      <svg
+                        class="bi bi-lock"
+                        width="16"
+                        height="16"
+                        fill="currentColor"
+                      >
+                        <use xlink:href="#bi-lock" />
+                      </svg>
+                    </div>
+                    <input
+                      type="password"
+                      id="c_password"
+                      [(ngModel)]="user.c_password"
+                      name="c_password"
+                      class="form-control"
+                      placeholder="Confirm your password"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <!-- Error Message -->
+                <div *ngIf="errorMessage" class="text-danger mb-3">
+                  <p>{{ errorMessage }}</p>
+                </div>
+
+                <!-- Success Message -->
+                <div *ngIf="successMessage" class="text-success mb-3">
+                  <p>{{ successMessage }}</p>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary w-100">
+                  Register
+                </button>
+              </form>
+              <!-- Reset Form Button -->
+              <div class="mt-2 text-end">
                 <button
                   type="button"
-                  class="btn btn-success btn-sm"
-                  (click)="openEditModal(adminItem)"
-                  aria-label="Edit Admin"
-                  data-toggle="modal"
-                  data-target="#editAdminModal"
+                  class="btn btn-link"
+                  (click)="resetForm()"
                 >
-                  <i class="fas fa-edit fa-sm text-white"></i>
+                  Reset
                 </button>
-                <button
-                  type="button"
-                  class="btn btn-danger btn-sm"
-                  (click)="setDelete(adminItem)"
-                  aria-label="Delete Admin"
-                >
-                  <i class="fas fa-trash fa-sm text-white"></i>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</div>
+              </div>
+            </div>
+          </div>
 
-<!-- Add Admin Modal -->
-<div
-  class="modal fade"
-  id="addAdminModal"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="addAdminModalLabel"
-  aria-hidden="true"
->
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="addAdminModalLabel">Add Admin</h5>
-        <button
-          type="button"
-          class="close"
-          data-dismiss="modal"
-          aria-label="Close"
-        >
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label for="addAdminUsername">Username</label>
-          <input
-            type="text"
-            class="form-control"
-            id="addAdminUsername"
-            placeholder="Enter Username"
-            [(ngModel)]="currentAdmin.username"
-            required
-          />
+          <!-- Login Section -->
+          <!-- <div class="card bg-primary text-white py-5">
+            <div class="card-body text-center">
+              <h2>Already have an account?</h2>
+              <p>Sign in and continue your journey with us.</p>
+              <button class="btn btn-light">Login Now!</button>
+            </div>
+          </div> -->
         </div>
-        <div class="form-group">
-          <label for="addAdminEmail">Email</label>
-          <input
-            type="email"
-            class="form-control"
-            id="addAdminEmail"
-            placeholder="Enter Email"
-            [(ngModel)]="currentAdmin.email"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="addAdminPassword">Password</label>
-          <input
-            type="password"
-            class="form-control"
-            id="addAdminPassword"
-            placeholder="Enter Password"
-            [(ngModel)]="currentAdmin.password"
-            required
-          />
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">
-          Close
-        </button>
-        <button
-          type="button"
-          class="btn btn-primary"
-          (click)="save()"
-          data-dismiss="modal"
-        >
-          Add
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Edit Admin Modal -->
-<div
-  class="modal fade"
-  id="editAdminModal"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="editAdminModalLabel"
-  aria-hidden="true"
->
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="editAdminModalLabel">Edit Admin</h5>
-        <button
-          type="button"
-          class="close"
-          data-dismiss="modal"
-          aria-label="Close"
-        >
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label for="editAdminUsername">Username</label>
-          <input
-            type="text"
-            class="form-control"
-            id="editAdminUsername"
-            placeholder="Enter Username"
-            [(ngModel)]="currentAdmin.username"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="editAdminEmail">Email</label>
-          <input
-            type="email"
-            class="form-control"
-            id="editAdminEmail"
-            placeholder="Enter Email"
-            [(ngModel)]="currentAdmin.email"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="editAdminPassword">Password</label>
-          <input
-            type="password"
-            class="form-control"
-            id="editAdminPassword"
-            placeholder="Enter Password"
-            [(ngModel)]="currentAdmin.password"
-            required
-          />
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">
-          Close
-        </button>
-        <button
-          type="button"
-          class="btn btn-primary"
-          (click)="save()"
-          data-dismiss="modal"
-        >
-          Update
-        </button>
       </div>
     </div>
   </div>

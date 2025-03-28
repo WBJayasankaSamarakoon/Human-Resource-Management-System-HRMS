@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('tbldepartments', function (Blueprint $table) {
             $table->id();
-            $table->string('DepartmentName', 150)->nullable();
+            $table->string('DepartmentName', 150);//->nullable();
             $table->string('DepartmentShortName', 100)->nullable();
             $table->string('DepartmentCode', 50)->nullable();
             $table->timestamps();

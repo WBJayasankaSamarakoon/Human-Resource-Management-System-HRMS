@@ -15,6 +15,7 @@ class Tblemployee extends Model
         'EmpId',
         'NameWithInitials',
         'EPFNumber',
+        'EpfEligible',
         'Phone',
         'CurrentAddress',
         'PermanentAddress',
@@ -25,6 +26,7 @@ class Tblemployee extends Model
         'Salutation',
         'Designation',
         'Branch',
+        'Department',
         'Company',
         'ReportsTo',
         'EmploymentType',
@@ -33,4 +35,9 @@ class Tblemployee extends Model
         'Relation',
         'DefaultShift',
     ];
+
+    public function empshift()
+    {
+        return $this->belongsTo(EmpShift::class, 'DefaultShift');
+    }
 }

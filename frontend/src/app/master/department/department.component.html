@@ -2,27 +2,41 @@
   <h2 class="mb-4">Manage Department</h2>
 
   <!-- Custom Alert Box -->
-<div id="custom-alert" class="alert-box"></div>
+  <div id="custom-alert" class="alert-box"></div>
 
-<!-- Custom Confirmation Modal -->
-<div id="confirmationModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h5 class="modal-title">Delete Department</h5>
-      <button type="button" class="close" (click)="closeConfirmationModal()">
-        <span>&times;</span>
-      </button>
-    </div>
-    <div class="modal-body">
-      <p>Are you sure you want to delete {{ currentDepartment.DepartmentName }}?</p>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" (click)="closeConfirmationModal()">Cancel</button>
-      <button type="button" class="btn btn-danger" (click)="deleteDepartment()">OK</button>
+  <!-- Custom Confirmation Modal -->
+  <div id="confirmationModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete Department</h5>
+        <button type="button" class="close" (click)="closeConfirmationModal()">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>
+          Are you sure you want to delete
+          {{ currentDepartment.DepartmentName }}?
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="closeConfirmationModal()"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn btn-danger"
+          (click)="deleteDepartment()"
+        >
+          OK
+        </button>
+      </div>
     </div>
   </div>
-</div>
-
 
   <div class="card">
     <div
@@ -107,7 +121,7 @@
       <div class="modal-body">
         <form>
           <div class="form-group">
-            <label>Department Name</label>
+            <label>Department Name<span class="text-danger">*</span></label>
             <input
               type="text"
               class="form-control"
@@ -116,7 +130,12 @@
               name="DepartmentName"
               required
             />
-            <small *ngIf="showDepartmentNameError" class="text-danger">
+            <small
+              *ngIf="
+                showDepartmentNameError && !currentDepartment.DepartmentName
+              "
+              class="text-danger"
+            >
               Department Name is required
             </small>
           </div>
@@ -149,12 +168,21 @@
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="closeModal()">Cancel</button>
-        <button type="button" class="btn btn-primary" (click)="save()">Add</button>
-      </div>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-dismiss="modal"
+          (click)="closeModal()"
+        >
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary" (click)="save()">
+          Add
+        </button>
       </div>
     </div>
   </div>
+</div>
 
 <!-- Edit Department Modal -->
 <div class="modal fade" id="editDepartmentModal" tabindex="-1" role="dialog">
@@ -177,6 +205,9 @@
             name="DepartmentName"
             required
           />
+          <small *ngIf="!currentDepartment.DepartmentName" class="text-danger">
+            Department Name is required
+          </small>
         </div>
         <div class="form-group mt-3">
           <label>Short Name</label>

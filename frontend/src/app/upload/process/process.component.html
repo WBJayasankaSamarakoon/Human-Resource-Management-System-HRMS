@@ -1,6 +1,6 @@
-<div class="container mt-5">
+<div class="container">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h4>Monthly Attendance Data</h4>
+    <h4>Monthly Report</h4>
     <button class="btn btn-outline-secondary" (click)="goBack()">Back</button>
   </div>
 
@@ -16,12 +16,28 @@
         <tr>
           <th>Emp ID</th>
           <th>Name</th>
+          <th>No Pay</th>
           <th>Leave Days</th>
           <th>Holidays</th>
           <th>Late Hours</th>
+          <th>Days Worked</th>
+          <th>Post Approve</th>
+          <th>Pre Approve</th>
           <th>Basic Salary</th>
-          <th>Total Allowances</th>
-          <th>Deductions</th>
+          <th>BRA1</th>
+          <th>BRA2</th>
+          <th>
+            Attendance Incentive
+          </th>
+          <th>Super Attendance</th>
+          <th>Performance Incentive</th>
+
+          <th *ngFor="let allowance of allowancesArray">{{ allowance.Name }}</th>
+          <th *ngFor="let deduction of deductionsArray">{{ deduction.Name }}</th>
+
+          <th>Total Additional</th>
+          <th>Total Deduction</th>
+          <th>Gross Salary</th>
           <th>Net Salary</th>
           <th>Action</th>
         </tr>
@@ -30,12 +46,37 @@
         <tr *ngFor="let record of pagedData">
           <td>{{ record.emp_id }}</td>
           <td>{{ record.name }}</td>
+          <td>{{ record.no_pay_count }}</td>
           <td>{{ record.leave_days }}</td>
           <td>{{ record.holidays }}</td>
-          <td>{{ record.late_hours }}</td>
+          <td>{{ record.late_hours }} h</td>
+          <td>{{ record.days_worked }}</td>
+          <td>{{ record.post_approve_leave }}</td>
+          <td>{{ record.pre_approve_leave }}</td>
           <td>{{ record.basic_salary }}</td>
-          <td>{{ record.total_allowances }}</td>
-          <td>{{ record.deductions }}</td>
+          <td>{{ record.bra1 }}</td>
+          <td>{{ record.bra2 }}</td>
+          <td>
+            <!-- <label>
+              <input type="checkbox"
+                     [(ngModel)]="record.applyAttendanceLogic"
+                     (change)="adjustAttendanceIncentive(record)" />
+            </label> -->
+            {{ record.attendance_incentive || 0.0 }}
+          </td>
+          <td>{{record.super_attendance}}</td>
+          <td>{{ record.performance_incentive || 0.0 }}</td>
+
+          <td *ngFor="let allowance of allowancesArray">
+            {{ record.dynamicAllowances[allowance.id] || 0 }}
+          </td>
+          <td *ngFor="let deduction of deductionsArray">
+            {{ record.dynamicDeductions[deduction.id] || 0 }}
+          </td>
+
+          <td>{{record.total_allowances}}</td>
+          <td>{{record.total_deductions}}</td>
+          <td>{{ record.gross_salary }}</td>
           <td>{{ record.net_salary }}</td>
           <td>
             <button

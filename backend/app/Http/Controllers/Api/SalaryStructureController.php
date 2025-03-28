@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\SalaryStructure; // Make sure this model exists
+use App\Models\SalaryStructure;
 
 class SalaryStructureController extends Controller
 {

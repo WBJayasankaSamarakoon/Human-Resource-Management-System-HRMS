@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('leave_types', function (Blueprint $table) {
             $table->id();
-            $table->string('LeaveType', 200)->nullable();
+            $table->string('LeaveType', 200);
             $table->mediumText('Description')->nullable();
             $table->timestamps();
         });

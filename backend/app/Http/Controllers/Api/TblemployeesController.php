@@ -12,7 +12,7 @@ class TblemployeesController extends Controller
     // Display a listing of employees
     public function index(): JsonResponse
     {
-        $employees = Tblemployee::all();
+        $employees = Tblemployee::with('empshift')->get();
         return response()->json($employees, 200);
     }
 
@@ -20,26 +20,28 @@ class TblemployeesController extends Controller
     public function store(Request $request): JsonResponse
     {
         $request->validate([
-            'EmpId' => 'required|numeric|unique:tblemployees,EmpId', // Ensure EmpId is numeric and unique
+            'EmpId' => 'required|numeric|unique:tblemployees,EmpId',
             'NameWithInitials' => 'required|string|max:255',
-            'EPFNumber' => 'required|string|max:100',
-            'Phone' => 'required|string|max:20',
-            'CurrentAddress' => 'required|string',
-            'PermanentAddress' => 'required|string',
-            'PersonalEmail' => 'required|email|max:255',
-            'CompanyEmail' => 'required|email|max:255',
-            'DateOfJoining' => 'required|date',
-            'Status' => 'required|in:Active,Inactive,Suspended,Left',
-            'Salutation' => 'required|in:Mr,Ms,Mrs',
-            'Designation' => 'required|string|max:100',
-            'Branch' => 'required|string|max:100',
-            'Company' => 'required|string|max:100',
-            'ReportsTo' => 'required|string|max:100',
-            'EmploymentType' => 'required|in:Intern,Full-time,Part-time,Contract',
-            'EmergencyContactName' => 'required|string|max:255',
-            'EmergencyPhone' => 'required|string|max:20',
-            'Relation' => 'required|string|max:100',
-            'DefaultShift' => 'required|string|max:100',
+            'EPFNumber' => 'nullable|string|max:100',
+            'EpfEligible' => 'nullable|boolean',
+            'Phone' => 'nullable|string|max:20',
+            'CurrentAddress' => 'nullable|string',
+            'PermanentAddress' => 'nullable|string',
+            'PersonalEmail' => 'nullable|email|max:255',
+            'CompanyEmail' => 'nullable|email|max:255',
+            'DateOfJoining' => 'nullable|date',
+            'Status' => 'nullable|in:Active,Inactive,Suspended,Left',
+            'Salutation' => 'nullable|in:Mr,Ms,Mrs',
+            'Designation' => 'nullable|string|max:100',
+            'Branch' => 'nullable|string|max:100',
+            'Department' => 'nullable|string|max:100',
+            'Company' => 'nullable|string|max:100',
+            'ReportsTo' => 'nullable|string|max:100',
+            'EmploymentType' => 'nullable|in:Intern,Full-time,Part-time,Contract',
+            'EmergencyContactName' => 'nullable|string|max:255',
+            'EmergencyPhone' => 'nullable|string|max:20',
+            'Relation' => 'nullable|string|max:100',
+            'DefaultShift' => 'required|exists:empshift,id',
         ]);
 
         // Create employee
@@ -69,26 +71,28 @@ class TblemployeesController extends Controller
         }
 
         $request->validate([
-            'EmpId' => 'required|numeric|unique:tblemployees,EmpId,' . $id, // Ensure EmpId is numeric and unique excluding current record
+            'EmpId' => 'required|numeric|unique:tblemployees,EmpId,' . $id,
             'NameWithInitials' => 'required|string|max:255',
-            'EPFNumber' => 'required|string|max:100',
-            'Phone' => 'required|string|max:20',
-            'CurrentAddress' => 'required|string',
-            'PermanentAddress' => 'required|string',
-            'PersonalEmail' => 'required|email|max:255',
-            'CompanyEmail' => 'required|email|max:255',
-            'DateOfJoining' => 'required|date',
-            'Status' => 'required|in:Active,Inactive,Suspended,Left',
-            'Salutation' => 'required|in:Mr,Ms,Mrs',
-            'Designation' => 'required|string|max:100',
-            'Branch' => 'required|string|max:100',
-            'Company' => 'required|string|max:100',
-            'ReportsTo' => 'required|string|max:100',
-            'EmploymentType' => 'required|in:Intern,Full-time,Part-time,Contract',
-            'EmergencyContactName' => 'required|string|max:255',
-            'EmergencyPhone' => 'required|string|max:20',
-            'Relation' => 'required|string|max:100',
-            'DefaultShift' => 'required|string|max:100',
+            'EPFNumber' => 'nullable|string|max:100',
+            'EpfEligible' => 'nullable|boolean',
+            'Phone' => 'nullable|string|max:20',
+            'CurrentAddress' => 'nullable|string',
+            'PermanentAddress' => 'nullable|string',
+            'PersonalEmail' => 'nullable|email|max:255',
+            'CompanyEmail' => 'nullable|email|max:255',
+            'DateOfJoining' => 'nullable|date',
+            'Status' => 'nullable|in:Active,Inactive,Suspended,Left',
+            'Salutation' => 'nullable|in:Mr,Ms,Mrs',
+            'Designation' => 'nullable|string|max:100',
+            'Branch' => 'nullable|string|max:100',
+            'Department' => 'nullable|string|max:100',
+            'Company' => 'nullable|string|max:100',
+            'ReportsTo' => 'nullable|string|max:100',
+            'EmploymentType' => 'nullable|in:Intern,Full-time,Part-time,Contract',
+            'EmergencyContactName' => 'nullable|string|max:255',
+            'EmergencyPhone' => 'nullable|string|max:20',
+            'Relation' => 'nullable|string|max:100',
+            'DefaultShift' => 'required|exists:empshift,id',
         ]);
 
         // Update employee

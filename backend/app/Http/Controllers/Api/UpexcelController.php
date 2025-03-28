@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Upexcel;
 use App\Models\UploadedFile;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use Carbon\Carbon;
 use Exception;
 
 class UpexcelController extends Controller
@@ -68,14 +69,14 @@ class UpexcelController extends Controller
                         'timetable' => $row[8],
                         'check_in' => $row[9] ?? null,
                         'check_out' => $row[10] ?? null,
-                        'work' => (int) $row[11],
-                        'ot' => (int) $row[12],
-                        'attended' => (int) $row[13],
-                        'late' => (int) $row[14],
-                        'early' => (int) $row[15],
-                        'absent' => (int) $row[16],
-                        'leave' => (int) $row[17],
-                        'status' => $row[18],
+                        'work' => isset($row[11]) ? (int) $row[11] : null,
+                        'ot' => isset($row[12]) ? (int) $row[12] : null,
+                        'attended' => isset($row[13]) ? (int) $row[13] : null,
+                        'late' => isset($row[14]) ? (int) $row[14] : null,
+                        'early' => isset($row[15]) ? (int) $row[15] : null,
+                        'absent' => isset($row[16]) ? (int) $row[16] : null,
+                        'leave' => isset($row[17]) ? (int) $row[17] : null,
+                        'status' => $row[18] ?? null,
                         'records' => $row[19] ?? null,
                     ]);
                 }
@@ -131,59 +132,60 @@ class UpexcelController extends Controller
 
         return response()->json(['message' => 'File and related data deleted successfully!']);
     }
+}
 
     // Fetch combined data
-    public function getCombinedData()
-    {
-        $data = DB::select("
-            SELECT
-                e.EmpId AS emp_id,
-                e.NameWithInitials AS name,
-                COUNT(
-                    CASE
-                        WHEN (u.check_in IS NULL OR u.check_in = '00:00:00' OR u.check_out IS NULL OR u.check_out = '00:00:00')
-                        THEN 1
-                    END
-                ) AS no_pay_count,
-                IFNULL(l.leave_days, 0) AS leave_days,
-                IFNULL(h.holiday_count, 0) AS holidays,
-                ROUND(SUM(u.late) / 60 + SUM(u.early) / 60, 2) AS late_hours,
-                p.basic_salary,
-                p.AttendanceIncentive,
-                p.SuperAttendance,
-                p.PerformanceIncentive,
-                p.BRA1,
-                p.BRA2,
-                p.BRA3,
-                p.deductions,
-                (p.basic_salary + p.AttendanceIncentive + p.SuperAttendance + p.PerformanceIncentive + p.BRA1 + p.BRA2 + p.BRA3 - p.deductions) AS net_salary,
-                (p.AttendanceIncentive + p.SuperAttendance + p.PerformanceIncentive + p.BRA1 + p.BRA2 + p.BRA3) AS total_allowances
-            FROM
-                upexcel u
-            JOIN
-                tblemployees e ON u.person_id = e.EmpId
-            LEFT JOIN (
-                SELECT
-                    employee_id,
-                    SUM(DATEDIFF(end_date, start_date) + 1) AS leave_days
-                FROM
-                    `leave`
-                GROUP BY
-                    employee_id
-            ) l ON e.id = l.employee_id
-            LEFT JOIN (
-                SELECT
-                    COUNT(*) AS holiday_count
-                FROM
-                    events
-            ) h ON 1 = 1
-            LEFT JOIN
-                payroll p ON e.EmpId = p.emp_id
-            GROUP BY
-                e.EmpId, e.NameWithInitials, p.basic_salary, p.AttendanceIncentive, p.SuperAttendance,
-                p.PerformanceIncentive, p.BRA1, p.BRA2, p.BRA3, p.deductions
-        ");
+    // public function getCombinedData()
+    // {
+    //     $data = DB::select("
+    //         SELECT
+    //             e.EmpId AS emp_id,
+    //             e.NameWithInitials AS name,
+    //             COUNT(
+    //                 CASE
+    //                     WHEN (u.check_in IS NULL OR u.check_in = '00:00:00' OR u.check_out IS NULL OR u.check_out = '00:00:00')
+    //                     THEN 1
+    //                 END
+    //             ) AS no_pay_count,
+    //             IFNULL(l.leave_days, 0) AS leave_days,
+    //             IFNULL(h.holiday_count, 0) AS holidays,
+    //             ROUND(SUM(u.late) / 60 + SUM(u.early) / 60, 2) AS late_hours,
+    //             p.basic_salary,
+    //             p.AttendanceIncentive,
+    //             p.SuperAttendance,
+    //             p.PerformanceIncentive,
+    //             p.BRA1,
+    //             p.BRA2,
+    //             p.BRA3,
+    //             p.deductions,
+    //             (p.basic_salary + p.AttendanceIncentive + p.SuperAttendance + p.PerformanceIncentive + p.BRA1 + p.BRA2 + p.BRA3 - p.deductions) AS net_salary,
+    //             (p.AttendanceIncentive + p.SuperAttendance + p.PerformanceIncentive + p.BRA1 + p.BRA2 + p.BRA3) AS total_allowances
+    //         FROM
+    //             upexcel u
+    //         JOIN
+    //             tblemployees e ON u.person_id = e.EmpId
+    //         LEFT JOIN (
+    //             SELECT
+    //                 employee_id,
+    //                 SUM(DATEDIFF(end_date, start_date) + 1) AS leave_days
+    //             FROM
+    //                 `leave`
+    //             GROUP BY
+    //                 employee_id
+    //         ) l ON e.id = l.employee_id
+    //         LEFT JOIN (
+    //             SELECT
+    //                 COUNT(*) AS holiday_count
+    //             FROM
+    //                 events
+    //         ) h ON 1 = 1
+    //         LEFT JOIN
+    //             payroll p ON e.EmpId = p.emp_id
+    //         GROUP BY
+    //             e.EmpId, e.NameWithInitials, p.basic_salary, p.AttendanceIncentive, p.SuperAttendance,
+    //             p.PerformanceIncentive, p.BRA1, p.BRA2, p.BRA3, p.deductions
+    //     ");
 
-        return response()->json(['data' => $data]);
-    }
-}
+    //     return response()->json(['data' => $data]);
+    // }
+// }

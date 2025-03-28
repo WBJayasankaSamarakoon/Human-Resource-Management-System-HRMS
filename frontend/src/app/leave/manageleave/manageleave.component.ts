@@ -13,39 +13,105 @@ import { apiBaseUrl } from '../../app.config';
 })
 export class ManageLeaveComponent {
   leaveArray: any[] = [];
+  filteredLeaves: any[] = [];
   employeesArray: any[] = [];
   leaveTypesArray: any[] = [];
+  leaveApprovalArray: any[] = [];
+  leaveDayArray: any[] = [];
+
   currentLeave: any = {
     id: '',
     employeeId: '',
     leaveTypeId: '',
     startDate: '',
     endDate: '',
+    approve: '',
+    leavedayId: '',
   };
+
+  filters = {
+    employeeId: '',
+    year: '',
+    month: ''
+  };
+
+  yearsArray: number[] = [];
+monthsArray = [
+  { value: 1, name: 'January' },
+  { value: 2, name: 'February' },
+  { value: 3, name: 'March' },
+  { value: 4, name: 'April' },
+  { value: 5, name: 'May' },
+  { value: 6, name: 'June' },
+  { value: 7, name: 'July' },
+  { value: 8, name: 'August' },
+  { value: 9, name: 'September' },
+  { value: 10, name: 'October' },
+  { value: 11, name: 'November' },
+  { value: 12, name: 'December' },
+];
+
+ngOnInit() {
+  const currentYear = new Date().getFullYear();
+  for (let i = currentYear - 5; i <= currentYear + 1; i++) {
+    this.yearsArray.push(i);
+  }
+}
+
+resetFilters() {
+  this.filters = { employeeId: '', year: '', month: '' };
+  this.getAllLeaves();
+}
+
+
   isLoading: boolean = false;
   showEmployeeError: boolean = false;
   showLeaveTypeError: boolean = false;
   showStartDateError: boolean = false;
   showEndDateError: boolean = false;
+  showApproveError: boolean = false;
+  showNameError: boolean = false;
 
   constructor(private http: HttpClient) {
     this.getAllLeaves();
     this.getAllEmployees();
     this.getAllLeaveTypes();
+    this.getAllLeaveApprovals();
+    this.getAllLeaveDays();
   }
 
-  // Fetch all leave records from the API
+  applyFilters() {
+    let filtered = this.leaveArray;
+
+    const employeeId = this.filters.employeeId;
+    const year = this.filters.year ? parseInt(this.filters.year, 10) : null;
+    const month = this.filters.month ? parseInt(this.filters.month, 10) : null;
+
+    if (employeeId) {
+      filtered = filtered.filter(l => l.employee_id == employeeId);
+    }
+
+    if (year) {
+      filtered = filtered.filter(l => {
+        return new Date(l.start_date).getFullYear() === year;
+      });
+    }
+
+    if (month) {
+      filtered = filtered.filter(l => {
+        return new Date(l.start_date).getMonth() + 1 === month;
+      });
+    }
+
+    this.filteredLeaves = [...filtered]; // use this for view binding (see below)
+  }
+
   getAllLeaves() {
     this.isLoading = true;
     this.http.get(`${apiBaseUrl}api/leave`).subscribe(
       (data: any) => {
-        this.leaveArray = data.map((leave: any) => ({
-          ...leave,
-          employeeName: leave.employee ? leave.employee.NameWithInitials : 'Unknown',
-          leaveType: leave.leaveType ? leave.leaveType.LeaveType : 'Unknown',
-          startDate: leave.start_date,
-          endDate: leave.end_date,
-        }));
+        this.leaveArray = data;
+        this.filteredLeaves = data; // initialize filtered leaves
         this.isLoading = false;
       },
       (error) => {
@@ -54,6 +120,30 @@ export class ManageLeaveComponent {
       }
     );
   }
+
+
+  // // Fetch all leave records from the API
+  // getAllLeaves() {
+  //   this.isLoading = true;
+  //   this.http.get(`${apiBaseUrl}api/leave`).subscribe(
+  //     (data: any) => {
+  //       this.leaveArray = data;
+  //       console.log(data);
+  //       // .map((leave: any) => ({
+  //       //   ...leave,
+  //       //   employeeName: leave.employee ? leave.employee.NameWithInitials : 'Unknown',
+  //       //   leaveType: leave.leaveType ? leave.leaveType.LeaveType : 'Unknown',
+  //       //   startDate: leave.start_date,
+  //       //   endDate: leave.end_date,
+  //       // }));
+  //       this.isLoading = false;
+  //     },
+  //     (error) => {
+  //       console.error('Error loading leaves:', error);
+  //       this.isLoading = false;
+  //     }
+  //   );
+  // }
 
   // Fetch all employees from the API
   getAllEmployees() {
@@ -72,6 +162,24 @@ export class ManageLeaveComponent {
     });
   }
 
+  // Fetch all Leave Approve from the API
+  getAllLeaveApprovals() {
+    this.http.get(`${apiBaseUrl}api/leaveapprove`).subscribe((data: any) => {
+      this.leaveApprovalArray = data;
+    });
+  }
+
+  // Fetch all Leave Days from the API
+  getAllLeaveDays() {
+    this.http.get(`${apiBaseUrl}api/leaveday`).subscribe((data: any) => {
+        this.leaveDayArray = data.map((day: any) => ({
+            id: day.id,
+            Name: day.Name, // Map the 'Name' field
+        }));
+        console.log('Leave Days:', this.leaveDayArray); // Debugging: Log the leaveDayArray
+    });
+}
+
   // Open modal for adding a new leave entry
   openAddModal() {
     this.resetForm();
@@ -79,30 +187,55 @@ export class ManageLeaveComponent {
     this.showLeaveTypeError = false;
     this.showStartDateError = false;
     this.showEndDateError = false;
+    this.showApproveError = false;
+    this.showNameError = false;
     this.removeModalFade();
   }
 
   // Open modal for editing a leave entry
   openEditModal(leave: any) {
     this.currentLeave = { ...leave };
+    //this.currentLeave.employeeId = leave.employee.NameWithInitials;
+    this.currentLeave.employeeId = leave.employee_id;
+    this.currentLeave.leaveTypeId = leave.leave_type_id;
+    this.currentLeave.startDate = leave.start_date;
+    this.currentLeave.endDate = leave.end_date;
+    this.currentLeave.approve = leave.approve;
+    this.currentLeave.leaveadayId = leave.leaveaday_id;
+
+    console.log(this.currentLeave);
     this.showEmployeeError = false;
     this.showLeaveTypeError = false;
     this.showStartDateError = false;
     this.showEndDateError = false;
+    this.showApproveError = false;
+    this.showNameError = false;
     this.removeModalFade();
   }
 
   // Save leave (either add or update)
   save() {
-    this.showEmployeeError = !this.currentLeave.employeeId?.trim();
-    this.showLeaveTypeError = !this.currentLeave.leaveTypeId?.trim();
-    this.showStartDateError = !this.currentLeave.startDate?.trim();
-    this.showEndDateError = !this.currentLeave.endDate?.trim();
+    // Check for empty required fields before saving
+    this.showEmployeeError = !this.currentLeave.employeeId;
+    this.showLeaveTypeError = !this.currentLeave.leaveTypeId;
+    this.showStartDateError = !this.currentLeave.startDate;
+    this.showEndDateError = !this.currentLeave.endDate;
+    this.showApproveError = !this.currentLeave.approve;
+    this.showNameError = !this.currentLeave.leavedayId;
 
-    if (this.showEmployeeError || this.showLeaveTypeError || this.showStartDateError || this.showEndDateError) {
+    // If there are any validation errors, return early
+    if (
+      this.showEmployeeError ||
+      this.showLeaveTypeError ||
+      this.showStartDateError ||
+      this.showEndDateError ||
+      this.showApproveError ||
+      this.showNameError
+    ) {
       return;
     }
 
+    // If there's no ID, it's a new leave; otherwise, it's an update
     if (!this.currentLeave.id) {
       this.register();
     } else {
@@ -118,6 +251,8 @@ export class ManageLeaveComponent {
       leave_type_id: this.currentLeave.leaveTypeId,
       start_date: this.currentLeave.startDate,
       end_date: this.currentLeave.endDate,
+      approve: this.currentLeave.approve,
+      leaveday_id: this.currentLeave.leavedayId,
     };
     this.http.post(`${apiBaseUrl}api/leave`, leaveData).subscribe(
       () => {
@@ -141,19 +276,23 @@ export class ManageLeaveComponent {
       leave_type_id: this.currentLeave.leaveTypeId,
       start_date: this.currentLeave.startDate,
       end_date: this.currentLeave.endDate,
+      approve: this.currentLeave.approve,
+      leaveday_id: this.currentLeave.leavedayId,
     };
-    this.http.put(`${apiBaseUrl}api/leave/${this.currentLeave.id}`, leaveData).subscribe(
-      () => {
-        this.alertSuccess('Leave Updated Successfully');
-        this.getAllLeaves();
-        this.resetForm();
-        this.closeModal();
-      },
-      (error) => {
-        this.alertError('Failed to update leave');
-        this.isLoading = false;
-      }
-    );
+    this.http
+      .put(`${apiBaseUrl}api/leave/${this.currentLeave.id}`, leaveData)
+      .subscribe(
+        () => {
+          this.alertSuccess('Leave Updated Successfully');
+          this.getAllLeaves();
+          this.resetForm();
+          this.closeModal();
+        },
+        (error) => {
+          this.alertError('Failed to update leave');
+          this.isLoading = false;
+        }
+      );
   }
 
   // Delete a leave record
@@ -220,11 +359,15 @@ export class ManageLeaveComponent {
       leaveTypeId: '',
       startDate: '',
       endDate: '',
+      approve: '',
+      leavedayId: '',
     };
     this.showEmployeeError = false;
     this.showLeaveTypeError = false;
     this.showStartDateError = false;
     this.showEndDateError = false;
+    this.showApproveError = false;
+    this.showNameError = false;
   }
 
   // Track leave data by ID
