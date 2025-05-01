@@ -45,10 +45,13 @@ export class MachineComponent {
   openAddModal() {
     this.resetForm();
     this.showNameError = false;
-    // this.showModelError = false;
-    // this.showBrandError = false;
-    this.removeModalFade();
+  const modalElement = document.getElementById('addMachineModal');
+    if (modalElement) {
+      const modalInstance = new (window as any).bootstrap.Modal(modalElement);
+      modalInstance.show();
+    }
   }
+
 
   openEditModal(machineItem: any) {
     this.currentMachine = { ...machineItem };
@@ -182,13 +185,18 @@ export class MachineComponent {
   }
 
   closeModal() {
-    const modal = document.getElementById('addMachineModal') as HTMLElement;
-    if (modal) {
-      modal.classList.remove('show');
-      modal.style.display = 'none';
-      this.removeModalFade();
+    const modalElement = document.getElementById('addMachineModal');
+    if (modalElement) {
+      const modalInstance = (window as any).bootstrap?.Modal.getInstance(modalElement);
+      if (modalInstance) {
+        modalInstance.hide();
+      } else {
+        // fallback for first-time close
+        new (window as any).bootstrap.Modal(modalElement).hide();
+      }
     }
   }
+
 
   removeModalFade() {
     const modalBackdrop = document.querySelector('.modal-backdrop');

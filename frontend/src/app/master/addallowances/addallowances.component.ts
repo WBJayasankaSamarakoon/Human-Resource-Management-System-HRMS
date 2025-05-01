@@ -41,8 +41,13 @@ export class AddallowancesComponent {
   openAddModal() {
     this.resetForm();
     this.showAllowanceNameError = false;
-    this.removeModalFade();
+  const modalElement = document.getElementById('addAllowanceModal');
+    if (modalElement) {
+      const modalInstance = new (window as any).bootstrap.Modal(modalElement);
+      modalInstance.show();
+    }
   }
+
 
   openEditModal(allowanceItem: any) {
     this.currentAllowance = { ...allowanceItem };

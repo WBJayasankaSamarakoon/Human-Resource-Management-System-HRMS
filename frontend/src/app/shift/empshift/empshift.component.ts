@@ -39,11 +39,22 @@ export class EmpshiftComponent {
     );
   }
 
+  // openAddModal() {
+  //   this.resetForm();
+  //   this.showNameError = false;
+  //   this.removeModalFade();
+  // }
+
   openAddModal() {
     this.resetForm();
     this.showNameError = false;
-    this.removeModalFade();
+  const modalElement = document.getElementById('addEmpShiftModal');
+    if (modalElement) {
+      const modalInstance = new (window as any).bootstrap.Modal(modalElement);
+      modalInstance.show();
+    }
   }
+
 
   openEditModal(empShiftItem: any) {
     this.currentEmpShift = { ...empShiftItem };

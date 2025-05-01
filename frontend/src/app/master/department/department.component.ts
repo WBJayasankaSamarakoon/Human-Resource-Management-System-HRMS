@@ -46,10 +46,13 @@ export class DepartmentComponent {
   openAddModal() {
     this.resetForm();
     this.showDepartmentNameError = false;
-    // this.showShortNameError = false;
-    // this.showDepartmentCodeError = false;
-    this.removeModalFade();
+  const modalElement = document.getElementById('addDepartmentModal');
+    if (modalElement) {
+      const modalInstance = new (window as any).bootstrap.Modal(modalElement);
+      modalInstance.show();
+    }
   }
+
 
   openEditModal(departmentItem: any) {
     this.currentDepartment = { ...departmentItem };
@@ -189,13 +192,18 @@ export class DepartmentComponent {
   }
 
   closeModal() {
-    const modal = document.getElementById('addDepartmentModal') as HTMLElement;
-    if (modal) {
-      modal.classList.remove('show');
-      modal.style.display = 'none';
-      this.removeModalFade();
+    const modalElement = document.getElementById('addDepartmentModal');
+    if (modalElement) {
+      const modalInstance = (window as any).bootstrap?.Modal.getInstance(modalElement);
+      if (modalInstance) {
+        modalInstance.hide();
+      } else {
+        // fallback for first-time close
+        new (window as any).bootstrap.Modal(modalElement).hide();
+      }
     }
   }
+
 
   removeModalFade() {
     const modalBackdrop = document.querySelector('.modal-backdrop');

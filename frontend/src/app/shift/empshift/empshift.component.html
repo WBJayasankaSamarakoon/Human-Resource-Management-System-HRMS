@@ -43,8 +43,6 @@
         class="btn btn-light"
         (click)="openAddModal()"
         aria-label="Add EmpShift"
-        data-toggle="modal"
-        data-target="#addEmpShiftModal"
       >
         <i class="fas fa-plus fa-sm"></i> Add
       </button>
@@ -61,17 +59,14 @@
         <table id="empshiftTable" class="table table-bordered table-striped">
           <thead>
             <tr>
+              <th class="col-action">Actions</th>
               <th>ID</th>
               <th>Shift Name</th>
               <th>Description</th>
-              <th class="col-action">Actions</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let EmpShiftItem of EmpShiftArray; trackBy: trackById">
-              <td>{{ EmpShiftItem.id }}</td>
-              <td>{{ EmpShiftItem.Name }}</td>
-              <td>{{ EmpShiftItem.Description }}</td>
               <td class="col-action">
                 <button
                   type="button"
@@ -92,6 +87,9 @@
                   <i class="fas fa-trash fa-sm text-white"></i>
                 </button>
               </td>
+              <td>{{ EmpShiftItem.id }}</td>
+              <td>{{ EmpShiftItem.Name }}</td>
+              <td>{{ EmpShiftItem.Description }}</td>
             </tr>
           </tbody>
         </table>
@@ -106,7 +104,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Add Shift</h5>
-        <button type="button" class="close" data-dismiss="modal">
+        <button type="button" class="close" (click)="closeModal()">
           <span>&times;</span>
         </button>
       </div>

@@ -42,6 +42,7 @@ import { AddallowancesComponent } from './master/addallowances/addallowances.com
 import { AdddeductionsComponent } from './master/adddeductions/adddeductions.component';
 import { SpecialComponent } from './payroll/salary/special/special.component';
 import { LateComponent } from './master/late/late.component';
+import { AllocationComponent } from './leave/allocation/allocation.component';
 
 export const routes: Routes = [
   {
@@ -263,6 +264,12 @@ export const routes: Routes = [
         component: LateComponent,
         canActivate: [AuthGuard],
         data: { title: 'Late Deduction' },
+      },
+      {
+        path: 'allocation',
+        component: AllocationComponent,
+        canActivate: [AuthGuard],
+        data: { title: 'Leave Allocation' },
       },
     ],
   },

@@ -43,8 +43,6 @@
         type="button"
         class="btn btn-light"
         (click)="openAddModal()"
-        data-toggle="modal"
-        data-target="#addLeaveApprovalModal"
       >
         <i class="fas fa-plus fa-sm"></i> Add
       </button>
@@ -64,9 +62,9 @@
         >
           <thead>
             <tr>
+              <th class="col-action">Actions</th>
               <th>ID</th>
               <th>Name</th>
-              <th class="col-action">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -76,26 +74,26 @@
                 trackBy: trackById
               "
             >
+            <td class="col-action">
+              <button
+                type="button"
+                class="btn btn-success btn-sm"
+                (click)="openEditModal(leaveApprovalItem)"
+                data-toggle="modal"
+                data-target="#editLeaveApprovalModal"
+              >
+                <i class="fas fa-edit fa-sm text-white"></i>
+              </button>
+              <button
+                type="button"
+                class="btn btn-danger btn-sm"
+                (click)="confirmDelete(leaveApprovalItem)"
+              >
+                <i class="fas fa-trash fa-sm text-white"></i>
+              </button>
+            </td>
               <td>{{ leaveApprovalItem.id }}</td>
               <td>{{ leaveApprovalItem.Name }}</td>
-              <td class="col-action">
-                <button
-                  type="button"
-                  class="btn btn-success btn-sm"
-                  (click)="openEditModal(leaveApprovalItem)"
-                  data-toggle="modal"
-                  data-target="#editLeaveApprovalModal"
-                >
-                  <i class="fas fa-edit fa-sm text-white"></i>
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-danger btn-sm"
-                  (click)="confirmDelete(leaveApprovalItem)"
-                >
-                  <i class="fas fa-trash fa-sm text-white"></i>
-                </button>
-              </td>
             </tr>
           </tbody>
         </table>
@@ -110,7 +108,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Add Leave Approval Type</h5>
-        <button type="button" class="close" data-dismiss="modal">
+        <button type="button" class="close" (click)="closeModal()">
           <span>&times;</span>
         </button>
       </div>

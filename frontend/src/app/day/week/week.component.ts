@@ -36,11 +36,22 @@ export class WeekComponent {
     );
   }
 
+  // openAddModal() {
+  //   this.resetForm();
+  //   this.showDaysError = false;
+  //   this.removeModalFade();
+  // }
+
   openAddModal() {
     this.resetForm();
     this.showDaysError = false;
-    this.removeModalFade();
+  const modalElement = document.getElementById('addWeekModal');
+    if (modalElement) {
+      const modalInstance = new (window as any).bootstrap.Modal(modalElement);
+      modalInstance.show();
+    }
   }
+
 
   openEditModal(weekItem: any) {
     this.currentWeek = { ...weekItem };
@@ -151,14 +162,28 @@ export class WeekComponent {
     return weekItem.id;
   }
 
+  // closeModal() {
+  //   const modal = document.querySelector('.modal.show') as HTMLElement;
+  //   if (modal) {
+  //     modal.classList.remove('show');
+  //     modal.style.display = 'none';
+  //     this.removeModalFade();
+  //   }
+  // }
+
   closeModal() {
-    const modal = document.querySelector('.modal.show') as HTMLElement;
-    if (modal) {
-      modal.classList.remove('show');
-      modal.style.display = 'none';
-      this.removeModalFade();
+    const modalElement = document.getElementById('addWeekModal');
+    if (modalElement) {
+      const modalInstance = (window as any).bootstrap?.Modal.getInstance(modalElement);
+      if (modalInstance) {
+        modalInstance.hide();
+      } else {
+        // fallback for first-time close
+        new (window as any).bootstrap.Modal(modalElement).hide();
+      }
     }
   }
+
 
   removeModalFade() {
     const modalBackdrop = document.querySelector('.modal-backdrop');

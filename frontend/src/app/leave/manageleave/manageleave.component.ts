@@ -121,30 +121,6 @@ resetFilters() {
     );
   }
 
-
-  // // Fetch all leave records from the API
-  // getAllLeaves() {
-  //   this.isLoading = true;
-  //   this.http.get(`${apiBaseUrl}api/leave`).subscribe(
-  //     (data: any) => {
-  //       this.leaveArray = data;
-  //       console.log(data);
-  //       // .map((leave: any) => ({
-  //       //   ...leave,
-  //       //   employeeName: leave.employee ? leave.employee.NameWithInitials : 'Unknown',
-  //       //   leaveType: leave.leaveType ? leave.leaveType.LeaveType : 'Unknown',
-  //       //   startDate: leave.start_date,
-  //       //   endDate: leave.end_date,
-  //       // }));
-  //       this.isLoading = false;
-  //     },
-  //     (error) => {
-  //       console.error('Error loading leaves:', error);
-  //       this.isLoading = false;
-  //     }
-  //   );
-  // }
-
   // Fetch all employees from the API
   getAllEmployees() {
     this.http.get(`${apiBaseUrl}api/tblemployees`).subscribe((data: any) => {
@@ -176,11 +152,10 @@ resetFilters() {
             id: day.id,
             Name: day.Name, // Map the 'Name' field
         }));
-        console.log('Leave Days:', this.leaveDayArray); // Debugging: Log the leaveDayArray
+        console.log('Leave Days:', this.leaveDayArray);
     });
 }
 
-  // Open modal for adding a new leave entry
   openAddModal() {
     this.resetForm();
     this.showEmployeeError = false;
@@ -189,8 +164,13 @@ resetFilters() {
     this.showEndDateError = false;
     this.showApproveError = false;
     this.showNameError = false;
-    this.removeModalFade();
+  const modalElement = document.getElementById('addLeaveModal');
+    if (modalElement) {
+      const modalInstance = new (window as any).bootstrap.Modal(modalElement);
+      modalInstance.show();
+    }
   }
+
 
   // Open modal for editing a leave entry
   openEditModal(leave: any) {
@@ -254,12 +234,36 @@ resetFilters() {
       approve: this.currentLeave.approve,
       leaveday_id: this.currentLeave.leavedayId,
     };
+
+    // Save the current employee filter
+    const currentEmployeeFilter = this.filters.employeeId;
+
     this.http.post(`${apiBaseUrl}api/leave`, leaveData).subscribe(
       () => {
         this.alertSuccess('Leave Registered Successfully');
-        this.getAllLeaves();
-        this.resetForm();
-        this.closeModal();
+
+        // Refresh all leaves
+        this.http.get(`${apiBaseUrl}api/leave`).subscribe(
+          (data: any) => {
+            this.leaveArray = data;
+
+            // Reapply the employee filter if it was set
+            if (currentEmployeeFilter) {
+              this.filters.employeeId = currentEmployeeFilter;
+              this.filteredLeaves = this.leaveArray.filter(l => l.employee_id == currentEmployeeFilter);
+            } else {
+              this.filteredLeaves = [...this.leaveArray];
+            }
+
+            this.isLoading = false;
+            this.resetForm();
+            this.closeModal();
+          },
+          (error) => {
+            console.error('Error loading leaves:', error);
+            this.isLoading = false;
+          }
+        );
       },
       (error) => {
         this.alertError('Failed to register leave');
@@ -279,14 +283,40 @@ resetFilters() {
       approve: this.currentLeave.approve,
       leaveday_id: this.currentLeave.leavedayId,
     };
+
+    // Save current filters
+    const currentEmployeeFilter = this.filters.employeeId;
+    const currentYearFilter = this.filters.year;
+    const currentMonthFilter = this.filters.month;
+
     this.http
       .put(`${apiBaseUrl}api/leave/${this.currentLeave.id}`, leaveData)
       .subscribe(
         () => {
           this.alertSuccess('Leave Updated Successfully');
-          this.getAllLeaves();
-          this.resetForm();
-          this.closeModal();
+
+          // Refresh all leaves
+          this.http.get(`${apiBaseUrl}api/leave`).subscribe(
+            (data: any) => {
+              this.leaveArray = data;
+
+              // Reapply filters if they were set
+              this.filters.employeeId = currentEmployeeFilter;
+              this.filters.year = currentYearFilter;
+              this.filters.month = currentMonthFilter;
+
+              // Apply all active filters
+              this.applyFilters();
+
+              this.isLoading = false;
+              this.resetForm();
+              this.closeModal();
+            },
+            (error) => {
+              console.error('Error loading leaves:', error);
+              this.isLoading = false;
+            }
+          );
         },
         (error) => {
           this.alertError('Failed to update leave');
@@ -312,10 +342,32 @@ resetFilters() {
   }
 
   deleteRecord(leave: any) {
+    // Save current filters
+    const currentEmployeeFilter = this.filters.employeeId;
+    const currentYearFilter = this.filters.year;
+    const currentMonthFilter = this.filters.month;
+
     this.http.delete(`${apiBaseUrl}api/leave/${leave.id}`).subscribe(
       () => {
         this.alertSuccess('Leave Deleted Successfully');
-        this.getAllLeaves();
+
+        // Refresh all leaves
+        this.http.get(`${apiBaseUrl}api/leave`).subscribe(
+          (data: any) => {
+            this.leaveArray = data;
+
+            // Reapply filters if they were set
+            this.filters.employeeId = currentEmployeeFilter;
+            this.filters.year = currentYearFilter;
+            this.filters.month = currentMonthFilter;
+
+            // Apply all active filters
+            this.applyFilters();
+          },
+          (error) => {
+            console.error('Error loading leaves:', error);
+          }
+        );
       },
       (error) => {
         this.alertError('Failed to delete leave');
@@ -375,14 +427,32 @@ resetFilters() {
     return leave.id;
   }
 
+  // closeModal() {
+  //   const modal = document.getElementById('addLeaveModal') as HTMLElement;
+  //   if (modal) {
+      // modal.classList.remove('show');
+      // modal.style.display = 'none';
+      // this.removeModalFade();
+  //   }
+  // }
+
   closeModal() {
-    const modal = document.getElementById('addLeaveModal') as HTMLElement;
-    if (modal) {
-      modal.classList.remove('show');
-      modal.style.display = 'none';
+    const modalElement = document.getElementById('addLeaveModal') as HTMLElement;
+    if (modalElement) {
+      const modalInstance = (window as any).bootstrap?.Modal.getInstance(modalElement);
+      if (modalInstance) {
+        modalInstance.hide();
+      } else {
+        new (window as any).bootstrap.Modal(modalElement).hide();
+      }
+
+      // Manual adjustments
+      modalElement.classList.remove('show');
+      modalElement.style.display = 'none';
       this.removeModalFade();
     }
   }
+
 
   // Remove modal backdrop fade
   removeModalFade() {

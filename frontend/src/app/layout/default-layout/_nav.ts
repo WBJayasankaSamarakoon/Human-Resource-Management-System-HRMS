@@ -185,7 +185,7 @@ export const navItems: INavData[] = [
     iconComponent: { name: 'cil-calendar' },
     children: [
       {
-        name: 'Manage Leave Type',
+        name: 'Leave Type',
         url: '/typeleave',
         iconComponent: { name: 'cil-dot' },
       },
@@ -195,8 +195,13 @@ export const navItems: INavData[] = [
         iconComponent: { name: 'cil-dot' },
       },
       {
-        name: 'Manage Leave Employee',
+        name: 'Employee Leave',
         url: '/manageleave',
+        iconComponent: { name: 'cil-dot' },
+      },
+      {
+        name: 'Leave Allocation',
+        url: '/allocation',
         iconComponent: { name: 'cil-dot' },
       },
     ],

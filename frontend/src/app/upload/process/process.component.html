@@ -14,6 +14,7 @@
     <table class="table table-hover table-striped table-bordered text-center">
       <thead class="table-dark">
         <tr>
+          <th>Action</th>
           <th>Emp ID</th>
           <th>Name</th>
           <th>No Pay</th>
@@ -39,11 +40,18 @@
           <th>Total Deduction</th>
           <th>Gross Salary</th>
           <th>Net Salary</th>
-          <th>Action</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let record of pagedData">
+          <td>
+            <button
+              class="btn btn-sm btn-primary"
+              (click)="navigateToSlip(record.emp_id)"
+            >
+              Report
+            </button>
+          </td>
           <td>{{ record.emp_id }}</td>
           <td>{{ record.name }}</td>
           <td>{{ record.no_pay_count }}</td>
@@ -78,14 +86,6 @@
           <td>{{record.total_deductions}}</td>
           <td>{{ record.gross_salary }}</td>
           <td>{{ record.net_salary }}</td>
-          <td>
-            <button
-              class="btn btn-sm btn-primary"
-              (click)="navigateToSlip(record.emp_id)"
-            >
-              Report
-            </button>
-          </td>
         </tr>
       </tbody>
     </table>

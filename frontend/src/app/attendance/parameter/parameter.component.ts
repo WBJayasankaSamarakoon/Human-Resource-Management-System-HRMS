@@ -46,8 +46,14 @@ export class ParameterComponent {
   openAddModal() {
     this.resetForm();
     this.showNameError = false;
-    this.removeModalFade();
+  const modalElement = document.getElementById('addParameterModal');
+    if (modalElement) {
+      const modalInstance = new (window as any).bootstrap.Modal(modalElement);
+      modalInstance.show();
+    }
   }
+
+
 
   openEditModal(parameterItem: any) {
     this.currentParameter = { ...parameterItem };
@@ -175,13 +181,18 @@ export class ParameterComponent {
   }
 
   closeModal() {
-    const modal = document.getElementById('addParameterModal') as HTMLElement;
-    if (modal) {
-      modal.classList.remove('show');
-      modal.style.display = 'none';
-      this.removeModalFade();
+    const modalElement = document.getElementById('addParameterModal');
+    if (modalElement) {
+      const modalInstance = (window as any).bootstrap?.Modal.getInstance(modalElement);
+      if (modalInstance) {
+        modalInstance.hide();
+      } else {
+        // fallback for first-time close
+        new (window as any).bootstrap.Modal(modalElement).hide();
+      }
     }
   }
+
 
   removeModalFade() {
     const modalBackdrop = document.querySelector('.modal-backdrop');

@@ -33,6 +33,7 @@ import { AddallowancesComponent } from './master/addallowances/addallowances.com
 import { AdddeductionsComponent } from './master/adddeductions/adddeductions.component';
 import { SpecialComponent } from './payroll/salary/special/special.component';
 import { LateComponent } from './master/late/late.component';
+import { AllocationComponent } from './leave/allocation/allocation.component';
 
 
 import { appConfig } from './app.config';
@@ -98,6 +99,7 @@ import { JsonPipe } from '@angular/common';
     AdddeductionsComponent,
     SpecialComponent,
     LateComponent,
+    AllocationComponent
   ],
 
   imports: [

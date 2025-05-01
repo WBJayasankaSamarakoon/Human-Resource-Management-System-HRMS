@@ -40,11 +40,22 @@ export class TypeshiftComponent {
     );
   }
 
+  // openAddModal() {
+  //   this.resetForm();
+  //   this.showNameError = false;
+  //   this.showValueError = false;
+  //   this.removeModalFade();
+  // }
+
   openAddModal() {
     this.resetForm();
     this.showNameError = false;
     this.showValueError = false;
-    this.removeModalFade();
+  const modalElement = document.getElementById('addTypeShiftModal');
+    if (modalElement) {
+      const modalInstance = new (window as any).bootstrap.Modal(modalElement);
+      modalInstance.show();
+    }
   }
 
   openEditModal(typeshiftItem: any) {

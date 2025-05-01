@@ -43,8 +43,6 @@
         class="btn btn-light"
         (click)="openAddModal()"
         aria-label="Add Deduction"
-        data-toggle="modal"
-        data-target="#addDeductionModal"
       >
         <i class="fas fa-plus fa-sm"></i> Add
       </button>
@@ -61,34 +59,17 @@
         <table id="deductionsTable" class="table table-bordered table-striped">
           <thead>
             <tr>
+              <th class="col-action">Actions</th>
               <th>Employee ID</th>
               <th>Employee Name</th>
               <th>Deduction Type</th>
               <th>Amount</th>
               <th>Payment Date</th>
               <!-- <th>Status</th> -->
-              <th class="col-action">Actions</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let deduction of deductions; trackBy: trackById">
-              <td>{{ deduction.emp_id }}</td>
-              <td>{{ deduction.employee.NameWithInitials }}</td>
-              <td>{{ deduction.deduction_type.Name }}</td>
-              <td>{{ deduction.amount || 0.00 }}</td>
-              <td>{{ deduction.payment_date }}</td>
-              <!-- <td>
-                <label class="form-check-label">
-                  <input
-                    type="checkbox"
-                    class="form-check-input"
-                    [checked]="deduction.is_active"
-                    (change)="toggleStatus(deduction)"
-                  />
-                  {{ deduction.is_active ? "Active" : "Inactive" }}
-                </label>
-              </td> -->
-
               <td class="col-action">
                 <button
                   type="button"
@@ -109,6 +90,22 @@
                   <i class="fas fa-trash fa-sm text-white"></i>
                 </button>
               </td>
+              <td>{{ deduction.emp_id }}</td>
+              <td>{{ deduction.employee?.NameWithInitials || 'N/A' }}</td>
+              <td>{{ deduction.deduction_type.Name }}</td>
+              <td>{{ deduction.amount || 0.00 }}</td>
+              <td>{{ deduction.payment_date }}</td>
+              <!-- <td>
+                <label class="form-check-label">
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    [checked]="deduction.is_active"
+                    (change)="toggleStatus(deduction)"
+                  />
+                  {{ deduction.is_active ? "Active" : "Inactive" }}
+                </label>
+              </td> -->
             </tr>
           </tbody>
         </table>
@@ -123,7 +120,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Add Deduction</h5>
-        <button type="button" class="close" data-dismiss="modal">
+        <button type="button" class="close" (click)="closeModal()">
           <span>&times;</span>
         </button>
       </div>

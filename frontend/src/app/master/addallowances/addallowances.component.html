@@ -46,8 +46,6 @@
         class="btn btn-light"
         (click)="openAddModal()"
         aria-label="Add Allowance"
-        data-toggle="modal"
-        data-target="#addAllowanceModal"
       >
         <i class="fas fa-plus fa-sm"></i> Add
       </button>
@@ -64,37 +62,37 @@
         <table id="allowancesTable" class="table table-bordered table-striped">
           <thead>
             <tr>
+              <th class="col-action">Actions</th>
               <th>ID</th>
               <th>Allowance Name</th>
-              <th class="col-action">Actions</th>
             </tr>
           </thead>
           <tbody>
             <tr
               *ngFor="let allowanceItem of allowancesArray; trackBy: trackById"
             >
+            <td class="col-action">
+              <button
+                type="button"
+                class="btn btn-success btn-sm"
+                (click)="openEditModal(allowanceItem)"
+                aria-label="Edit Allowance"
+                data-toggle="modal"
+                data-target="#editAllowanceModal"
+              >
+                <i class="fas fa-edit fa-sm text-white"></i>
+              </button>
+              <button
+                type="button"
+                class="btn btn-danger btn-sm"
+                (click)="confirmDelete(allowanceItem)"
+                aria-label="Delete Allowance"
+              >
+                <i class="fas fa-trash fa-sm text-white"></i>
+              </button>
+            </td>
               <td>{{ allowanceItem.id }}</td>
               <td>{{ allowanceItem.Name }}</td>
-              <td class="col-action">
-                <button
-                  type="button"
-                  class="btn btn-success btn-sm"
-                  (click)="openEditModal(allowanceItem)"
-                  aria-label="Edit Allowance"
-                  data-toggle="modal"
-                  data-target="#editAllowanceModal"
-                >
-                  <i class="fas fa-edit fa-sm text-white"></i>
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-danger btn-sm"
-                  (click)="confirmDelete(allowanceItem)"
-                  aria-label="Delete Allowance"
-                >
-                  <i class="fas fa-trash fa-sm text-white"></i>
-                </button>
-              </td>
             </tr>
           </tbody>
         </table>
@@ -109,7 +107,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Add Allowance</h5>
-        <button type="button" class="close" data-dismiss="modal">
+        <button type="button" class="close" (click)="closeModal()">
           <span>&times;</span>
         </button>
       </div>

@@ -43,9 +43,13 @@ export class LeaveTypeComponent {
   openAddModal() {
     this.resetForm();
     this.showLeaveTypeError = false;
-    // this.showDescriptionError = false;
-    this.removeModalFade();
+  const modalElement = document.getElementById('addLeaveTypeModal');
+    if (modalElement) {
+      const modalInstance = new (window as any).bootstrap.Modal(modalElement);
+      modalInstance.show();
+    }
   }
+
 
   openEditModal(leaveTypeItem: any) {
     this.currentLeaveType = { ...leaveTypeItem };

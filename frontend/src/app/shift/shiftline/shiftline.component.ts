@@ -104,6 +104,16 @@ export class ShiftlineComponent {
     );
   }
 
+  // openAddModal() {
+  //   this.resetForm();
+  //   this.showNameError = false;
+  //   this.showStartTimeError = false;
+  //   this.showEndTimeError = false;
+  //   this.showDayError = false;
+  //   this.showShiftTypeError = false;
+  //   this.removeModalFade();
+  // }
+
   openAddModal() {
     this.resetForm();
     this.showNameError = false;
@@ -111,8 +121,13 @@ export class ShiftlineComponent {
     this.showEndTimeError = false;
     this.showDayError = false;
     this.showShiftTypeError = false;
-    this.removeModalFade();
+  const modalElement = document.getElementById('addShiftLineModal');
+    if (modalElement) {
+      const modalInstance = new (window as any).bootstrap.Modal(modalElement);
+      modalInstance.show();
+    }
   }
+
 
   openEditModal(shiftLineItem: any) {
     this.currentShiftLine = {

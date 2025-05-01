@@ -41,8 +41,13 @@ export class LeaveApprovalComponent {
   openAddModal() {
     this.resetForm();
     this.showNameError = false;
-    this.removeModalFade();
+  const modalElement = document.getElementById('addLeaveApprovalModal');
+    if (modalElement) {
+      const modalInstance = new (window as any).bootstrap.Modal(modalElement);
+      modalInstance.show();
+    }
   }
+
 
   openEditModal(leaveApprovalItem: any) {
     this.currentLeaveApproval = { ...leaveApprovalItem };

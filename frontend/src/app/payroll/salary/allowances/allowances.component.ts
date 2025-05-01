@@ -1,5 +1,3 @@
-// allowances.component.ts
-
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
@@ -80,12 +78,16 @@ export class AllowancesComponent {
     );
   }
 
-  // Open modal for adding a new allowance
   openAddModal() {
     this.resetForm();
     this.showEmployeeError = false;
-    this.removeModalFade();
+  const modalElement = document.getElementById('addAllowanceModal');
+    if (modalElement) {
+      const modalInstance = new (window as any).bootstrap.Modal(modalElement);
+      modalInstance.show();
+    }
   }
+
 
   // Open modal for editing an allowance entry
   openEditModal(allowance: any) {

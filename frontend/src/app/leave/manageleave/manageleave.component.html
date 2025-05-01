@@ -95,8 +95,6 @@
         class="btn btn-light"
         (click)="openAddModal()"
         aria-label="Add Leave"
-        data-toggle="modal"
-        data-target="#addLeaveModal"
       >
         <i class="fas fa-plus fa-sm"></i> Add
       </button>
@@ -113,6 +111,7 @@
         <table id="leavesTable" class="table table-bordered table-striped">
           <thead>
             <tr>
+              <th class="col-action">Actions</th>
               <th class="col-id">ID</th>
               <th>Employee</th>
               <th>Leave Type</th>
@@ -120,12 +119,31 @@
               <th>End Date</th>
               <th>Approval Type</th>
               <th>Day Type</th>
-              <th class="col-action">Actions</th>
             </tr>
           </thead>
           <tbody>
             <!-- <tr *ngFor="let leave of leaveArray; trackBy: trackById"> -->
               <tr *ngFor="let leave of filteredLeaves; trackBy: trackById">
+                <td class="col-action">
+                  <button
+                    type="button"
+                    class="btn btn-success btn-sm"
+                    (click)="openEditModal(leave)"
+                    aria-label="Edit Leave"
+                    data-toggle="modal"
+                    data-target="#editLeaveModal"
+                  >
+                    <i class="fas fa-edit fa-sm text-white"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-danger btn-sm"
+                    (click)="confirmDelete(leave)"
+                    aria-label="Delete Leave"
+                  >
+                    <i class="fas fa-trash fa-sm text-white"></i>
+                  </button>
+                </td>
               <td>{{ leave.id }}</td>
               <td>{{ leave.employee.NameWithInitials }}</td>
               <td>{{ leave.leave_type.LeaveType }}</td>
@@ -133,26 +151,6 @@
               <td>{{ leave.end_date | date : "yyyy-MM-dd" }}</td>
               <td>{{ leave.approve === 1 ? 'Post Approve' : leave.approve === 2 ? 'Pre Approve' : 'Unapproved' }}</td>
               <td>{{ leave.leaveday.Name }}</td>
-              <td class="col-action">
-                <button
-                  type="button"
-                  class="btn btn-success btn-sm"
-                  (click)="openEditModal(leave)"
-                  aria-label="Edit Leave"
-                  data-toggle="modal"
-                  data-target="#editLeaveModal"
-                >
-                  <i class="fas fa-edit fa-sm text-white"></i>
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-danger btn-sm"
-                  (click)="confirmDelete(leave)"
-                  aria-label="Delete Leave"
-                >
-                  <i class="fas fa-trash fa-sm text-white"></i>
-                </button>
-              </td>
             </tr>
           </tbody>
         </table>
@@ -167,7 +165,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Add Leave</h5>
-        <button type="button" class="close" data-dismiss="modal">
+        <button type="button" class="close" (click)="closeModal()">
           <span>&times;</span>
         </button>
       </div>

@@ -1,0 +1,227 @@
+<div class="container-fluid">
+  <h2 class="mb-4">Manage Allocation</h2>
+
+  <!-- Alert Box -->
+  <div id="custom-alert" class="alert-box"></div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="confirmationModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete Allocation</h5>
+        <button type="button" class="close" (click)="closeConfirmationModal()">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete allocation for {{ currentAllocation.employee_name }} ({{ currentAllocation.year }})?</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeConfirmationModal()">Cancel</button>
+        <button class="btn btn-danger" (click)="deleteAllocation()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Card -->
+  <div class="card">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+      <button class="btn btn-light" (click)="openAddModal()">
+        <i class="fas fa-plus fa-sm"></i> Add
+      </button>
+    </div>
+    <div class="card-body">
+      <div *ngIf="isLoading" class="text-center">
+        <div class="spinner-border text-primary" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+
+      <div class="table-responsive" *ngIf="!isLoading">
+        <table class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th class="col-action">Actions</th>
+              <th>ID</th>
+              <th>Employee</th>
+              <th>Year</th>
+              <th>Leave Type</th>
+              <th>No of Leaves</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of filteredAllocations; trackBy: trackById">
+              <td class="col-action">
+                <button
+                  type="button"
+                  class="btn btn-success btn-sm"
+                  (click)="openEditModal(item)"
+                  aria-label="Edit Allocation"
+                  data-toggle="modal"
+                  data-target="#editAllocationModal"
+                >
+                  <i class="fas fa-edit fa-sm text-white"></i>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-danger btn-sm"
+                  (click)="confirmDelete(item)"
+                  aria-label="Delete Allocation"
+                >
+                  <i class="fas fa-trash fa-sm text-white"></i>
+                </button>
+              </td>
+              <td>{{ item.id }}</td>
+              <td>{{ item.employee?.NameWithInitials }}</td>
+              <td>{{ item.year }}</td>
+              <td>{{ item.leave_type?.LeaveType }}</td>
+              <td>{{ item.leave_count }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Allocation Modal -->
+<div class="modal fade" id="addAllocationModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Allocation</h5>
+        <button type="button" class="close" (click)="closeModal('addAllocationModal')">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label for="employee">Employee<span class="text-danger">*</span></label>
+            <select
+              class="form-control"
+              [(ngModel)]="currentAllocation.employee_id"
+              name="employee"
+              id="employee"
+              required
+              aria-label="Select employee"
+            >
+              <option
+                *ngFor="let employee of employeesArray"
+                [value]="employee.id"
+              >
+                {{ employee.NameWithInitials }}
+              </option>
+            </select>
+            <small
+              *ngIf="showEmployeeError && !currentAllocation.employee_id"
+              class="text-danger"
+            >
+              Employee selection is required
+            </small>
+          </div>
+
+          <div class="form-group mt-3">
+            <label>Year</label>
+            <select class="form-control" [(ngModel)]="currentAllocation.year" name="year">
+              <option *ngFor="let year of yearsArray" [value]="year">{{ year }}</option>
+            </select>
+            <small class="text-danger" *ngIf="showYearError">Year is required</small>
+          </div>
+
+          <div class="form-group mt-3">
+            <label for="leaveType">Leave Type<span class="text-danger">*</span></label>
+            <select
+              class="form-control"
+              [(ngModel)]="currentAllocation.leave_type_id"
+              name="leaveType"
+              id="leaveType"
+              required
+              aria-label="Select leave type"
+            >
+              <option *ngFor="let type of leaveTypesArray" [value]="type.id">
+                {{ type.typeName }}
+              </option>
+            </select>
+            <small
+              *ngIf="showLeaveTypeError && !currentAllocation.leave_type_id"
+              class="text-danger"
+            >
+              Leave type is required
+            </small>
+          </div>
+
+          <div class="form-group mt-3">
+            <label>Leave Count</label>
+            <input type="number" class="form-control" [(ngModel)]="currentAllocation.leave_count" name="leave_count" />
+            <small class="text-danger" *ngIf="showLeaveCountError">Leave Count is required</small>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal('addAllocationModal')">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary" (click)="save()">
+          Add
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Allocation Modal -->
+<div class="modal fade" id="editAllocationModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Allocation</h5>
+        <button type="button" class="close" (click)="closeModal('editAllocationModal')">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label>Employee</label>
+            <select class="form-control" [(ngModel)]="currentAllocation.employee_id" name="employee_id">
+              <option *ngFor="let emp of employeesArray" [value]="emp.id">{{ emp.NameWithInitials }}</option>
+            </select>
+            <small class="text-danger" *ngIf="showEmployeeError">Employee is required</small>
+          </div>
+
+          <div class="form-group mt-3">
+            <label>Year</label>
+            <select class="form-control" [(ngModel)]="currentAllocation.year" name="year">
+              <option *ngFor="let year of yearsArray" [value]="year">{{ year }}</option>
+            </select>
+            <small class="text-danger" *ngIf="showYearError">Year is required</small>
+          </div>
+
+          <div class="form-group mt-3">
+            <label>Leave Type</label>
+            <select class="form-control" [(ngModel)]="currentAllocation.leave_type_id" name="leave_type_id">
+              <option *ngFor="let type of leaveTypesArray" [value]="type.id">{{ type.typeName }}</option>
+            </select>
+            <small class="text-danger" *ngIf="showLeaveTypeError">Leave Type is required</small>
+          </div>
+
+          <div class="form-group mt-3">
+            <label>Leave Count</label>
+            <input type="number" class="form-control" [(ngModel)]="currentAllocation.leave_count" name="leave_count" />
+            <small class="text-danger" *ngIf="showLeaveCountError">Leave Count is required</small>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal('editAllocationModal')">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary" (click)="update()">
+          Update
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+

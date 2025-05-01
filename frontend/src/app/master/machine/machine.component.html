@@ -40,8 +40,6 @@
         class="btn btn-light"
         (click)="openAddModal()"
         aria-label="Add Machine"
-        data-toggle="modal"
-        data-target="#addMachineModal"
       >
         <i class="fas fa-plus fa-sm"></i> Add
       </button>
@@ -58,19 +56,15 @@
         <table id="machinesTable" class="table table-bordered table-striped">
           <thead>
             <tr>
+              <th class="col-action">Actions</th>
               <th>ID</th>
               <th>Name</th>
               <th>Model</th>
               <th>Brand</th>
-              <th class="col-action">Actions</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let MachineItem of MachineArray; trackBy: trackById">
-              <td>{{ MachineItem.id }}</td>
-              <td>{{ MachineItem.Name }}</td>
-              <td>{{ MachineItem.Model }}</td>
-              <td>{{ MachineItem.Brand }}</td>
               <td class="col-action">
                 <button
                   type="button"
@@ -91,6 +85,10 @@
                   <i class="fas fa-trash fa-sm text-white"></i>
                 </button>
               </td>
+              <td>{{ MachineItem.id }}</td>
+              <td>{{ MachineItem.Name }}</td>
+              <td>{{ MachineItem.Model }}</td>
+              <td>{{ MachineItem.Brand }}</td>
             </tr>
           </tbody>
         </table>
@@ -105,7 +103,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Add Machine</h5>
-        <button type="button" class="close" data-dismiss="modal">
+        <button type="button" class="close" (click)="closeModal()">
           <span>&times;</span>
         </button>
       </div>

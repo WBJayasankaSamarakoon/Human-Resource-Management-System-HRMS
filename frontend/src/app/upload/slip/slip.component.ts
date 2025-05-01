@@ -38,12 +38,13 @@ export class SlipComponent implements OnInit {
 
   ngOnInit(): void {
     const empId = this.route.snapshot.queryParamMap.get('emp_id');
-    if (empId) {
+    const fileId = localStorage.getItem('fileId');
+    if (empId && fileId) {
       this.loadSlipData(empId);
       this.getAllAllowances();
       this.getAllDeductions();
-      this.loadAllowances();
-      this.loadDeductions();
+      this.loadAllowances(empId, fileId);
+      this.loadDeductions(empId, fileId);
       this.getAllCompanies();
     } else {
       console.error('Employee ID is missing.');
@@ -209,8 +210,8 @@ getAllDeductions() {
 }
 
   // Load Allowances by mapping type to addallowance.id
-  loadAllowances() {
-    this.http.get(`${apiBaseUrl}api/allowances`).subscribe(
+  loadAllowances(empId: string, fileId: string) {
+    this.http.get(`${apiBaseUrl}api/allowances?emp_id=${empId}&file_id=${fileId}`).subscribe(
       (resultData: any) => {
         if (Array.isArray(resultData)) {
           resultData.forEach((allowance: any) => {
@@ -231,8 +232,8 @@ getAllDeductions() {
   }
 
   // Load Deductions by mapping type to adddeduction.id
-  loadDeductions() {
-    this.http.get(`${apiBaseUrl}api/deductions`).subscribe(
+  loadDeductions(empId: string, fileId: string) {
+    this.http.get(`${apiBaseUrl}api/deductions?emp_id=${empId}&file_id=${fileId}`).subscribe(
       (resultData: any) => {
         if (Array.isArray(resultData)) {
           resultData.forEach((deduction: any) => {

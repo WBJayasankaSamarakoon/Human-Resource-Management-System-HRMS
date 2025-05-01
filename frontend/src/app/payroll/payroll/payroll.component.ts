@@ -90,14 +90,26 @@ export class PayrollComponent {
     );
   }
 
-  // Open modal for adding a new payroll entry
+  // openAddModal() {
+  //   this.resetForm();
+  //   this.showEmployeeError = false;
+  //   this.showDateError = false;
+  //   this.showBasicSalaryError = false;
+  //   this.removeModalFade();
+  // }
+
   openAddModal() {
     this.resetForm();
     this.showEmployeeError = false;
     this.showDateError = false;
     this.showBasicSalaryError = false;
-    this.removeModalFade();
+  const modalElement = document.getElementById('addPayrollModal');
+    if (modalElement) {
+      const modalInstance = new (window as any).bootstrap.Modal(modalElement);
+      modalInstance.show();
+    }
   }
+
 
   // Open modal for editing a payroll entry
   openEditModal(payroll: any) {

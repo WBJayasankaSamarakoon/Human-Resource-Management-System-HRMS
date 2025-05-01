@@ -40,8 +40,6 @@
         class="btn btn-light"
         (click)="openAddModal()"
         aria-label="Add Company"
-        data-toggle="modal"
-        data-target="#addCompanyModal"
       >
         <i class="fas fa-plus fa-sm"></i> Add
       </button>
@@ -58,6 +56,7 @@
         <table id="companiesTable" class="table table-bordered table-striped">
           <thead>
             <tr>
+              <th class="col-action">Actions</th>
               <th class="col-id">ID</th>
               <th>Name</th>
               <th>Address</th>
@@ -65,11 +64,28 @@
               <th>Telephone</th>
               <th>Fax</th>
               <th>Logo</th>
-              <th class="col-action">Actions</th>
             </tr>
           </thead>
             <tbody>
               <tr *ngFor="let CompanyItem of CompanyArray; trackBy: trackById">
+                <td class="col-action">
+                  <button
+                    type="button"
+                    class="btn btn-success btn-sm"
+                    (click)="openEditModal(CompanyItem)"
+                    data-toggle="modal"
+                    data-target="#editCompanyModal"
+                  >
+                    <i class="fas fa-edit fa-sm text-white"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-danger btn-sm"
+                    (click)="confirmDelete(CompanyItem)"
+                  >
+                    <i class="fas fa-trash fa-sm text-white"></i>
+                  </button>
+                </td>
                 <td>{{ CompanyItem.id }}</td>
                 <td>{{ CompanyItem.Name }}</td>
                 <td>{{ CompanyItem.Address }}</td>
@@ -82,24 +98,6 @@
                     <span>No Logo</span>
                   </ng-template>
                 </td>
-              <td class="col-action">
-                <button
-                  type="button"
-                  class="btn btn-success btn-sm"
-                  (click)="openEditModal(CompanyItem)"
-                  data-toggle="modal"
-                  data-target="#editCompanyModal"
-                >
-                  <i class="fas fa-edit fa-sm text-white"></i>
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-danger btn-sm"
-                  (click)="confirmDelete(CompanyItem)"
-                >
-                  <i class="fas fa-trash fa-sm text-white"></i>
-                </button>
-              </td>
             </tr>
           </tbody>
         </table>
@@ -114,7 +112,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Add Company</h5>
-        <button type="button" class="close" data-dismiss="modal">
+        <button type="button" class="close" (click)="closeModal()">
           <span>&times;</span>
         </button>
       </div>

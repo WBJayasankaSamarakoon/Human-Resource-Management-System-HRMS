@@ -38,6 +38,7 @@ export class DeductionsComponent {
     this.http.get(`${apiBaseUrl}api/deductions`).subscribe(
       (resultData: any) => {
         this.deductions = Array.isArray(resultData) ? resultData : [];
+        console.log(this.deductions); //Debugging
         this.isLoading = false;
       },
       () => {
@@ -77,12 +78,16 @@ export class DeductionsComponent {
     );
   }
 
-  // Open modal for adding a new deduction
   openAddModal() {
     this.resetForm();
     this.showEmployeeError = false;
-    this.removeModalFade();
+  const modalElement = document.getElementById('addDeductionModal');
+    if (modalElement) {
+      const modalInstance = new (window as any).bootstrap.Modal(modalElement);
+      modalInstance.show();
+    }
   }
+
 
   // Open modal for editing a deduction entry
   openEditModal(deduction: any) {

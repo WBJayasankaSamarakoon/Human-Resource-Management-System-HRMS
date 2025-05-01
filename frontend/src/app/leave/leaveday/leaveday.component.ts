@@ -40,12 +40,24 @@ export class LeavedayComponent {
     );
   }
 
+  // openAddModal() {
+  //   this.resetForm();
+  //   this.showNameError = false;
+  //   this.showValueError = false;
+  //   this.removeModalFade();
+  // }
+
   openAddModal() {
     this.resetForm();
     this.showNameError = false;
     this.showValueError = false;
-    this.removeModalFade();
+  const modalElement = document.getElementById('addLeaveDayModal');
+    if (modalElement) {
+      const modalInstance = new (window as any).bootstrap.Modal(modalElement);
+      modalInstance.show();
+    }
   }
+
 
   openEditModal(leaveDayItem: any) {
     this.currentLeaveDay = { ...leaveDayItem };

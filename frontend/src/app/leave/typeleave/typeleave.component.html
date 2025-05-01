@@ -47,8 +47,6 @@
         class="btn btn-light"
         (click)="openAddModal()"
         aria-label="Add Leave Type"
-        data-toggle="modal"
-        data-target="#addLeaveTypeModal"
       >
         <i class="fas fa-plus fa-sm"></i> Add
       </button>
@@ -65,39 +63,39 @@
         <table id="leaveTypesTable" class="table table-bordered table-striped">
           <thead>
             <tr>
+              <th class="col-action">Actions</th>
               <th>ID</th>
               <th>Name</th>
               <th>Description</th>
-              <th class="col-action">Actions</th>
             </tr>
           </thead>
           <tbody>
             <tr
               *ngFor="let leaveTypeItem of leaveTypesArray; trackBy: trackById"
             >
+            <td class="col-action">
+              <button
+                type="button"
+                class="btn btn-success btn-sm"
+                (click)="openEditModal(leaveTypeItem)"
+                aria-label="Edit Leave Type"
+                data-toggle="modal"
+                data-target="#editLeaveTypeModal"
+              >
+                <i class="fas fa-edit fa-sm text-white"></i>
+              </button>
+              <button
+                type="button"
+                class="btn btn-danger btn-sm"
+                (click)="confirmDelete(leaveTypeItem)"
+                aria-label="Delete Leave Type"
+              >
+                <i class="fas fa-trash fa-sm text-white"></i>
+              </button>
+            </td>
               <td>{{ leaveTypeItem.id }}</td>
               <td>{{ leaveTypeItem.LeaveType }}</td>
               <td>{{ leaveTypeItem.Description }}</td>
-              <td class="col-action">
-                <button
-                  type="button"
-                  class="btn btn-success btn-sm"
-                  (click)="openEditModal(leaveTypeItem)"
-                  aria-label="Edit Leave Type"
-                  data-toggle="modal"
-                  data-target="#editLeaveTypeModal"
-                >
-                  <i class="fas fa-edit fa-sm text-white"></i>
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-danger btn-sm"
-                  (click)="confirmDelete(leaveTypeItem)"
-                  aria-label="Delete Leave Type"
-                >
-                  <i class="fas fa-trash fa-sm text-white"></i>
-                </button>
-              </td>
             </tr>
           </tbody>
         </table>
@@ -112,7 +110,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Add Leave Type</h5>
-        <button type="button" class="close" data-dismiss="modal">
+        <button type="button" class="close" (click)="closeModal()">
           <span>&times;</span>
         </button>
       </div>

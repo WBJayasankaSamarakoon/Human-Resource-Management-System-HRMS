@@ -64,8 +64,13 @@ export class CompanyComponent {
   openAddModal() {
     this.resetForm();
     this.showNameError = false;
-    this.removeModalFade();
+  const modalElement = document.getElementById('addCompanyModal');
+    if (modalElement) {
+      const modalInstance = new (window as any).bootstrap.Modal(modalElement);
+      modalInstance.show();
+    }
   }
+
 
 openEditModal(companyItem: any) {
   this.currentCompany = { ...companyItem };
@@ -219,13 +224,18 @@ updateRecords() {
     return companyItem.id;
   }
 
+
+
   closeModal() {
-    const modal = document.getElementById('addCompanyModal') as HTMLElement;
-    if (modal) {
-      modal.classList.remove('show');
-      modal.style.display = 'none';
-      // this.resetForm();
-      this.removeModalFade();
+    const modalElement = document.getElementById('addCompanyModal');
+    if (modalElement) {
+      const modalInstance = (window as any).bootstrap?.Modal.getInstance(modalElement);
+      if (modalInstance) {
+        modalInstance.hide();
+      } else {
+        // fallback for first-time close
+        new (window as any).bootstrap.Modal(modalElement).hide();
+      }
     }
   }
 

@@ -41,8 +41,14 @@ export class PositionComponent {
   openAddModal() {
     this.resetForm();
     this.showNameError = false;
-    this.removeModalFade();
+
+    const modalElement = document.getElementById('addPositionModal');
+    if (modalElement) {
+      const modalInstance = new (window as any).bootstrap.Modal(modalElement);
+      modalInstance.show();
+    }
   }
+
 
   openEditModal(positionItem: any) {
     this.currentPosition = { ...positionItem };
@@ -163,13 +169,18 @@ export class PositionComponent {
   }
 
   closeModal() {
-    const modal = document.getElementById('addPositionModal') as HTMLElement;
-    if (modal) {
-      modal.classList.remove('show');
-      modal.style.display = 'none';
-      this.removeModalFade();
+    const modalElement = document.getElementById('addPositionModal');
+    if (modalElement) {
+      const modalInstance = (window as any).bootstrap?.Modal.getInstance(modalElement);
+      if (modalInstance) {
+        modalInstance.hide();
+      } else {
+        // fallback for first-time close
+        new (window as any).bootstrap.Modal(modalElement).hide();
+      }
     }
   }
+
 
   removeModalFade() {
     const modalBackdrop = document.querySelector('.modal-backdrop');

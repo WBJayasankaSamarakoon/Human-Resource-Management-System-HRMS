@@ -89,15 +89,13 @@
           <td class="text-end" ></td>
         </tr>
 
-        <!-- Dynamic Allowances -->
-       <tr *ngIf="allowancesArray.length > 0; else noAllowances">
-        <td *ngFor="let allowance of allowancesArray">
-          {{ allowance.Name }}
-        </td>
-          <td *ngFor="let allowance of allowancesArray">
-            {{ slipData.dynamicAllowances[allowance.id] || 0 }}
-          </td>
-          <td></td>
+       <!-- Dynamic Allowances -->
+        <tr *ngIf="allowancesArray.length > 0; else noAllowances">
+        </tr>
+        <tr *ngFor="let allowance of allowancesArray">
+          <td>{{ allowance.Name }}</td>
+          <td>{{ slipData.dynamicAllowances[allowance.id] || 0 }}</td>
+          <td class="text-end"></td>
         </tr>
         <ng-template #noAllowances>
           <tr>
@@ -127,20 +125,18 @@
         </tr>
 
        <!-- Dynamic Deductions -->
-       <tr *ngIf="deductionsArray.length > 0; else noDeductions">
-        <td *ngFor="let deduction of deductionsArray">
-          {{ deduction.Name }}
-        </td>
-          <td *ngFor="let deduction of deductionsArray">
-            {{ slipData.dynamicDeductions[deduction.id] || 0 }}
-          </td>
-          <td></td>
+        <tr *ngIf="deductionsArray.length > 0; else noDeductions">
+        </tr>
+        <tr *ngFor="let deduction of deductionsArray">
+          <td>{{ deduction.Name }}</td>
+          <td>{{ slipData.dynamicDeductions[deduction.id] || 0 }}</td>
+          <td class="text-end"></td>
         </tr>
         <ng-template #noDeductions>
           <tr>
             <td colspan="3">No deductions found.</td>
           </tr>
-       </ng-template>
+        </ng-template>
         <tr>
           <td>Total Deductions</td>
           <td></td>

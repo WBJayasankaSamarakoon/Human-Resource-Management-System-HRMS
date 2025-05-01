@@ -28,6 +28,6 @@ class Deductions extends Model
 
         public function deductionType()
         {
-            return $this->belongsTo(AddDeduction::class, 'type', 'id');
+            return $this->belongsTo(Adddeduction::class, 'type', 'id');
         }
 }

@@ -43,8 +43,6 @@
         type="button"
         class="btn btn-light"
         (click)="openAddModal()"
-        data-toggle="modal"
-        data-target="#addTypeShiftModal"
       >
         <i class="fas fa-plus fa-sm"></i> Add
       </button>
@@ -61,35 +59,35 @@
         <table id="typeshiftTable" class="table table-bordered table-striped">
           <thead>
             <tr>
+              <th class="col-action">Actions</th>
               <th>ID</th>
               <th>Shift Name</th>
-              <th class="col-action">Actions</th>
             </tr>
           </thead>
           <tbody>
             <tr
               *ngFor="let TypeShiftItem of TypeshiftArray; trackBy: trackById"
             >
+            <td class="col-action">
+              <button
+                type="button"
+                class="btn btn-success btn-sm"
+                (click)="openEditModal(TypeShiftItem)"
+                data-toggle="modal"
+                data-target="#editTypeShiftModal"
+              >
+                <i class="fas fa-edit fa-sm text-white"></i>
+              </button>
+              <button
+                type="button"
+                class="btn btn-danger btn-sm"
+                (click)="confirmDelete(TypeShiftItem)"
+              >
+                <i class="fas fa-trash fa-sm text-white"></i>
+              </button>
+            </td>
               <td>{{ TypeShiftItem.id }}</td>
               <td>{{ TypeShiftItem.Name }}</td>
-              <td class="col-action">
-                <button
-                  type="button"
-                  class="btn btn-success btn-sm"
-                  (click)="openEditModal(TypeShiftItem)"
-                  data-toggle="modal"
-                  data-target="#editTypeShiftModal"
-                >
-                  <i class="fas fa-edit fa-sm text-white"></i>
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-danger btn-sm"
-                  (click)="confirmDelete(TypeShiftItem)"
-                >
-                  <i class="fas fa-trash fa-sm text-white"></i>
-                </button>
-              </td>
             </tr>
           </tbody>
         </table>
@@ -104,7 +102,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Add Shift Type</h5>
-        <button type="button" class="close" data-dismiss="modal">
+        <button type="button" class="close" (click)="closeModal()">
           <span>&times;</span>
         </button>
       </div>

@@ -158,14 +158,27 @@ calculateAttendanceIncentive(): void {
   }
 }
 
-  // Open modal for adding a new record
-  openAddModal(): void {
+  // openAddModal(): void {
+  //   this.resetForm();
+  //   this.newRecord = { type: 'full' };
+  //   this.isEditMode = false;
+  //   this.showEmployeeError = false;
+  //   this.removeModalFade();
+  // }
+
+  openAddModal() {
     this.resetForm();
     this.newRecord = { type: 'full' };
     this.isEditMode = false;
     this.showEmployeeError = false;
-    this.removeModalFade();
+  const modalElement = document.getElementById('addSpecialModal');
+    if (modalElement) {
+      const modalInstance = new (window as any).bootstrap.Modal(modalElement);
+      modalInstance.show();
+    }
   }
+
+
 
   // Open modal for editing an existing record
   openEditModal(record: any): void {
