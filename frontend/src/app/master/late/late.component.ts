@@ -43,8 +43,13 @@ export class LateComponent {
   openAddModal() {
     this.resetForm();
     this.showEmployeeError = false;
-    this.removeModalFade();
+  const modalElement = document.getElementById('addLateModal');
+    if (modalElement) {
+      const modalInstance = new (window as any).bootstrap.Modal(modalElement);
+      modalInstance.show();
+    }
   }
+
 
   openEditModal(lateItem: any) {
     this.currentLate = { ...lateItem };
@@ -179,13 +184,26 @@ export class LateComponent {
   }
 
   closeModal() {
-    const modal = document.getElementById('addLateModal') as HTMLElement;
-    if (modal) {
-      modal.classList.remove('show');
-      modal.style.display = 'none';
-      this.removeModalFade();
+    const modalElement = document.getElementById('addLateModal');
+    if (modalElement) {
+      const modalInstance = (window as any).bootstrap?.Modal.getInstance(modalElement);
+      if (modalInstance) {
+        modalInstance.hide();
+      } else {
+        new (window as any).bootstrap.Modal(modalElement).hide();
+      }
     }
+
+    // Cleanup: Remove any leftover backdrop or modal-open class
+    const backdrop = document.querySelector('.modal-backdrop');
+    if (backdrop) {
+      backdrop.remove();
+    }
+
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = ''; // Allow scroll
   }
+
 
   removeModalFade() {
     const modalBackdrop = document.querySelector('.modal-backdrop');

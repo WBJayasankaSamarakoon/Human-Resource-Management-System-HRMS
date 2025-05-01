@@ -14,7 +14,7 @@ import { DropdownModule, SidebarModule } from '@coreui/angular';
 import { IconSetService } from '@coreui/icons-angular';
 import { routes } from './app.routes';
 
-export const apiBaseUrl = 'http://localhost:8000/';
+export const apiBaseUrl = 'https://laravel.ueshr.ultimate.lk/';
 
 export const appConfig: ApplicationConfig = {
   providers: [

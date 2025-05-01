@@ -176,21 +176,31 @@ export class LeavedayComponent {
   }
 
   closeModal() {
-    const addModal = document.getElementById('addLeaveDayModal') as HTMLElement;
-    const editModal = document.getElementById('editLeaveDayModal') as HTMLElement;
+    const modals = ['addLeaveDayModal', 'editLeaveDayModal'];
 
-    if (addModal && addModal.classList.contains('show')) {
-      addModal.classList.remove('show');
-      addModal.style.display = 'none';
+    modals.forEach(id => {
+      const modalElement = document.getElementById(id);
+      if (modalElement) {
+        const modalInstance = (window as any).bootstrap?.Modal.getInstance(modalElement);
+        if (modalInstance) {
+          modalInstance.hide();
+        } else {
+          new (window as any).bootstrap.Modal(modalElement).hide();
+        }
+      }
+    });
+
+    // Cleanup: Remove any leftover backdrop or modal-open class
+    const backdrop = document.querySelector('.modal-backdrop');
+    if (backdrop) {
+      backdrop.remove();
     }
 
-    if (editModal && editModal.classList.contains('show')) {
-      editModal.classList.remove('show');
-      editModal.style.display = 'none';
-    }
-
-    this.removeModalFade();
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = ''; // Allow scroll
   }
+
+
 
 
   removeModalFade() {

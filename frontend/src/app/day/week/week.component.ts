@@ -162,15 +162,6 @@ export class WeekComponent {
     return weekItem.id;
   }
 
-  // closeModal() {
-  //   const modal = document.querySelector('.modal.show') as HTMLElement;
-  //   if (modal) {
-  //     modal.classList.remove('show');
-  //     modal.style.display = 'none';
-  //     this.removeModalFade();
-  //   }
-  // }
-
   closeModal() {
     const modalElement = document.getElementById('addWeekModal');
     if (modalElement) {
@@ -178,11 +169,20 @@ export class WeekComponent {
       if (modalInstance) {
         modalInstance.hide();
       } else {
-        // fallback for first-time close
         new (window as any).bootstrap.Modal(modalElement).hide();
       }
     }
+
+    // Cleanup: Remove any leftover backdrop or modal-open class
+    const backdrop = document.querySelector('.modal-backdrop');
+    if (backdrop) {
+      backdrop.remove();
+    }
+
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = ''; // Allow scroll
   }
+
 
 
   removeModalFade() {

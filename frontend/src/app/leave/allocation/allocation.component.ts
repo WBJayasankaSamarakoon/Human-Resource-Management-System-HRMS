@@ -57,7 +57,6 @@ export class AllocationComponent {
     this.isLoading = true;
     this.http.get(`${apiBaseUrl}api/allocation`).subscribe(
       (resultData: any) => {
-        // Expecting each item to have `employee` and `leave_type` objects
         this.allocationArray = Array.isArray(resultData) ? resultData : [];
         this.filteredAllocations = [...this.allocationArray];
         this.isLoading = false;
@@ -68,7 +67,6 @@ export class AllocationComponent {
       }
     );
   }
-
 
   getAllEmployees() {
     this.http.get(`${apiBaseUrl}api/tblemployees`).subscribe((data: any) => {
@@ -97,50 +95,48 @@ export class AllocationComponent {
 
   openEditModal(allocation: any) {
     this.currentAllocation = { ...allocation };
-    this.clearErrors();
-    const modal = document.getElementById('editAllocationModal');
-    if (modal) {
-      const instance = new (window as any).bootstrap.Modal(modal);
-      instance.show();
-    }
+    this.showEmployeeError = false;
+    this.showYearError = false;
+    this.showLeaveTypeError = false;
+    this.showLeaveCountError = false;
+    this.removeModalFade();
   }
 
 
   save() {
-    this.validateForm();
+    this.showEmployeeError = !this.currentAllocation.employee_id;
+    this.showYearError = !this.currentAllocation.year;
+    this.showLeaveTypeError = !this.currentAllocation.leave_type_id;
+    this.showLeaveCountError = !this.currentAllocation.leave_count;
 
-    if (this.hasErrors()) return;
+    if (
+      this.showEmployeeError ||
+      this.showYearError ||
+      this.showLeaveTypeError ||
+      this.showLeaveCountError
+    ) {
+      return;
+    }
 
     this.register();
   }
 
   update() {
-    this.validateForm();
-
-    if (this.hasErrors()) return;
-
-    this.updateRecord();
-  }
-
-  validateForm() {
     this.showEmployeeError = !this.currentAllocation.employee_id;
     this.showYearError = !this.currentAllocation.year;
     this.showLeaveTypeError = !this.currentAllocation.leave_type_id;
     this.showLeaveCountError = !this.currentAllocation.leave_count;
-  }
 
-  hasErrors(): boolean {
-    return this.showEmployeeError ||
-           this.showYearError ||
-           this.showLeaveTypeError ||
-           this.showLeaveCountError;
-  }
+    if (
+      this.showEmployeeError ||
+      this.showYearError ||
+      this.showLeaveTypeError ||
+      this.showLeaveCountError
+    ) {
+      return;
+    }
 
-  clearErrors() {
-    this.showEmployeeError = false;
-    this.showYearError = false;
-    this.showLeaveTypeError = false;
-    this.showLeaveCountError = false;
+    this.updateRecord();
   }
 
   register() {
@@ -149,7 +145,7 @@ export class AllocationComponent {
       () => {
         this.alertSuccess('Allocation added successfully!');
         this.getAllAllocations();
-        this.closeModal('addAllocationModal');
+        this.closeModal();
         this.isLoading = false;
       },
       (error) => {
@@ -166,7 +162,7 @@ export class AllocationComponent {
       () => {
         this.alertSuccess('Allocation updated successfully!');
         this.getAllAllocations();
-        this.closeModal('editAllocationModal');
+        this.closeModal();
         this.isLoading = false;
       },
       (error) => {
@@ -209,17 +205,6 @@ export class AllocationComponent {
     }
   }
 
-  closeModal(modalId: string) {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-      const instance = (window as any).bootstrap.Modal.getInstance(modal);
-      if (instance) {
-        instance.hide();
-      }
-    }
-    this.removeModalFade();
-  }
-
   resetForm() {
     this.currentAllocation = {
       id: '',
@@ -231,6 +216,13 @@ export class AllocationComponent {
       leave_count: '',
     };
     this.clearErrors();
+  }
+
+  clearErrors() {
+    this.showEmployeeError = false;
+    this.showYearError = false;
+    this.showLeaveTypeError = false;
+    this.showLeaveCountError = false;
   }
 
   alertSuccess(message: string) {
@@ -250,6 +242,26 @@ export class AllocationComponent {
         alertBox.classList.remove('visible');
       }, 3000);
     }
+  }
+
+  closeModal() {
+    const modalElement = document.getElementById('addAllocationModal');
+    if (modalElement) {
+      const modalInstance = (window as any).bootstrap?.Modal.getInstance(modalElement);
+      if (modalInstance) {
+        modalInstance.hide();
+      } else {
+        new (window as any).bootstrap.Modal(modalElement).hide();
+      }
+    }
+
+    const backdrop = document.querySelector('.modal-backdrop');
+    if (backdrop) {
+      backdrop.remove();
+    }
+
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
   }
 
   trackById(index: number, item: any): number {

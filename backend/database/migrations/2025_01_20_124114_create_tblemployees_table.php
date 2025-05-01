@@ -15,6 +15,11 @@ return new class extends Migration
             $table->id(); // auto-increment primary key
             $table->unsignedBigInteger('EmpId');
             $table->string('NameWithInitials', 255);
+
+            $table->string('FirstName', 100)->nullable();
+            $table->string('MiddleName', 100)->nullable();
+            $table->string('LastName', 100)->nullable();
+
             $table->string('EPFNumber', 100)->nullable();
             $table->boolean('EpfEligible')->default(false);
             $table->string('Phone', 20)->nullable();

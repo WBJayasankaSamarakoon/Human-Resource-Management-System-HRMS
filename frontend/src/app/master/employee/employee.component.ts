@@ -20,6 +20,9 @@ export class EmployeeComponent {
     id: '',
     EmpId: null,
     NameWithInitials: '',
+    FirstName: '',
+    MiddleName: '',
+    LastName: '',
     EPFNumber: '',
     EpfEligible: false,
     Phone: '',
@@ -100,13 +103,24 @@ export class EmployeeComponent {
     );
   }
 
-  // Open Add Modal
+  // openAddModal() {
+  //   this.resetForm();
+  //   this.showEmployeeEmpIdError = false;
+  //   this.showEmployeeNameWithInitialsError = false;
+  //   this.showDefaultShiftError = false;
+  //   this.removeModalFade();
+  // }
+
   openAddModal() {
     this.resetForm();
     this.showEmployeeEmpIdError = false;
     this.showEmployeeNameWithInitialsError = false;
     this.showDefaultShiftError = false;
-    this.removeModalFade();
+  const modalElement = document.getElementById('addEmployeeModal');
+    if (modalElement) {
+      const modalInstance = new (window as any).bootstrap.Modal(modalElement);
+      modalInstance.show();
+    }
   }
 
   // Open Edit Modal
@@ -240,6 +254,9 @@ export class EmployeeComponent {
       id: '',
       EmpId: null,
       NameWithInitials: '',
+      FirstName: '',
+      MiddleName: '',
+      LastName: '',
       EPFNumber: '',
       EpfEligible: false,
       Phone: '',
@@ -265,15 +282,27 @@ export class EmployeeComponent {
     return employeeItem.id;
   }
 
-  // Close modal
   closeModal() {
-    const modal = document.getElementById('addEmployeeModal') as HTMLElement;
-    if (modal) {
-      modal.classList.remove('show');
-      modal.style.display = 'none';
-      this.removeModalFade();
+    const modalElement = document.getElementById('addEmployeeModal');
+    if (modalElement) {
+      const modalInstance = (window as any).bootstrap?.Modal.getInstance(modalElement);
+      if (modalInstance) {
+        modalInstance.hide();
+      } else {
+        new (window as any).bootstrap.Modal(modalElement).hide();
+      }
     }
+
+    // Cleanup: Remove any leftover backdrop or modal-open class
+    const backdrop = document.querySelector('.modal-backdrop');
+    if (backdrop) {
+      backdrop.remove();
+    }
+
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = ''; // Allow scroll
   }
+
 
   // Remove modal fade
   removeModalFade() {

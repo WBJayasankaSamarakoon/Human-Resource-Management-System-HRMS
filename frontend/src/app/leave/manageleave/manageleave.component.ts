@@ -437,7 +437,7 @@ resetFilters() {
   // }
 
   closeModal() {
-    const modalElement = document.getElementById('addLeaveModal') as HTMLElement;
+    const modalElement = document.getElementById('addLeaveModal');
     if (modalElement) {
       const modalInstance = (window as any).bootstrap?.Modal.getInstance(modalElement);
       if (modalInstance) {
@@ -445,13 +445,18 @@ resetFilters() {
       } else {
         new (window as any).bootstrap.Modal(modalElement).hide();
       }
-
-      // Manual adjustments
-      modalElement.classList.remove('show');
-      modalElement.style.display = 'none';
-      this.removeModalFade();
     }
+
+    // Cleanup: Remove any leftover backdrop or modal-open class
+    const backdrop = document.querySelector('.modal-backdrop');
+    if (backdrop) {
+      backdrop.remove();
+    }
+
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = ''; // Allow scroll
   }
+
 
 
   // Remove modal backdrop fade

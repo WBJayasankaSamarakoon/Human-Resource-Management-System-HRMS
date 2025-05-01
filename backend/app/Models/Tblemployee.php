@@ -14,6 +14,9 @@ class Tblemployee extends Model
     protected $fillable = [
         'EmpId',
         'NameWithInitials',
+        'FirstName',
+        'MiddleName',
+        'LastName',
         'EPFNumber',
         'EpfEligible',
         'Phone',

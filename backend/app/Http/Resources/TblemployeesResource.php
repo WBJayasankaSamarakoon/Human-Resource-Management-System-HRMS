@@ -17,6 +17,9 @@ class TblemployeesResource extends JsonResource
         return [
             'id' => $this->id,
             'NameWithInitials' => $this->NameWithInitials,
+            'FirstName' => $this->FirstName,
+            'MiddleName' => $this->MiddleName,
+            'LastName' => $this->LastName,
             'EPFNumber' => $this->EPFNumber,
             'Phone' => $this->Phone,
             'CurrentAddress' => $this->CurrentAddress,

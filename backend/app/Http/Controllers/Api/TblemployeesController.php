@@ -22,6 +22,11 @@ class TblemployeesController extends Controller
         $request->validate([
             'EmpId' => 'required|numeric|unique:tblemployees,EmpId',
             'NameWithInitials' => 'required|string|max:255',
+
+            'FirstName'=> 'nullable|string|max:100',
+            'MiddleName'=> 'nullable|string|max:100',
+            'LastName'=> 'nullable|string|max:100',
+
             'EPFNumber' => 'nullable|string|max:100',
             'EpfEligible' => 'nullable|boolean',
             'Phone' => 'nullable|string|max:20',
@@ -73,6 +78,11 @@ class TblemployeesController extends Controller
         $request->validate([
             'EmpId' => 'required|numeric|unique:tblemployees,EmpId,' . $id,
             'NameWithInitials' => 'required|string|max:255',
+
+            'FirstName'=> 'nullable|string|max:100',
+            'MiddleName'=> 'nullable|string|max:100',
+            'LastName'=> 'nullable|string|max:100',
+
             'EPFNumber' => 'nullable|string|max:100',
             'EpfEligible' => 'nullable|boolean',
             'Phone' => 'nullable|string|max:20',
