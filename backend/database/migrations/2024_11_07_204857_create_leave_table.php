@@ -21,15 +21,8 @@ class CreateLeaveTable extends Migration
             $table->date('end_date');
             $table->tinyInteger('approve');
             $table->unsignedBigInteger('leaveday_id');
-            // $table->enum('approve', ['Post Approve', 'Pre Approve']);
             $table->timestamps();
-
-
-            //$table->unsignedBigInteger('leaveapprove_id');
-            // Foreign Key Constraints (Assuming these tables exist)
-            //$table->foreign('employee_id')->references('id')->on('tblemployees')->onDelete('cascade');
-            // $table->foreign('leave_type_id')->references('id')->on('leave_types')->onDelete('cascade');
-        });
+            });
     }
 
     /**

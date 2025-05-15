@@ -64,8 +64,8 @@
               <th>Employee Name</th>
               <th>Basic Salary</th>
               <th *ngFor="let field of incentiveFields">{{ field }}</th>
-              <!-- <th>Salary Advance</th>
-              <th>Telephone Expenses</th> -->
+              <th>Tax Amount</th>
+              <!-- <th>Telephone Expenses</th> -->
               <!-- <th>Deductions</th> -->
               <th>Net Salary</th>
               <th>Month</th>
@@ -100,8 +100,8 @@
               <td *ngFor="let field of incentiveFields">
                 {{ payroll[field] || 0 }}
               </td>
-              <!-- <td>{{ payroll.s_advance || 0 }}</td>
-              <td>{{ payroll.t_expenses || 0 }}</td> -->
+              <td>{{ payroll.tax || 0 }}</td>
+              <!-- <td>{{ payroll.t_expenses || 0 }}</td> -->
               <!-- <td>{{ payroll.deductions || 0 }}</td> -->
               <td>{{ payroll.net_salary }}</td>
               <td>{{ payroll.payment_date | date : "yyyy-MM" }}</td>
@@ -191,18 +191,19 @@
                     Basic Salary is required
                   </small>
                 </div>
-                <!-- <div class="form-group mt-3">
-                  <label for="s_advance">Salary Advance</label>
+                <div class="form-group mt-3">
+                  <label for="tax">Tax Amount</label>
                   <input
                     type="number"
-                    id="s_advance"
+                    id="tax"
                     class="form-control"
-                    [(ngModel)]="currentPayroll.s_advance"
-                    name="s_advance"
+                    placeholder="0.00"
+                    [(ngModel)]="currentPayroll.tax"
+                    name="tax"
                     required
                   />
                 </div>
-                <div class="form-group mt-3">
+                <!-- <div class="form-group mt-3">
                   <label for="t_expenses">Telephone Expenses</label>
                   <input
                     type="number"
@@ -380,18 +381,18 @@
                     Basic Salary is required
                   </small>
                 </div>
-                <!-- <div class="form-group mt-3">
-                  <label for="s_advance">Salary Advance	</label>
+                <div class="form-group mt-3">
+                  <label for="tax">Tax Amount	</label>
                   <input
                     type="number"
-                    id="s_advance"
+                    id="tax"
                     class="form-control"
-                    [(ngModel)]="currentPayroll.s_advance"
-                    name="s_advance"
+                    [(ngModel)]="currentPayroll.tax"
+                    name="tax"
                     required
                   />
                 </div>
-                <div class="form-group mt-3">
+                <!-- <div class="form-group mt-3">
                   <label for="t_expenses">Telephone Expenses</label>
                   <input
                     type="number"

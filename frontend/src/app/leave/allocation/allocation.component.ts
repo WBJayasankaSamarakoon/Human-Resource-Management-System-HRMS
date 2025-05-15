@@ -102,41 +102,24 @@ export class AllocationComponent {
     this.removeModalFade();
   }
 
-
   save() {
     this.showEmployeeError = !this.currentAllocation.employee_id;
     this.showYearError = !this.currentAllocation.year;
     this.showLeaveTypeError = !this.currentAllocation.leave_type_id;
     this.showLeaveCountError = !this.currentAllocation.leave_count;
 
-    if (
-      this.showEmployeeError ||
+    if (this.showEmployeeError ||
       this.showYearError ||
       this.showLeaveTypeError ||
-      this.showLeaveCountError
-    ) {
+      this.showLeaveCountError) {
       return;
     }
 
-    this.register();
-  }
-
-  update() {
-    this.showEmployeeError = !this.currentAllocation.employee_id;
-    this.showYearError = !this.currentAllocation.year;
-    this.showLeaveTypeError = !this.currentAllocation.leave_type_id;
-    this.showLeaveCountError = !this.currentAllocation.leave_count;
-
-    if (
-      this.showEmployeeError ||
-      this.showYearError ||
-      this.showLeaveTypeError ||
-      this.showLeaveCountError
-    ) {
-      return;
+    if (!this.currentAllocation.id) {
+      this.register();
+    } else {
+      this.updateRecord();
     }
-
-    this.updateRecord();
   }
 
   register() {

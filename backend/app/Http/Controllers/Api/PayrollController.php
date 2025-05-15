@@ -89,7 +89,7 @@ class PayrollController extends Controller
             'PerformanceIncentive' => 'nullable|numeric',
             'BRA1' => 'nullable|numeric',
             'BRA2' => 'nullable|numeric',
-            // 'BRA3' => 'nullable|numeric',
+            'tax' => 'nullable|numeric',
             // 'deductions' => 'nullable|numeric',
             // 's_advance' => 'nullable|numeric',
             // 't_expenses' => 'nullable|numeric',
@@ -100,7 +100,7 @@ class PayrollController extends Controller
         // Ensure missing fields are set to zero
         $payrollData = $request->only([
             'emp_id', 'basic_salary', 'AttendanceIncentive', 'SuperAttendance',
-                'PerformanceIncentive', 'BRA1', 'BRA2', 'payment_date','is_active'
+                'PerformanceIncentive', 'BRA1', 'BRA2', 'payment_date', 'tax', 'is_active'
         ]);
 
         // Set default values for missing fields
@@ -110,7 +110,7 @@ class PayrollController extends Controller
         $payrollData['PerformanceIncentive'] = $payrollData['PerformanceIncentive'] ?? 0.00;
         $payrollData['BRA1'] = $payrollData['BRA1'] ?? 0.00;
         $payrollData['BRA2'] = $payrollData['BRA2'] ?? 0.00;
-        // $payrollData['BRA3'] = $payrollData['BRA3'] ?? 0.00;
+        $payrollData['tax'] = $payrollData['tax'] ?? 0.00;
         // $payrollData['commission'] = $payrollData['commission'] ?? 0.00;
         // $payrollData['s_advance'] = $payrollData['s_advance'] ?? 0.00;
         // $payrollData['t_expenses'] = $payrollData['t_expenses'] ?? 0.00;
@@ -147,7 +147,7 @@ class PayrollController extends Controller
             'PerformanceIncentive' => 'nullable|numeric',
             'BRA1' => 'nullable|numeric',
             'BRA2' => 'nullable|numeric',
-            // 'BRA3' => 'nullable|numeric',
+            'tax' => 'nullable|numeric',
             // 'deductions' => 'nullable|numeric',
             // 's_advance' => 'nullable|numeric',
             // 't_expenses' => 'nullable|numeric',
@@ -159,7 +159,7 @@ class PayrollController extends Controller
         if ($payroll) {
             $payrollData = $request->only([
                 'emp_id', 'basic_salary', 'AttendanceIncentive', 'SuperAttendance',
-                'PerformanceIncentive', 'BRA1', 'BRA2', 'payment_date','is_active'
+                'PerformanceIncentive', 'BRA1', 'BRA2', 'payment_date', 'tax','is_active'
             ]);
 
             // Set default values for any missing fields
@@ -169,7 +169,7 @@ class PayrollController extends Controller
             $payrollData['PerformanceIncentive'] = $payrollData['PerformanceIncentive'] ?? 0.00;
             $payrollData['BRA1'] = $payrollData['BRA1'] ?? 0.00;
             $payrollData['BRA2'] = $payrollData['BRA2'] ?? 0.00;
-            // $payrollData['BRA3'] = $payrollData['BRA3'] ?? 0.00;
+            $payrollData['tax'] = $payrollData['tax'] ?? 0.00;
             // $payrollData['commission'] = $payrollData['commission'] ?? 0.00;
             // $payrollData['s_advance'] = $payrollData['s_advance'] ?? 0.00;
             // $payrollData['t_expenses'] = $payrollData['t_expenses'] ?? 0.00;

@@ -20,7 +20,7 @@ class Payroll extends Model
         'PerformanceIncentive',
         'BRA1',
         'BRA2',
-        // 'BRA3',
+        'tax',
         'commission',
         // 'deductions',
         // 's_advance',

@@ -5,6 +5,8 @@ import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { apiBaseUrl } from '../../app.config';
 import { CommonModule } from '@angular/common';
+import { cilOptions, cilCircle, cilDog } from '@coreui/icons';
+import { IconSetService } from '@coreui/icons-angular';
 
 @Component({
   selector: 'app-slip',
@@ -18,13 +20,13 @@ export class SlipComponent implements OnInit {
   slipData: any = {};
   company: any = {};
   loading: boolean = false;
-
+  currentMonth: number = 0;
+  currentYear: number = 0;
   monthNames: string[] = [
     '', 'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
   ];
 
-  // Allowances and Deductions
   allowancesArray: any[] = [];
   deductionsArray: any[] = [];
   allowancesMap: { [key: number]: number } = {};
@@ -62,7 +64,7 @@ export class SlipComponent implements OnInit {
         console.error('Error loading companies.');
       }
     );
-}
+  }
 
   loadSlipData(empId: string): void {
     this.loading = true;
@@ -78,7 +80,8 @@ export class SlipComponent implements OnInit {
     this.http.get<any>(url).subscribe({
       next: (response) => {
         if (response && response.data) {
-          const year = response.year;
+          this.currentYear = response.year;
+          this.currentMonth = response.month;
           const month = this.monthNames[response.month];
 
           const employeeData = response.data.find(
@@ -108,7 +111,6 @@ export class SlipComponent implements OnInit {
             const lateDeduction = (grossSalary / 240) * lateHours;
             const salaryForEPF = grossSalary - (noPayAmount + lateDeduction);
 
-            // Keep them as numbers
             const attendanceIncentive = parseFloat(employeeData.AttendanceIncentive || '0');
             const performanceIncentive = parseFloat(employeeData.PerformanceIncentive || '0');
 
@@ -116,21 +118,19 @@ export class SlipComponent implements OnInit {
               .reduce((sum: number, value: any) => sum + parseFloat(value || 0), 0);
 
             const total_allowances = attendanceIncentive + performanceIncentive + dynamicAllowancesTotal;
-
             const isEpfEligible = employeeData.EpfEligible === 1;
 
             const format = (val: number) => val.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
             const epfEmpAmount = salaryForEPF * parseFloat(employeeData.epfEmp || '0') / 100;
-            let total_deductions = parseFloat(employeeData.total_deductions || '0') + epfEmpAmount;
+            let total_deductions = parseFloat(employeeData.total_deductions || '0');
 
-            // Calculate netSalary
-            const netSalary = (total_allowances + salaryForEPF) - total_deductions;
+            const netSalary = (salaryForEPF + total_allowances) - total_deductions;
 
             this.slipData = {
               empId: employeeData.emp_id,
               name: employeeData.name,
-              year: year,
+              year: this.currentYear,
               month: month,
               basicSalary: format(parseFloat(employeeData.basic_salary || '0')),
               attendanceIncentive: format(attendanceIncentive),
@@ -139,6 +139,7 @@ export class SlipComponent implements OnInit {
               bra1: format(parseFloat(employeeData.BRA1 || '0')),
               bra2: format(parseFloat(employeeData.BRA2 || '0')),
               bra3: format(parseFloat(employeeData.BRA3 || '0')),
+              tax: format(parseFloat(employeeData.tax || '0')),
               late_hours: lateHours,
               unApproveLeave: employeeData.un_approve_leave || '0',
               postApproveLeave: employeeData.post_approve_leave || '0',
@@ -159,22 +160,18 @@ export class SlipComponent implements OnInit {
               noPayAmount: format(noPayAmount),
               lateDeduction: format(lateDeduction),
               salaryForEPF: format(salaryForEPF),
-              // dynamicAllowances: employeeData.dynamicAllowances || {},
-              // dynamicDeductions: employeeData.dynamicDeductions || {},
               dynamicAllowances,
               dynamicDeductions,
               epfEmp: format(parseFloat(employeeData.epfEmp || '0')),
               epfCom: format(parseFloat(employeeData.epfCom || '0')),
               etfCom: format(parseFloat(employeeData.etfCom || '0')),
-              // Add these new calculated amounts:
-            epfEmpAmount: format((salaryForEPF * parseFloat(employeeData.epfEmp || '0') / 100)),
-            epfComAmount: format((salaryForEPF * parseFloat(employeeData.epfCom || '0') / 100)),
-            etfComAmount: format((salaryForEPF * parseFloat(employeeData.etfCom || '0') / 100)),
+              epfEmpAmount: format(epfEmpAmount),
+              epfComAmount: format((salaryForEPF * parseFloat(employeeData.epfCom || '0') / 100)),
+              etfComAmount: format((salaryForEPF * parseFloat(employeeData.etfCom || '0') / 100)),
             };
 
             console.log('Slip Data:', this.slipData);
           }
-
         }
         this.loading = false;
       },
@@ -185,7 +182,6 @@ export class SlipComponent implements OnInit {
     });
   }
 
-  // Fetch all Allowances
   getAllAllowances() {
     this.http.get(`${apiBaseUrl}api/addallowance`).subscribe(
       (resultData: any) => {
@@ -197,32 +193,37 @@ export class SlipComponent implements OnInit {
     );
   }
 
-// Fetch all Deductions Names
-getAllDeductions() {
-  this.http.get(`${apiBaseUrl}api/adddeduction`).subscribe(
-    (resultData: any) => {
-      this.deductionsArray = Array.isArray(resultData) ? resultData : [];
-    },
-    () => {
-      console.error('Error loading deductions.');
-    }
-  );
-}
+  getAllDeductions() {
+    this.http.get(`${apiBaseUrl}api/adddeduction`).subscribe(
+      (resultData: any) => {
+        this.deductionsArray = Array.isArray(resultData) ? resultData : [];
+      },
+      () => {
+        console.error('Error loading deductions.');
+      }
+    );
+  }
 
-  // Load Allowances by mapping type to addallowance.id
   loadAllowances(empId: string, fileId: string) {
     this.http.get(`${apiBaseUrl}api/allowances?emp_id=${empId}&file_id=${fileId}`).subscribe(
       (resultData: any) => {
         if (Array.isArray(resultData)) {
-          resultData.forEach((allowance: any) => {
-            // Map by type which is the id in addallowance table
+          const filteredAllowances = resultData.filter((allowance: any) => {
+            if (!allowance.payment_date) return false;
+            const paymentDate = new Date(allowance.payment_date);
+            return paymentDate.getMonth() + 1 === this.currentMonth &&
+                   paymentDate.getFullYear() === this.currentYear;
+          });
+
+          filteredAllowances.forEach((allowance: any) => {
             if (!this.allowancesMap[allowance.type]) {
               this.allowancesMap[allowance.type] = 0;
             }
             this.allowancesMap[allowance.type] += parseFloat(allowance.amount || 0);
           });
-          // Populate slipData.dynamicDeductions with the mapped data
+
           this.slipData.dynamicAllowances = { ...this.allowancesMap };
+          this.recalculateTotalAllowances();
         }
       },
       () => {
@@ -231,27 +232,74 @@ getAllDeductions() {
     );
   }
 
-  // Load Deductions by mapping type to adddeduction.id
+  recalculateTotalAllowances() {
+    const parseNumber = (val: string | number): number => {
+      if (typeof val === 'number') return val;
+      return parseFloat((val || '0').toString().replace(/,/g, ''));
+    };
+
+    const attendanceIncentive = parseNumber(this.slipData.attendanceIncentive);
+    const performanceIncentive = parseNumber(this.slipData.performanceIncentive);
+    const dynamicAllowancesTotal = Object.values(this.slipData.dynamicAllowances || {})
+      .reduce((sum: number, value: any) => sum + parseNumber(value), 0);
+
+    const total = attendanceIncentive + performanceIncentive + dynamicAllowancesTotal;
+    this.slipData.total_allowances = total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    this.recalculateNetSalary();
+  }
+
   loadDeductions(empId: string, fileId: string) {
     this.http.get(`${apiBaseUrl}api/deductions?emp_id=${empId}&file_id=${fileId}`).subscribe(
       (resultData: any) => {
         if (Array.isArray(resultData)) {
-          resultData.forEach((deduction: any) => {
-            // Map by type which is the id in adddeduction table
+          const filteredDeductions = resultData.filter((deduction: any) => {
+            if (!deduction.payment_date) return false;
+            const paymentDate = new Date(deduction.payment_date);
+            return paymentDate.getMonth() + 1 === this.currentMonth &&
+                   paymentDate.getFullYear() === this.currentYear;
+          });
+
+          filteredDeductions.forEach((deduction: any) => {
             if (!this.deductionsMap[deduction.type]) {
               this.deductionsMap[deduction.type] = 0;
             }
             this.deductionsMap[deduction.type] += parseFloat(deduction.amount || 0);
           });
 
-          // Populate slipData.dynamicDeductions with the mapped data
           this.slipData.dynamicDeductions = { ...this.deductionsMap };
+
+          const parseNumber = (val: string): number =>
+            parseFloat((val || '0').toString().replace(/,/g, ''));
+
+          const dynamicDeductionsTotal = Object.values(this.slipData.dynamicDeductions || {})
+            .reduce((sum: number, value: any) => sum + parseFloat(value || 0), 0);
+
+          const epfAmount = parseNumber(this.slipData.epfEmpAmount);
+          const tax = parseNumber(this.slipData.tax);
+          const total = dynamicDeductionsTotal + epfAmount + tax;
+
+          this.slipData.total_deductions = total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+          this.recalculateNetSalary();
         }
       },
       () => {
         console.error('Error loading deductions amounts.');
       }
     );
+  }
+
+  recalculateNetSalary() {
+    const parseNumber = (val: string | number): number => {
+      if (typeof val === 'number') return val;
+      return parseFloat((val || '0').toString().replace(/,/g, ''));
+    };
+
+    const grossSalary = parseNumber(this.slipData.grossSalary);
+    const totalAllowances = parseNumber(this.slipData.total_allowances);
+    const totalDeductions = parseNumber(this.slipData.total_deductions);
+
+    const netSalary = (grossSalary + totalAllowances) - (totalDeductions);
+    this.slipData.netSalary = netSalary.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
 
   goBack(): void {
@@ -292,10 +340,8 @@ getAllDeductions() {
         const pageHeight = 210;
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-        // Calculate the xOffset to center the image horizontally
         const xOffset = (pageWidth - imgWidth) / 2;
 
-        // Check if image height exceeds page height and scale accordingly
         if (imgHeight > pageHeight) {
           const scaleFactor = pageHeight / imgHeight;
           const scaledImgHeight = imgHeight * scaleFactor;
