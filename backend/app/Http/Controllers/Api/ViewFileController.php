@@ -351,127 +351,80 @@ class ViewFileController extends Controller
             IFNULL(pr.pre_approve_leave, 0) AS pre_approve_leave,
             IFNULL(ua.un_approve_leave, 0) AS un_approve_leave,
 
-            SUM(
-                CASE
-                    WHEN u.check_in IS NOT NULL AND u.check_in != '-'
-                        AND u.check_out IS NOT NULL AND u.check_out != '-'
-                        AND s.StartTime IS NOT NULL AND s.EndTime IS NOT NULL THEN
-                        -- Check if this is a half-day leave (either AM or PM)
-                        CASE
-                            -- When it's a half-day leave (either AM or PM)
-                            WHEN EXISTS (
-                                SELECT 1 FROM `leave` l
-                                JOIN leaveday ld ON l.leaveday_id = ld.id
-                                WHERE l.employee_id = e.id
-                                AND ld.Value = 0.5
-                                AND u.date BETWEEN l.start_date AND l.end_date
-                            ) THEN
-                                -- For half-day leaves, use HalfTime to determine morning/afternoon
-                                CASE
-                                    -- Morning half-day (check-in before HalfTime)
-                                    WHEN TIME(STR_TO_DATE(u.check_in, '%H:%i:%s')) < s.HalfTime THEN
-                                        -- Calculate late arrival only (against StartTime)
-                                        ROUND(
-                                            COALESCE(
-                                                (
-                                                    SELECT l.deduction_min
-                                                    FROM late l
-                                                    WHERE TIMESTAMPDIFF(
-                                                        MINUTE,
-                                                        s.StartTime,
-                                                        STR_TO_DATE(u.check_in, '%H:%i:%s')
-                                                    ) BETWEEN l.from_min AND IFNULL(l.to_min, 9999)
-                                                    ORDER BY l.from_min ASC LIMIT 1
-                                                ),
-                                                GREATEST(
-                                                    TIMESTAMPDIFF(
-                                                        MINUTE,
-                                                        s.StartTime,
-                                                        STR_TO_DATE(u.check_in, '%H:%i:%s')
-                                                    ),
-                                                    0
-                                                )
-                                            ) / 60.0,
-                                            2
-                                        )
-                                    -- Afternoon half-day (check-in at or after HalfTime)
-                                    ELSE
-                                        -- Calculate early departure only (against EndTime)
-                                        ROUND(
-                                            COALESCE(
-                                                (
-                                                    SELECT l.deduction_min
-                                                    FROM late l
-                                                    WHERE TIMESTAMPDIFF(
-                                                        MINUTE,
-                                                        STR_TO_DATE(u.check_out, '%H:%i:%s'),
-                                                        s.EndTime
-                                                    ) BETWEEN l.from_min AND IFNULL(l.to_min, 9999)
-                                                    ORDER BY l.from_min ASC LIMIT 1
-                                                ),
-                                                GREATEST(
-                                                    TIMESTAMPDIFF(
-                                                        MINUTE,
-                                                        STR_TO_DATE(u.check_out, '%H:%i:%s'),
-                                                        s.EndTime
-                                                    ),
-                                                    0
-                                                )
-                                            ) / 60.0,
-                                            2
-                                        )
-                                END
-                            -- Regular full day calculation
-                            ELSE
-                                ROUND(
-                                    (
-                                        -- Late arrival minutes (only positive values)
-                                        COALESCE(
-                                            (
-                                                SELECT l.deduction_min
-                                                FROM late l
-                                                WHERE TIMESTAMPDIFF(
-                                                    MINUTE,
-                                                    s.StartTime,
-                                                    STR_TO_DATE(u.check_in, '%H:%i:%s')
-                                                ) BETWEEN l.from_min AND IFNULL(l.to_min, 9999)
-                                                ORDER BY l.from_min ASC LIMIT 1
-                                            ),
-                                            GREATEST(
-                                                TIMESTAMPDIFF(
-                                                    MINUTE,
-                                                    s.StartTime,
-                                                    STR_TO_DATE(u.check_in, '%H:%i:%s')
-                                                ),
-                                                0
-                                            )
-                                        ) +
-                                        -- Early departure minutes (only positive values)
-                                        COALESCE(
-                                            (
-                                                SELECT l.deduction_min
-                                                FROM late l
-                                                WHERE TIMESTAMPDIFF(
-                                                    MINUTE,
-                                                    STR_TO_DATE(u.check_out, '%H:%i:%s'),
-                                                    s.EndTime
-                                                ) BETWEEN l.from_min AND IFNULL(l.to_min, 9999)
-                                                ORDER BY l.from_min ASC LIMIT 1
-                                            ),
-                                            GREATEST(
-                                                TIMESTAMPDIFF(
-                                                    MINUTE,
-                                                    STR_TO_DATE(u.check_out, '%H:%i:%s'),
-                                                    s.EndTime
-                                                ),
-                                                0
-                                            )
-                                        )
-                                    ) / 60.0,
-                                    2
-                                )
+        SUM(
+            CASE
+                WHEN u.check_in IS NOT NULL AND u.check_in != '-'
+                    AND u.check_out IS NOT NULL AND u.check_out != '-' THEN
+                        -- First check if this is a half-day leave
+                        CASE WHEN EXISTS (
+                            SELECT 1 FROM `leave` l
+                            JOIN leaveday ld ON l.leaveday_id = ld.id
+                            WHERE l.employee_id = e.id
+                            AND u.date BETWEEN l.start_date AND l.end_date
+                            AND ld.Value = 0.5
+                        ) THEN
+                            -- Half-day leave case
+                            CASE
+                                -- For PM leave (worked morning only)
+                                WHEN EXISTS (
+                                    SELECT 1 FROM `leave` l
+                                    JOIN leaveday ld ON l.leaveday_id = ld.id
+                                    WHERE l.employee_id = e.id
+                                    AND u.date BETWEEN l.start_date AND l.end_date
+                                    AND ld.Name = 'PM'
+                                ) THEN
+                                    -- Calculate late minutes based on how early they left before halftime
+                                    ROUND(
+                                        COALESCE((
+                                            SELECT l.deduction_min FROM late l
+                                            WHERE TIMESTAMPDIFF(MINUTE, STR_TO_DATE(u.check_out, '%H:%i:%s'), s.HalfTime) >= l.from_min
+                                            AND (l.to_min IS NULL OR TIMESTAMPDIFF(MINUTE, STR_TO_DATE(u.check_out, '%H:%i:%s'), s.HalfTime) < l.to_min)
+                                            ORDER BY l.from_min ASC
+                                            LIMIT 1
+                                        ), 0) / 60.0, 2
+                                    )
+
+                                -- For AM leave (worked afternoon only)
+                                WHEN EXISTS (
+                                    SELECT 1 FROM `leave` l
+                                    JOIN leaveday ld ON l.leaveday_id = ld.id
+                                    WHERE l.employee_id = e.id
+                                    AND u.date BETWEEN l.start_date AND l.end_date
+                                    AND ld.Name = 'AM'
+                                ) THEN
+                                    -- Only check check-in time against shift start
+                                    ROUND(
+                                        COALESCE((
+                                            SELECT l.deduction_min FROM late l
+                                            WHERE TIMESTAMPDIFF(MINUTE, s.StartTime, STR_TO_DATE(u.check_in, '%H:%i:%s')) >= l.from_min
+                                            AND (l.to_min IS NULL OR TIMESTAMPDIFF(MINUTE, s.StartTime, STR_TO_DATE(u.check_in, '%H:%i:%s')) < l.to_min)
+                                            ORDER BY l.from_min ASC
+                                            LIMIT 1
+                                        ), 0) / 60.0, 2
+                                    )
+
+                                ELSE 0 -- Unknown half-day leave type
+                            END
+                        ELSE
+                            -- Full day worked - check both check-in and check-out
+                            ROUND((
+                                COALESCE((
+                                    SELECT l.deduction_min FROM late l
+                                    WHERE TIMESTAMPDIFF(MINUTE, s.StartTime, STR_TO_DATE(u.check_in, '%H:%i:%s')) >= l.from_min
+                                    AND (l.to_min IS NULL OR TIMESTAMPDIFF(MINUTE, s.StartTime, STR_TO_DATE(u.check_in, '%H:%i:%s')) < l.to_min)
+                                    ORDER BY l.from_min ASC
+                                    LIMIT 1
+                                ), 0) +
+                                COALESCE((
+                                    SELECT l.deduction_min FROM late l
+                                    WHERE TIMESTAMPDIFF(MINUTE, STR_TO_DATE(u.check_out, '%H:%i:%s'), s.EndTime) >= l.from_min
+                                    AND (l.to_min IS NULL OR TIMESTAMPDIFF(MINUTE, STR_TO_DATE(u.check_out, '%H:%i:%s'), s.EndTime) < l.to_min)
+                                    ORDER BY l.from_min ASC
+                                    LIMIT 1
+                                ), 0)
+                            ) / 60.0, 2)
                         END
-                    ELSE 0
+                    ELSE 0 -- No valid check-in/check-out
                 END
             ) AS late_hours,
 
@@ -492,22 +445,21 @@ class ViewFileController extends Controller
             p.tax,
 
             (
-        COALESCE(sp.AttendanceIncentive, p.AttendanceIncentive) +
-        p.SuperAttendance +
-        p.PerformanceIncentive +
-        p.BRA1 +
-        p.BRA2 +
-        IFNULL(a.amount, 0) -
-        IFNULL(d.amount, 0)
-    ) AS net_salary,
+                COALESCE(sp.AttendanceIncentive, p.AttendanceIncentive) +
+                p.SuperAttendance +
+                p.PerformanceIncentive +
+                p.BRA1 +
+                p.BRA2 +
+                IFNULL(a.amount, 0) -
+                IFNULL(d.amount, 0)
+            ) AS net_salary,
 
             (par.work - IFNULL(pa.post_approve_leave, 0)) AS daysForAttendanceIncentive,
 
-            CASE
-                WHEN IFNULL(l.leave_days, 0) >= IFNULL(par.leave, 0) THEN 0
-                ELSE
-                    ROUND(COALESCE(sp.AttendanceIncentive, p.AttendanceIncentive))
-            END AS AttendanceIncentive,
+
+                COALESCE(sp.AttendanceIncentive, p.AttendanceIncentive) / par.work *
+                (par.work - IFNULL(pa.post_approve_leave, 0))
+            ) AS AttendanceIncentive,
 
             FLOOR(
                 p.PerformanceIncentive -

@@ -40,6 +40,7 @@ use App\Http\Controllers\Api\{
     SpecialController,
     LateController,
     AllocationController,
+    ProcessReportController
 };
 use App\Models\Addallowance;
 use App\Models\Adddeduction;
@@ -87,6 +88,7 @@ Route::apiResource('leaveday', LeaveDayController::class);
 Route::apiResource('special', SpecialController::class);
 Route::apiResource('late', LateController::class);
 Route::apiResource('allocation', AllocationController::class);
+Route::apiResource('processreport',ProcessReportController::class);
 
 
 // Mail Sent Payslip

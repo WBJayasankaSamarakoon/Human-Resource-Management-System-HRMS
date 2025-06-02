@@ -1,8 +1,15 @@
-<div class="container">
+ <div class="container">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h4>Monthly Report</h4>
-    <button class="btn btn-outline-secondary" (click)="goBack()">Back</button>
+    <h4>Processed Monthly Reports</h4>
+    <div>
+      <button class="btn btn-outline-secondary me-2" (click)="goBack()">Back</button>
+      <button class="btn btn-primary" (click)="saveToDatabase()">
+        <i class="fas fa-save"></i> Save Report
+      </button>
+    </div>
   </div>
+
+  <div id="custom-alert" class="alert-box"></div>
 
   <div *ngIf="loading" class="text-center">
     <div class="spinner-border" role="status">

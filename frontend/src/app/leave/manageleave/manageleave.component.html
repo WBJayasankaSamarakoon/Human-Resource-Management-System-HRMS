@@ -149,7 +149,7 @@
               <td>{{ leave.leave_type.LeaveType }}</td>
               <td>{{ leave.start_date | date : "yyyy-MM-dd" }}</td>
               <td>{{ leave.end_date | date : "yyyy-MM-dd" }}</td>
-              <td>{{ leave.approve === 1 ? 'Post Approve' : leave.approve === 2 ? 'Pre Approve' : 'Unapproved' }}</td>
+              <td>{{ leave.approve == 1 ? 'Post Approve' : leave.approve == 2 ? 'Pre Approve' : 'Unapproved' }}</td>
               <td>{{ leave.leaveday.Name }}</td>
             </tr>
           </tbody>

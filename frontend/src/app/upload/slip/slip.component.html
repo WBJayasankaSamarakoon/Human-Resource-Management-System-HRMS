@@ -94,7 +94,7 @@
         </tr>
         <tr *ngFor="let allowance of allowancesArray">
           <td>{{ allowance.Name }}</td>
-          <td>{{ (slipData.dynamicAllowances[allowance.id] || 0) | number:'1.2-2' }}</td>
+          <td>{{ (slipData.dynamicAllowances?.[allowance.id] ?? 0) | number:'1.2-2' }}</td>
           <td class="text-end"></td>
         </tr>
         <ng-template #noAllowances>
@@ -103,11 +103,37 @@
           </tr>
         </ng-template>
 
-        <tr>
-          <td>OT - {{ slipData.otHours }} Hrs</td>
-          <td>{{ slipData.otAmount || "0" }}</td>
-          <td class="text-end"></td>
-        </tr>
+        <tr (mouseleave)="hovering = false">
+          <td
+            (mouseenter)="hovering = true"
+            style="position: relative;"
+          >
+            OT - {{ slipData.otHours }} Hrs
+
+            <button
+              *ngIf="hovering"
+              class="btn btn-sm btn-outline-primary"
+              (click)="toggleEditOt()"
+              style="position: absolute; right: 5px; top: 5px;"
+            >
+              <i class="fas" [ngClass]="editOtMode ? 'fa-save' : 'fa-edit'"></i>
+            </button>
+          </td>
+         <td>
+            <ng-container *ngIf="editOtMode; else viewMode">
+              <input
+                type="number"
+                [(ngModel)]="slipData.otAmount"
+                class="form-control form-control-sm"
+              />
+            </ng-container>
+            <ng-template #viewMode>
+              {{ slipData.otAmount || '0' }}
+            </ng-template>
+          </td>
+     <td class="text-end"></td>
+     </tr>
+
         <tr>
           <td>Total Allowances</td>
           <td></td>
@@ -136,7 +162,7 @@
         </tr>
         <tr *ngFor="let deduction of deductionsArray">
           <td>{{ deduction.Name }}</td>
-          <td>{{ (slipData.dynamicDeductions[deduction.id] || 0) | number:'1.2-2' }}</td>
+          <td>{{ (slipData.dynamicDeductions?.[deduction.id] ?? 0) | number:'1.2-2' }}</td>
           <td class="text-end"></td>
         </tr>
         <ng-template #noDeductions>

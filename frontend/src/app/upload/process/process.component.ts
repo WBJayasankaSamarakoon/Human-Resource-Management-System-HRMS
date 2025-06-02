@@ -17,6 +17,10 @@ export class ProcessComponent implements OnInit {
   pagedData: any[] = [];
   loading: boolean = false;
 
+  fileId: string = ''; // Changed from any[] to string
+  year: number = 0;    // Changed from any[] to number
+  month: number = 0;   // Changed from any[] to number
+
   // Allowances and Deductions
   allowancesArray: any[] = [];
   deductionsArray: any[] = [];
@@ -29,14 +33,13 @@ export class ProcessComponent implements OnInit {
   totalPages: number = 1;
   pages: number[] = [];
 
-  // applyAttendanceLogic: boolean = true;
-
   constructor(private http: HttpClient, private router: Router) {}
 
   ngOnInit(): void {
     const fileId = localStorage.getItem('fileId');
 
     if (fileId) {
+      this.fileId = fileId; // Store the fileId in the component property
       this.loadFileData(fileId);
       this.getAllAllowances();
       this.getAllDeductions();
@@ -48,35 +51,80 @@ export class ProcessComponent implements OnInit {
   }
 
   loadFileData(fileId: string): void {
-  this.loading = true;
-  const url = `${apiBaseUrl}api/uploaded_files/${fileId}/view/combined-data`;
-  // const params = { applyAttendanceLogic: this.applyAttendanceLogic.toString() };
+    this.loading = true;
+    const url = `${apiBaseUrl}api/uploaded_files/${fileId}/view/combined-data`;
 
-  this.http.get<any>(url).subscribe({
-    next: (response) => {
-      if (response.data && Array.isArray(response.data)) {
-        // Clear existing data before processing
-        this.fileData = [];
+    this.http.get<any>(url).subscribe({
+      next: (response) => {
+        if (response.data && Array.isArray(response.data)) {
+          // Store year and month from the response
+          this.year = response.year;
+          this.month = response.month;
 
-        // Process and format records
-        response.data.forEach((record: any) => {
-          this.formatRecord(record);
-        });
+          // Clear existing data before processing
+          this.fileData = [];
 
-        this.totalPages = Math.ceil(this.fileData.length / this.pageSize);
-        this.pages = Array.from({ length: this.totalPages }, (_, i) => i + 1);
-        this.updatePagedData();
-      } else {
-        console.error(response.message || 'No data found for the selected file.');
+          // Process and format records
+          response.data.forEach((record: any) => {
+            this.formatRecord(record);
+          });
+
+          this.totalPages = Math.ceil(this.fileData.length / this.pageSize);
+          this.pages = Array.from({ length: this.totalPages }, (_, i) => i + 1);
+          this.updatePagedData();
+        } else {
+          console.error(response.message || 'No data found for the selected file.');
+        }
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Error fetching file data:', err);
+        this.loading = false;
+      },
+    });
+  }
+
+  // Updated saveToDatabase method to use stored fileId, year, and month
+  saveToDatabase(): void {
+    if (!this.fileId) {
+      console.error('No fileId available');
+      this.alertError('No file selected!');
+      return;
+    }
+
+    const payload = {
+      year: this.year,
+      month: this.month,
+      data: this.fileData
+    };
+
+    this.http.post(`${apiBaseUrl}api/processreport`, payload).subscribe({
+      next: () => this.alertSuccess('Saved to database successfully!'),
+      error: (err) => {
+        console.error('Error:', err);
+        this.alertError('Failed to save data!');
       }
-      this.loading = false;
-    },
-    error: (err) => {
-      console.error('Error fetching file data:', err);
-      this.loading = false;
-    },
-  });
-}
+    });
+  }
+
+  alertSuccess(message: string): void {
+    this.showAlert(message, 'success');
+  }
+
+  alertError(message: string): void {
+    this.showAlert(message, 'error');
+  }
+
+  showAlert(message: string, type: string): void {
+    const alertBox = document.getElementById('custom-alert');
+    if (alertBox) {
+      alertBox.innerText = message;
+      alertBox.className = `alert-box visible ${type}`;
+      setTimeout(() => {
+        alertBox.classList.remove('visible');
+      }, 3000);
+    }
+  }
 
 
 formatRecord(record: any): any {

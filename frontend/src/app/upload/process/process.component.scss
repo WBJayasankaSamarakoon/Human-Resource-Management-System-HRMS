@@ -72,3 +72,29 @@ td.col-action {
 .table td {
   vertical-align: middle;
 }
+
+.alert-box {
+  display: none;
+  position: fixed;
+  top: 80px;
+  right: 12px;
+  z-index: 9999;
+  padding: 12px 20px;
+  border-radius: 8px;
+  // font-weight: bold;
+  transition: all 0.3s ease-in-out;
+
+  &.visible {
+    display: block;
+  }
+
+  &.success {
+    background-color: #28a745;
+    color: white;
+  }
+
+  &.error {
+    background-color: #dc3545;
+    color: white;
+  }
+}
