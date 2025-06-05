@@ -351,12 +351,24 @@ class ViewFileController extends Controller
             IFNULL(pr.pre_approve_leave, 0) AS pre_approve_leave,
             IFNULL(ua.un_approve_leave, 0) AS un_approve_leave,
 
-        SUM(
-            CASE
-                WHEN u.check_in IS NOT NULL AND u.check_in != '-'
-                    AND u.check_out IS NOT NULL AND u.check_out != '-' THEN
-                        -- First check if this is a half-day leave
-                        CASE WHEN EXISTS (
+            SUM(
+                CASE
+                    WHEN u.check_in IS NOT NULL AND u.check_in != '-'
+                        AND u.check_out IS NOT NULL AND u.check_out != '-' THEN
+                        -- First check if it's a Saturday (special handling)
+                        CASE WHEN DAYOFWEEK(u.date) = 7 THEN
+                            -- Saturday calculation - check late check-in only (since it's half day)
+                            ROUND(
+                                COALESCE((
+                                    SELECT l.deduction_min FROM late l
+                                    WHERE TIMESTAMPDIFF(MINUTE, s.StartTime, STR_TO_DATE(u.check_in, '%H:%i:%s')) >= l.from_min
+                                    AND (l.to_min IS NULL OR TIMESTAMPDIFF(MINUTE, s.StartTime, STR_TO_DATE(u.check_in, '%H:%i:%s')) < l.to_min)
+                                    ORDER BY l.from_min ASC
+                                    LIMIT 1
+                                ), 0) / 60.0, 2
+                            )
+                        -- Then check for half-day leaves
+                        WHEN EXISTS (
                             SELECT 1 FROM `leave` l
                             JOIN leaveday ld ON l.leaveday_id = ld.id
                             WHERE l.employee_id = e.id
@@ -365,7 +377,7 @@ class ViewFileController extends Controller
                         ) THEN
                             -- Half-day leave case
                             CASE
-                                -- For PM leave (worked morning only)
+                                -- PM leave (worked morning only)
                                 WHEN EXISTS (
                                     SELECT 1 FROM `leave` l
                                     JOIN leaveday ld ON l.leaveday_id = ld.id
@@ -373,7 +385,7 @@ class ViewFileController extends Controller
                                     AND u.date BETWEEN l.start_date AND l.end_date
                                     AND ld.Name = 'PM'
                                 ) THEN
-                                    -- Calculate late minutes based on how early they left before halftime
+                                    -- Calculate early departure before halftime
                                     ROUND(
                                         COALESCE((
                                             SELECT l.deduction_min FROM late l
@@ -383,8 +395,7 @@ class ViewFileController extends Controller
                                             LIMIT 1
                                         ), 0) / 60.0, 2
                                     )
-
-                                -- For AM leave (worked afternoon only)
+                                -- AM leave (worked afternoon only)
                                 WHEN EXISTS (
                                     SELECT 1 FROM `leave` l
                                     JOIN leaveday ld ON l.leaveday_id = ld.id
@@ -392,7 +403,7 @@ class ViewFileController extends Controller
                                     AND u.date BETWEEN l.start_date AND l.end_date
                                     AND ld.Name = 'AM'
                                 ) THEN
-                                    -- Only check check-in time against shift start
+                                    -- Calculate late arrival after shift start
                                     ROUND(
                                         COALESCE((
                                             SELECT l.deduction_min FROM late l
@@ -402,11 +413,10 @@ class ViewFileController extends Controller
                                             LIMIT 1
                                         ), 0) / 60.0, 2
                                     )
-
-                                ELSE 0 -- Unknown half-day leave type
+                                ELSE 0
                             END
                         ELSE
-                            -- Full day worked - check both check-in and check-out
+                            -- Normal weekday - check both late arrival and early departure
                             ROUND((
                                 COALESCE((
                                     SELECT l.deduction_min FROM late l
@@ -424,7 +434,7 @@ class ViewFileController extends Controller
                                 ), 0)
                             ) / 60.0, 2)
                         END
-                    ELSE 0 -- No valid check-in/check-out
+                    ELSE 0
                 END
             ) AS late_hours,
 
@@ -456,9 +466,9 @@ class ViewFileController extends Controller
 
             (par.work - IFNULL(pa.post_approve_leave, 0)) AS daysForAttendanceIncentive,
 
-
+            ROUND(
                 COALESCE(sp.AttendanceIncentive, p.AttendanceIncentive) / par.work *
-                (par.work - IFNULL(pa.post_approve_leave, 0))
+                (par.work - IFNULL(pa.post_approve_leave, 0)),2
             ) AS AttendanceIncentive,
 
             FLOOR(
