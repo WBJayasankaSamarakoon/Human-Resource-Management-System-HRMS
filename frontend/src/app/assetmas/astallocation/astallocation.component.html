@@ -1,0 +1,209 @@
+<div class="container-fluid">
+  <h2 class="mb-4">Manage Asset Allocations</h2>
+
+  <!-- Alert -->
+  <div id="custom-alert" class="alert-box"></div>
+
+  <!-- Confirmation Modal -->
+  <div id="confirmationModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete Allocation</h5>
+        <button type="button" class="close" (click)="closeConfirmationModal()">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete this allocation?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeConfirmationModal()">Cancel</button>
+        <button type="button" class="btn btn-danger" (click)="deleteAllocation()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card -->
+  <div class="card">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+      <button type="button" class="btn btn-light" (click)="openAddModal()">
+        <i class="fas fa-plus fa-sm"></i> Add
+      </button>
+    </div>
+    <div class="card-body">
+      <!-- Loading -->
+      <div *ngIf="isLoading" class="text-center">
+        <div class="spinner-border text-primary" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+
+      <div class="table-responsive" *ngIf="!isLoading">
+        <table id="companiesTable" class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th class="col-action">Actions</th>
+              <th class="col-id">ID</th>
+              <th>Employee</th>
+              <th>Asset</th>
+              <th>Give Date</th>
+              <th>Handover Date</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let allocation of AllocationArray; trackBy: trackById">
+              <td class="col-action">
+                <button
+                  type="button"
+                  class="btn btn-success btn-sm"
+                  (click)="openEditModal(allocation)"
+                >
+                  <i class="fas fa-edit fa-sm text-white"></i>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-danger btn-sm"
+                  (click)="confirmDelete(allocation)"
+                >
+                  <i class="fas fa-trash fa-sm text-white"></i>
+                </button>
+              </td>
+              <td>{{ allocation.id }}</td>
+              <td>{{ allocation.employee?.NameWithInitials }}</td>
+              <td>{{ allocation.asset?.name }} ({{ allocation.asset?.serial_no }})</td>
+              <td>{{ allocation.give_date | date }}</td>
+              <td>{{ allocation.handover_date | date }}</td>
+              <td>{{ allocation.description }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Allocation Modal -->
+<div class="modal fade" id="addAllocationModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Asset Allocation</h5>
+        <button type="button" class="close" (click)="closeModal()" data-bs-dismiss="modal">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label>Employee<span class="text-danger">*</span></label>
+            <select class="form-control" [(ngModel)]="currentAllocation.emp_id" name="emp_id" required>
+              <option value="">Select Employee</option>
+              <option *ngFor="let emp of EmployeeArray" [value]="emp.id">{{ emp.NameWithInitials }}</option>
+            </select>
+          </div>
+          <div class="form-group mt-3">
+            <label>Asset<span class="text-danger">*</span></label>
+            <select class="form-control" [(ngModel)]="currentAllocation.asset_id" name="asset_id" required>
+              <option value="">Select Asset</option>
+              <option *ngFor="let asset of AssetArray" [value]="asset.id">{{ asset.name }} ({{ asset.serial_no }})</option>
+            </select>
+          </div>
+          <div class="form-group mt-3">
+            <label>Give Date<span class="text-danger">*</span></label>
+            <input
+              type="date"
+              class="form-control"
+              [(ngModel)]="currentAllocation.give_date"
+              name="give_date"
+              required
+            />
+          </div>
+          <div class="form-group mt-3">
+            <label>Handover Date</label>
+            <input
+              type="date"
+              class="form-control"
+              [(ngModel)]="currentAllocation.handover_date"
+              name="handover_date"
+            />
+          </div>
+          <div class="form-group mt-3">
+            <label>Description</label>
+            <textarea
+              class="form-control"
+              placeholder="Enter Description"
+              [(ngModel)]="currentAllocation.description"
+              name="description"
+            ></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+        <button class="btn btn-primary" (click)="save()">Add</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Allocation Modal -->
+<div class="modal fade" id="editAllocationModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Asset Allocation</h5>
+        <button type="button" class="close" (click)="closeModal()">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label>Employee<span class="text-danger">*</span></label>
+            <select class="form-control" [(ngModel)]="currentAllocation.emp_id" name="emp_id" required>
+              <option *ngFor="let emp of EmployeeArray" [value]="emp.id">{{ emp.NameWithInitials }}</option>
+            </select>
+          </div>
+          <div class="form-group mt-3">
+            <label>Asset<span class="text-danger">*</span></label>
+            <select class="form-control" [(ngModel)]="currentAllocation.asset_id" name="asset_id" required>
+              <option *ngFor="let asset of AssetArray" [value]="asset.id">{{ asset.name }} ({{ asset.serial_no }})</option>
+            </select>
+          </div>
+          <div class="form-group mt-3">
+            <label>Give Date<span class="text-danger">*</span></label>
+            <input
+              type="date"
+              class="form-control"
+              [(ngModel)]="currentAllocation.give_date"
+              name="give_date"
+              required
+            />
+          </div>
+          <div class="form-group mt-3">
+            <label>Handover Date</label>
+            <input
+              type="date"
+              class="form-control"
+              [(ngModel)]="currentAllocation.handover_date"
+              name="handover_date"
+            />
+          </div>
+          <div class="form-group mt-3">
+            <label>Description</label>
+            <textarea
+              class="form-control"
+              [(ngModel)]="currentAllocation.description"
+              name="description"
+            ></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+        <button class="btn btn-primary" (click)="save()">Update</button>
+      </div>
+    </div>
+  </div>
+</div>

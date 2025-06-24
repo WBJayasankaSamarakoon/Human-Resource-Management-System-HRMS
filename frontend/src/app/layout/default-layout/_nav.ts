@@ -206,6 +206,25 @@ export const navItems: INavData[] = [
       },
     ],
   },
+
+  {
+    name: 'Asset Master',
+    url: '/assetmas',
+    iconComponent: { name: 'cil-calendar' },
+    children: [
+      {
+        name: 'Assets',
+        url: '/assets',
+        iconComponent: { name: 'cil-dot' },
+      },
+      {
+        name: 'Asset Allocation',
+        url: '/astallocation',
+        iconComponent: { name: 'cil-dot' },
+      },
+    ],
+  },
+
   {
     title: true,
     name: 'Login Details',

@@ -232,7 +232,15 @@
   <button class="btn btn-primary me-2" (click)="generatePdf()">
     Generate Payslip PDF
   </button>
-  <button class="btn btn-success me-2" (click)="sendSlipByEmail()">
+    <button class="btn btn-success me-2" (click)="openEmailModal()">
     Send Payslip
   </button>
+
+  <!-- Add template reference variable #slipMailComponent -->
+  <app-slipmail #slipMailComponent
+    [slipData]="slipData"
+    [company]="company"
+    (emailSent)="onEmailSent($event)">
+  </app-slipmail>
+
 </div>

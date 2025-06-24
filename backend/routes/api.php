@@ -1,8 +1,8 @@
 <?php
 
-use App\Mail\SlipMail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
+
 
 // Import Controllers
 use App\Http\Controllers\Api\{
@@ -40,7 +40,10 @@ use App\Http\Controllers\Api\{
     SpecialController,
     LateController,
     AllocationController,
-    ProcessReportController
+    ProcessReportController,
+    AssetsController,
+    AssetAllocationController,
+    MailController,
 };
 use App\Models\Addallowance;
 use App\Models\Adddeduction;
@@ -89,28 +92,31 @@ Route::apiResource('special', SpecialController::class);
 Route::apiResource('late', LateController::class);
 Route::apiResource('allocation', AllocationController::class);
 Route::apiResource('processreport',ProcessReportController::class);
+Route::apiResource('assets', AssetsController::class);
+Route::apiResource('assetallocation', AssetAllocationController::class);
+Route::apiResource('send-mail', MailController::class);
 
 
 // Mail Sent Payslip
+Route::post('/send-mail', [MailController::class, 'index']);
 Route::post('/send-payslip', [PayslipController::class, 'sendPayslip']);
 
 Route::post('/company/update/{id}', [CompanyController::class, 'update']);
 
-
-// Route::post('/send-slip', function (Request $request) {
-//     $validated = $request->validate([
-//         'email' => 'required|email',
-//         'slipData' => 'required|array',
-//     ]);
-
-//     Mail::to($validated['email'])->send(new SlipMail($validated['slipData']));
-
-//     return response()->json(['message' => 'Payslip sent successfully!']);
+// Route::get('/send-mail', function() {
+//     try {
+//         Mail::raw('Test email content', function($message) {
+//             $message->to('buddhika756jayasankafy@gmail.com')
+//                     ->subject('Test Email');
+//         });
+//         return 'Email sent successfully!';
+//     } catch (\Exception $e) {
+//         return 'Error: '.$e->getMessage();
+//     }
 // });
 
 // Dashboard Routes
 Route::get('/dashboard/counts', [DashboardController::class, 'getCounts']);
-
 
 // Spwcial Instrction Routes
 Route::get('/combined-data{id}', [SpecialController::class, 'getCombinedData1']);

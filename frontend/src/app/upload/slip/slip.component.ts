@@ -9,12 +9,14 @@ import { FormsModule } from '@angular/forms';
 import { cilOptions, cilCircle, cilDog } from '@coreui/icons';
 import { IconModule, IconSetModule, IconSetService } from '@coreui/icons-angular';
 import { forkJoin } from 'rxjs';
+import { ViewChild } from '@angular/core';
+import { SlipmailComponent } from '../slipmail/slipmail.component';
 
 @Component({
   selector: 'app-slip',
   templateUrl: './slip.component.html',
   styleUrls: ['./slip.component.scss'],
-  imports: [CommonModule, FormsModule, IconModule, IconSetModule],
+  imports: [CommonModule, FormsModule, IconModule, IconSetModule, SlipmailComponent],
   standalone: true,
 })
 export class SlipComponent implements OnInit {
@@ -28,6 +30,7 @@ export class SlipComponent implements OnInit {
   errorMessage: string | null = null;
   allowancesArray: any[] = [];
   deductionsArray: any[] = [];
+  @ViewChild('slipMailComponent') slipMailComponent!: SlipmailComponent;
 
   private readonly monthNames = [
     '', 'January', 'February', 'March', 'April', 'May', 'June',
@@ -168,7 +171,7 @@ export class SlipComponent implements OnInit {
       epfEmpAmount: this.formatCurrency(epfEmpAmount),
       epfComAmount: this.formatCurrency((salaryForEPF * parseFloat(employeeData.epfCom || '0') / 100)),
       etfComAmount: this.formatCurrency((salaryForEPF * parseFloat(employeeData.etfCom || '0') / 100)),
-      personalEmail: employeeData.personal_email || 'defaultEmail@example.com'
+      personalEmail: employeeData.personal_email || 'buddhika756jayasanka@gmail.com'
     };
   }
 
@@ -296,27 +299,20 @@ export class SlipComponent implements OnInit {
     this.editOtMode = !this.editOtMode;
   }
 
-  sendSlipByEmail(): void {
-    if (!this.slipData.name || !this.slipData.personalEmail) {
-      this.errorMessage = 'Missing required data to send email.';
-      return;
-    }
 
-    this.loading = true;
-    this.http.post(`${apiBaseUrl}api/send-payslip`, {
-      email: this.slipData.personalEmail,
-      name: this.slipData.name,
-      payslipData: this.slipData,
-    }).subscribe({
-      next: () => {
-        alert('Payslip sent successfully!');
-        this.loading = false;
-      },
-      error: (err) => {
-        this.handleError(err, 'Sending payslip');
-        this.loading = false;
-      },
-    });
+openEmailModal() {
+    if (this.slipMailComponent) {
+      this.slipMailComponent.openModal();
+    } else {
+      console.error('SlipMailComponent not found');
+    }
+  }
+
+  onEmailSent(success: boolean) {
+    if (success) {
+      // You can show a toast or alert here
+      console.log('Email sent successfully');
+    }
   }
 
   generatePdf(): void {

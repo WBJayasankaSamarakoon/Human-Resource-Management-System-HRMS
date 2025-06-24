@@ -34,7 +34,9 @@ import { AdddeductionsComponent } from './master/adddeductions/adddeductions.com
 import { SpecialComponent } from './payroll/salary/special/special.component';
 import { LateComponent } from './master/late/late.component';
 import { AllocationComponent } from './leave/allocation/allocation.component';
-
+import { AssetsComponent } from './assetmas/assets/assets.component';
+import { AstallocationComponent } from './assetmas/astallocation/astallocation.component';
+import { SlipmailComponent } from './upload/slipmail/slipmail.component';
 
 import { appConfig } from './app.config';
 import { routes } from './app.routes';
@@ -99,7 +101,10 @@ import { JsonPipe } from '@angular/common';
     AdddeductionsComponent,
     SpecialComponent,
     LateComponent,
-    AllocationComponent
+    AllocationComponent,
+    AssetsComponent,
+    AstallocationComponent,
+    SlipmailComponent
   ],
 
   imports: [

@@ -1,0 +1,103 @@
+<div class="email-payslip">
+  <div *ngIf="showModal" class="modal-backdrop fade show" (click)="closeModal()"></div>
+
+  <div *ngIf="showModal" class="modal fade show d-block" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Send Payslip via Email</h5>
+          <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form #emailFormRef="ngForm" (ngSubmit)="sendEmail()" novalidate>
+            <div class="mb-3">
+              <label for="recipientEmail" class="form-label">Recipient Email <span class="text-danger">*</span></label>
+              <input type="email" class="form-control" id="recipientEmail"
+                     [(ngModel)]="emailForm.recipient" name="recipient"
+                     required email
+                     [class.is-invalid]="recipientEmail.invalid && recipientEmail.touched"
+                     #recipientEmail="ngModel">
+              <div class="invalid-feedback" *ngIf="recipientEmail.invalid && recipientEmail.touched">
+                <div *ngIf="recipientEmail.errors?.['required']">Email is required</div>
+                <div *ngIf="recipientEmail.errors?.['email']">Please enter a valid email address</div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="emailSubject" class="form-label">Subject</label>
+              <input type="text" class="form-control" id="emailSubject"
+                     [(ngModel)]="emailForm.subject" name="subject"
+                     placeholder="Enter email subject">
+            </div>
+
+            <div class="mb-3">
+              <label for="emailMessage" class="form-label">Message</label>
+              <textarea class="form-control" id="emailMessage" rows="4"
+                        [(ngModel)]="emailForm.message" name="message"
+                        placeholder="Enter your message here..."></textarea>
+            </div>
+
+            <div class="mb-3 form-check">
+              <input type="checkbox" class="form-check-input" id="attachPdf"
+                     [(ngModel)]="emailForm.attachPdf" name="attachPdf">
+              <label class="form-check-label" for="attachPdf">
+                Generate and attach payslip PDF automatically
+              </label>
+            </div>
+
+            <!-- File Upload Section -->
+            <div class="mb-3">
+              <label class="form-label">Or Attach Custom PDF</label>
+              <div class="dropzone border rounded p-3 text-center"
+                   [class.border-primary]="isDragOver"
+                   [class.bg-light]="isDragOver"
+                   (dragover)="onDragOver($event)"
+                   (dragleave)="onDragLeave($event)"
+                   (drop)="onDrop($event)">
+                <div class="mb-2">
+                  <i class="fas fa-cloud-upload-alt fa-2x text-muted"></i>
+                </div>
+                <p class="mb-2">Drag & drop PDF here or</p>
+                <button type="button" class="btn btn-outline-primary" (click)="fileInput.click()">
+                  <i class="fas fa-paperclip me-1"></i>Choose PDF File
+                </button>
+                <input type="file" #fileInput accept=".pdf,application/pdf" hidden (change)="onFileSelected($event)">
+                <small class="text-muted d-block mt-2">Maximum file size: 10MB</small>
+              </div>
+
+              <div *ngIf="selectedFile" class="mt-2 alert alert-success d-flex align-items-center">
+                <i class="fas fa-file-pdf me-2"></i>
+                <span>Selected File: {{ selectedFile.name }} ({{ formatFileSize(selectedFile.size) }})</span>
+                <button type="button" class="btn btn-sm btn-outline-danger ms-auto" (click)="removeSelectedFile()">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </div>
+
+            <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+              <i class="fas fa-exclamation-circle me-2"></i>
+              {{ errorMessage }}
+            </div>
+
+            <div *ngIf="successMessage" class="alert alert-success" role="alert">
+              <i class="fas fa-check-circle me-2"></i>
+              {{ successMessage }}
+            </div>
+
+          </form>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()" [disabled]="loading">
+            Cancel
+          </button>
+          <button type="button" class="btn btn-primary" (click)="sendEmail()" [disabled]="loading || !isFormValid()">
+            <span *ngIf="loading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            <i *ngIf="!loading" class="fas fa-paper-plane me-1"></i>
+            {{ loading ? 'Sending...' : 'Send Email' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

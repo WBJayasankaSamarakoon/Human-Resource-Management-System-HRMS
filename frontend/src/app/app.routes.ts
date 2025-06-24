@@ -43,6 +43,9 @@ import { AdddeductionsComponent } from './master/adddeductions/adddeductions.com
 import { SpecialComponent } from './payroll/salary/special/special.component';
 import { LateComponent } from './master/late/late.component';
 import { AllocationComponent } from './leave/allocation/allocation.component';
+import { AssetsComponent } from './assetmas/assets/assets.component';
+import { AstallocationComponent } from './assetmas/astallocation/astallocation.component';
+import { SlipmailComponent } from './upload/slipmail/slipmail.component';
 
 export const routes: Routes = [
   {
@@ -270,6 +273,24 @@ export const routes: Routes = [
         component: AllocationComponent,
         canActivate: [AuthGuard],
         data: { title: 'Leave Allocation' },
+      },
+            {
+        path: 'assets',
+        component: AssetsComponent,
+        canActivate: [AuthGuard],
+        data: { title: 'Assets' },
+      },
+      {
+        path: 'astallocation',
+        component: AstallocationComponent,
+        canActivate: [AuthGuard],
+        data: { title: 'Asset Allocations' },
+      },
+      {
+        path: 'slipmail',
+        component: SlipmailComponent,
+        canActivate: [AuthGuard],
+        data: { title: 'Email' },
       },
     ],
   },

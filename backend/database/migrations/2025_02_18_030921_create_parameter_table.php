@@ -20,6 +20,8 @@ return new class extends Migration
             $table->decimal('epfEmp', 5, 2)->default(0); // EPF Employee (%)
             $table->decimal('epfCom', 5, 2)->default(0); // EPF Company (%)
             $table->decimal('etfCom', 5, 2)->default(0); // ETF Company (%)
+            $table->decimal('ot',5,2)->default(0);
+            $table->decimal('specot',5,2)->default(0);
             $table->timestamps();
         });
     }

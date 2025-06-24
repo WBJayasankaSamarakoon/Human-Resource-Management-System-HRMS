@@ -301,6 +301,7 @@ class ViewFileController extends Controller
         SELECT
             e.EmpId AS emp_id,
             e.NameWithInitials AS name,
+            e.PersonalEmail AS personal_email,
 
             -- Count days without check-in or check-out (excluding Sundays)
             GREATEST(
@@ -611,7 +612,7 @@ class ViewFileController extends Controller
 
         WHERE MONTH(u.date) = ? AND YEAR(u.date) = ?
 
-        GROUP BY e.EmpId, e.NameWithInitials, p.basic_salary, p.AttendanceIncentive,
+        GROUP BY e.EmpId, e.NameWithInitials, e.PersonalEmail, p.basic_salary, p.AttendanceIncentive,
                 p.SuperAttendance, p.PerformanceIncentive,
                 p.BRA1, p.BRA2, p.tax, l.leave_days, a.type, a.amount, d.type, d.amount,
                 h.holiday_count, pa.post_approve_leave, pr.pre_approve_leave, ua.un_approve_leave, sp.AttendanceIncentive, e.EpfEligible, par.epfEmp, par.epfCom, par.etfCom, par.work, par.leave,

@@ -18,5 +18,7 @@ class Parameter extends Model
         'epfEmp',
         'epfCom',
         'etfCom',
+        'ot',
+        'specot'
     ];
 }

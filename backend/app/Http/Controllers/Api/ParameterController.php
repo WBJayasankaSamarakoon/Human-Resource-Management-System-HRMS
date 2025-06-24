@@ -26,6 +26,8 @@ class ParameterController extends Controller
             'epfEmp' => 'required|numeric|min:0|max:100',
             'epfCom' => 'required|numeric|min:0|max:100',
             'etfCom' => 'required|numeric|min:0|max:100',
+            'ot' => 'required|numeric|min:0|max:100,',
+            'specot' => 'required|numeric|min:0|max:100'
         ]);
 
         $parameter = Parameter::create($request->all());
@@ -60,6 +62,8 @@ class ParameterController extends Controller
             'epfEmp' => 'required|numeric|min:0|max:100',
             'epfCom' => 'required|numeric|min:0|max:100',
             'etfCom' => 'required|numeric|min:0|max:100',
+            'ot' => 'required|numeric|min:0|max:100,',
+            'specot' => 'required|numeric|min:0|max:100'
         ]);
 
         $parameter->update($request->all());

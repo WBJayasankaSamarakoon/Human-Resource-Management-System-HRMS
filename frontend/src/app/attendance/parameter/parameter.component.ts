@@ -20,7 +20,9 @@ export class ParameterComponent {
     leave: 0,
     epfEmp: 0,
     epfCom: 0,
-    etfCom: 0
+    etfCom: 0,
+    ot: 0,
+    specot: 0
   };
   isLoading: boolean = false;
   showNameError: boolean = false;
@@ -171,7 +173,9 @@ export class ParameterComponent {
       leave: 0,
       epfEmp: 0,
       epfCom: 0,
-      etfCom: 0
+      etfCom: 0,
+      ot: 0,
+      specot: 0
     };
     this.showNameError = false;
   }

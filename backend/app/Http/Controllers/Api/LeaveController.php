@@ -111,7 +111,7 @@ class LeaveController extends Controller
          $leaveCount = Leave::where('employee_id', $employeeId)
              ->whereYear('start_date', $year)
              ->whereMonth('start_date', $month)
-             ->where('approve', 1) // Only count approved leaves
+             ->where('approve', 1)
              ->count();
 
          return response()->json(['leave_count' => $leaveCount], 200);
