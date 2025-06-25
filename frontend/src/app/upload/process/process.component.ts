@@ -139,6 +139,7 @@ formatRecord(record: any): any {
       leave_days: record.leave_days || 0,
       holidays: record.holidays || 0,
       late_hours: record.late_hours || 0,
+      ot_hours: record.ot_hours || 0,
       total_allowances: 0.0,
       total_deductions: 0.0,
       basic_salary: (parseFloat(record.basic_salary) || 0).toFixed(2),

@@ -111,7 +111,9 @@ export class SlipComponent implements OnInit {
     const grossSalary = employeeData.gross_salary || 0;
     const noPayDays = employeeData.no_pay_count || 0;
     const lateHours = employeeData.late_hours || 0;
-    const otAmount = employeeData.ot_amount || 0;
+    const otHours = employeeData.ot_hours || 0;
+    const otRate = parseFloat(employeeData.ot_rate || '0');
+    const specialOtRate = parseFloat(employeeData.special_ot_rate || '0');
 
     const noPayAmount = (grossSalary / 26) * noPayDays;
     const lateDeduction = (grossSalary / 240) * lateHours;
@@ -122,7 +124,13 @@ export class SlipComponent implements OnInit {
     const dynamicAllowancesTotal = Object.values(employeeData.dynamicAllowances || {})
       .reduce((sum: number, value: any) => sum + parseFloat(value || 0), 0);
 
-    const totalAllowances = attendanceIncentive + performanceIncentive + dynamicAllowancesTotal + otAmount;
+      // Calculate OT amount
+    const normalOtHours = otHours; // You might want to split between normal and special OT
+    const specialOtHours = 0; // You can add logic to determine special OT hours if needed
+    const otAmount = (normalOtHours * otRate * salaryForEPF / 240) +
+                    (specialOtHours * specialOtRate * salaryForEPF / 240);
+
+    const totalAllowances = attendanceIncentive + performanceIncentive + dynamicAllowancesTotal + otHours;
     const isEpfEligible = employeeData.EpfEligible === 1;
     const epfEmpAmount = salaryForEPF * parseFloat(employeeData.epfEmp || '0') / 100;
     const totalDeductions = parseFloat(employeeData.total_deductions || '0');

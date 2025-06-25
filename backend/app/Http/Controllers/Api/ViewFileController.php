@@ -278,203 +278,33 @@ class ViewFileController extends Controller
 
 
     //Combine data
-    public function getCombinedData($fileId)
-    {
-        // Fetch the year and month from the uploaded_files table for the given fileId
-        $fileData = DB::table('uploaded_files')->where('id', $fileId)->first();
+public function getCombinedData($fileId)
+{
+    // Fetch the year and month from the uploaded_files table for the given fileId
+    $fileData = DB::table('uploaded_files')->where('id', $fileId)->first();
 
-        if (!$fileData) {
-            return response()->json([
-                'success' => false,
-                'message' => 'File data not found for the specified file ID.'
-            ], 404);
-        }
+    if (!$fileData) {
+        return response()->json([
+            'success' => false,
+            'message' => 'File data not found for the specified file ID.'
+        ], 404);
+    }
 
-        $year = $fileData->year;
-        $month = $fileData->month;
+    $year = $fileData->year;
+    $month = $fileData->month;
 
-        // Get the applyAttendanceLogic parameter
-        $applyAttendanceLogic = request()->query('applyAttendanceLogic', 'true') === 'true';
+    // Get the applyAttendanceLogic parameter
+    $applyAttendanceLogic = request()->query('applyAttendanceLogic', 'true') === 'true';
 
-        // Query to fetch the combined data with the matching month and year
-        $data = DB::select("
-        SELECT
-            e.EmpId AS emp_id,
-            e.NameWithInitials AS name,
-            e.PersonalEmail AS personal_email,
+    // Query to fetch the combined data with the matching month and year
+    $data = DB::select("
+    SELECT
+        e.EmpId AS emp_id,
+        e.NameWithInitials AS name,
+        e.PersonalEmail AS personal_email,
 
-            -- Count days without check-in or check-out (excluding Sundays)
-            GREATEST(
-                        SUM(
-                            CASE
-                                WHEN (u.check_in IS NULL OR u.check_in = '-' OR u.check_out IS NULL OR u.check_out = '-')
-                                    AND DAYOFWEEK(u.date) != 1
-                                THEN
-                                    CASE
-                                        WHEN DAYOFWEEK(u.date) = 7 THEN 0.5
-                                        ELSE 1
-                                    END
-                                ELSE 0
-                            END
-                        ) - IFNULL(l.leave_days, 0) - IFNULL(h.holiday_count, 0),
-                        0
-                    ) +
-                    -- Only add excess leaves if there is an allocation AND YTD leaves exceed allocated leaves
-                    CASE
-                        WHEN IFNULL(al.total_leave_count, 0) > 0 AND IFNULL(l_ytd.ytd_leave_days, 0) > IFNULL(al.total_leave_count, 0)
-                        THEN IFNULL(l_ytd.ytd_leave_days, 0) - IFNULL(al.total_leave_count, 0)
-                        ELSE 0
-                    END AS no_pay_count,
-
-            -- Count days worked (valid check-in and check-out)
-            SUM(
-                CASE
-                    WHEN u.check_in IS NOT NULL AND u.check_in != '-'
-                         AND u.check_out IS NOT NULL AND u.check_out != '-'
-                    THEN
-                        CASE WHEN DAYOFWEEK(u.date) = 7 THEN 0.5 ELSE 1 END
-                    ELSE 0
-                END
-            ) AS days_worked,
-
-            IFNULL(l.leave_days, 0) AS leave_days,
-        IFNULL(al.total_leave_count, 0) AS allocated_leave_days,
-        IFNULL(l_ytd.ytd_leave_days, 0) AS ytd_leave_days,
-        IFNULL(h.holiday_count, 0) AS holidays,
-        CASE
-            WHEN IFNULL(al.total_leave_count, 0) > 0 AND IFNULL(l_ytd.ytd_leave_days, 0) > IFNULL(al.total_leave_count, 0)
-            THEN IFNULL(l_ytd.ytd_leave_days, 0) - IFNULL(al.total_leave_count, 0)
-            ELSE 0
-        END AS excess_leave_days,
-
-            -- Approve Leave Count
-            IFNULL(pa.post_approve_leave, 0) AS post_approve_leave,
-            IFNULL(pr.pre_approve_leave, 0) AS pre_approve_leave,
-            IFNULL(ua.un_approve_leave, 0) AS un_approve_leave,
-
-            SUM(
-                CASE
-                    WHEN u.check_in IS NOT NULL AND u.check_in != '-'
-                        AND u.check_out IS NOT NULL AND u.check_out != '-' THEN
-                        -- First check if it's a Saturday (special handling)
-                        CASE WHEN DAYOFWEEK(u.date) = 7 THEN
-                            -- Saturday calculation - check late check-in only (since it's half day)
-                            ROUND(
-                                COALESCE((
-                                    SELECT l.deduction_min FROM late l
-                                    WHERE TIMESTAMPDIFF(MINUTE, s.StartTime, STR_TO_DATE(u.check_in, '%H:%i:%s')) >= l.from_min
-                                    AND (l.to_min IS NULL OR TIMESTAMPDIFF(MINUTE, s.StartTime, STR_TO_DATE(u.check_in, '%H:%i:%s')) < l.to_min)
-                                    ORDER BY l.from_min ASC
-                                    LIMIT 1
-                                ), 0) / 60.0, 2
-                            )
-                        -- Then check for half-day leaves
-                        WHEN EXISTS (
-                            SELECT 1 FROM `leave` l
-                            JOIN leaveday ld ON l.leaveday_id = ld.id
-                            WHERE l.employee_id = e.id
-                            AND u.date BETWEEN l.start_date AND l.end_date
-                            AND ld.Value = 0.5
-                        ) THEN
-                            -- Half-day leave case
-                            CASE
-                                -- PM leave (worked morning only)
-                                WHEN EXISTS (
-                                    SELECT 1 FROM `leave` l
-                                    JOIN leaveday ld ON l.leaveday_id = ld.id
-                                    WHERE l.employee_id = e.id
-                                    AND u.date BETWEEN l.start_date AND l.end_date
-                                    AND ld.Name = 'PM'
-                                ) THEN
-                                    -- Calculate early departure before halftime
-                                    ROUND(
-                                        COALESCE((
-                                            SELECT l.deduction_min FROM late l
-                                            WHERE TIMESTAMPDIFF(MINUTE, STR_TO_DATE(u.check_out, '%H:%i:%s'), s.HalfTime) >= l.from_min
-                                            AND (l.to_min IS NULL OR TIMESTAMPDIFF(MINUTE, STR_TO_DATE(u.check_out, '%H:%i:%s'), s.HalfTime) < l.to_min)
-                                            ORDER BY l.from_min ASC
-                                            LIMIT 1
-                                        ), 0) / 60.0, 2
-                                    )
-                                -- AM leave (worked afternoon only)
-                                WHEN EXISTS (
-                                    SELECT 1 FROM `leave` l
-                                    JOIN leaveday ld ON l.leaveday_id = ld.id
-                                    WHERE l.employee_id = e.id
-                                    AND u.date BETWEEN l.start_date AND l.end_date
-                                    AND ld.Name = 'AM'
-                                ) THEN
-                                    -- Calculate late arrival after shift start
-                                    ROUND(
-                                        COALESCE((
-                                            SELECT l.deduction_min FROM late l
-                                            WHERE TIMESTAMPDIFF(MINUTE, s.StartTime, STR_TO_DATE(u.check_in, '%H:%i:%s')) >= l.from_min
-                                            AND (l.to_min IS NULL OR TIMESTAMPDIFF(MINUTE, s.StartTime, STR_TO_DATE(u.check_in, '%H:%i:%s')) < l.to_min)
-                                            ORDER BY l.from_min ASC
-                                            LIMIT 1
-                                        ), 0) / 60.0, 2
-                                    )
-                                ELSE 0
-                            END
-                        ELSE
-                            -- Normal weekday - check both late arrival and early departure
-                            ROUND((
-                                COALESCE((
-                                    SELECT l.deduction_min FROM late l
-                                    WHERE TIMESTAMPDIFF(MINUTE, s.StartTime, STR_TO_DATE(u.check_in, '%H:%i:%s')) >= l.from_min
-                                    AND (l.to_min IS NULL OR TIMESTAMPDIFF(MINUTE, s.StartTime, STR_TO_DATE(u.check_in, '%H:%i:%s')) < l.to_min)
-                                    ORDER BY l.from_min ASC
-                                    LIMIT 1
-                                ), 0) +
-                                COALESCE((
-                                    SELECT l.deduction_min FROM late l
-                                    WHERE TIMESTAMPDIFF(MINUTE, STR_TO_DATE(u.check_out, '%H:%i:%s'), s.EndTime) >= l.from_min
-                                    AND (l.to_min IS NULL OR TIMESTAMPDIFF(MINUTE, STR_TO_DATE(u.check_out, '%H:%i:%s'), s.EndTime) < l.to_min)
-                                    ORDER BY l.from_min ASC
-                                    LIMIT 1
-                                ), 0)
-                            ) / 60.0, 2)
-                        END
-                    ELSE 0
-                END
-            ) AS late_hours,
-
-            IFNULL(a.type, 0) AS allowance_type,
-            IFNULL(a.amount, 0) AS allowance_amount,
-
-            IFNULL(d.type, 0) AS deduction_type,
-            IFNULL(d.amount, 0) AS deduction_amount,
-
-            (p.basic_salary + p.BRA1 + p.BRA2) AS gross_salary,
-
-            p.basic_salary,
-            COALESCE(sp.AttendanceIncentive, p.AttendanceIncentive) AS AttendanceIncentive,
-            p.SuperAttendance,
-            p.PerformanceIncentive,
-            p.BRA1,
-            p.BRA2,
-            p.tax,
-
-            (
-                COALESCE(sp.AttendanceIncentive, p.AttendanceIncentive) +
-                p.SuperAttendance +
-                p.PerformanceIncentive +
-                p.BRA1 +
-                p.BRA2 +
-                IFNULL(a.amount, 0) -
-                IFNULL(d.amount, 0)
-            ) AS net_salary,
-
-            (par.work - IFNULL(pa.post_approve_leave, 0)) AS daysForAttendanceIncentive,
-
-            ROUND(
-                COALESCE(sp.AttendanceIncentive, p.AttendanceIncentive) / par.work *
-                (par.work - IFNULL(pa.post_approve_leave, 0)),2
-            ) AS AttendanceIncentive,
-
-            FLOOR(
-                p.PerformanceIncentive -
-                ((p.PerformanceIncentive / par.work) * GREATEST(
+        -- Count days without check-in or check-out (excluding Sundays)
+        GREATEST(
                     SUM(
                         CASE
                             WHEN (u.check_in IS NULL OR u.check_in = '-' OR u.check_out IS NULL OR u.check_out = '-')
@@ -488,138 +318,355 @@ class ViewFileController extends Controller
                         END
                     ) - IFNULL(l.leave_days, 0) - IFNULL(h.holiday_count, 0),
                     0
-                ))
-            ) AS PerformanceIncentive,
+                ) +
+                -- Only add excess leaves if there is an allocation AND YTD leaves exceed allocated leaves
+                CASE
+                    WHEN IFNULL(al.total_leave_count, 0) > 0 AND IFNULL(l_ytd.ytd_leave_days, 0) > IFNULL(al.total_leave_count, 0)
+                    THEN IFNULL(l_ytd.ytd_leave_days, 0) - IFNULL(al.total_leave_count, 0)
+                    ELSE 0
+                END AS no_pay_count,
 
-            (COALESCE(sp.AttendanceIncentive, p.AttendanceIncentive) + p.SuperAttendance + p.PerformanceIncentive + p.BRA1 + p.BRA2 + a.amount ) AS total_allowances,
-
-            (d.amount ) AS total_deductions,
-
-            -- EPF and ETF calculations based on EpfEligible status
+        -- Count days worked (valid check-in and check-out)
+        SUM(
             CASE
-                WHEN e.EpfEligible = 1 THEN par.epfEmp
+                WHEN u.check_in IS NOT NULL AND u.check_in != '-'
+                     AND u.check_out IS NOT NULL AND u.check_out != '-'
+                THEN
+                    CASE WHEN DAYOFWEEK(u.date) = 7 THEN 0.5 ELSE 1 END
                 ELSE 0
-            END AS epfEmp,
+            END
+        ) AS days_worked,
 
+        IFNULL(l.leave_days, 0) AS leave_days,
+    IFNULL(al.total_leave_count, 0) AS allocated_leave_days,
+    IFNULL(l_ytd.ytd_leave_days, 0) AS ytd_leave_days,
+    IFNULL(h.holiday_count, 0) AS holidays,
+    CASE
+        WHEN IFNULL(al.total_leave_count, 0) > 0 AND IFNULL(l_ytd.ytd_leave_days, 0) > IFNULL(al.total_leave_count, 0)
+        THEN IFNULL(l_ytd.ytd_leave_days, 0) - IFNULL(al.total_leave_count, 0)
+        ELSE 0
+    END AS excess_leave_days,
+
+        -- Approve Leave Count
+        IFNULL(pa.post_approve_leave, 0) AS post_approve_leave,
+        IFNULL(pr.pre_approve_leave, 0) AS pre_approve_leave,
+        IFNULL(ua.un_approve_leave, 0) AS un_approve_leave,
+
+        SUM(
             CASE
-                WHEN e.EpfEligible = 1 THEN par.epfCom
+                WHEN u.check_in IS NOT NULL AND u.check_in != '-'
+                    AND u.check_out IS NOT NULL AND u.check_out != '-' THEN
+                    -- First check if it's a Saturday (special handling)
+                    CASE WHEN DAYOFWEEK(u.date) = 7 THEN
+                        -- Saturday calculation - check late check-in only (since it's half day)
+                        ROUND(
+                            COALESCE((
+                                SELECT l.deduction_min FROM late l
+                                WHERE TIMESTAMPDIFF(MINUTE, s.StartTime, STR_TO_DATE(u.check_in, '%H:%i:%s')) >= l.from_min
+                                AND (l.to_min IS NULL OR TIMESTAMPDIFF(MINUTE, s.StartTime, STR_TO_DATE(u.check_in, '%H:%i:%s')) < l.to_min)
+                                ORDER BY l.from_min ASC
+                                LIMIT 1
+                            ), 0) / 60.0, 2
+                        )
+                    -- Then check for half-day leaves
+                    WHEN EXISTS (
+                        SELECT 1 FROM `leave` l
+                        JOIN leaveday ld ON l.leaveday_id = ld.id
+                        WHERE l.employee_id = e.id
+                        AND u.date BETWEEN l.start_date AND l.end_date
+                        AND ld.Value = 0.5
+                    ) THEN
+                        -- Half-day leave case
+                        CASE
+                            -- PM leave (worked morning only)
+                            WHEN EXISTS (
+                                SELECT 1 FROM `leave` l
+                                JOIN leaveday ld ON l.leaveday_id = ld.id
+                                WHERE l.employee_id = e.id
+                                AND u.date BETWEEN l.start_date AND l.end_date
+                                AND ld.Name = 'PM'
+                            ) THEN
+                                -- Calculate early departure before halftime
+                                ROUND(
+                                    COALESCE((
+                                        SELECT l.deduction_min FROM late l
+                                        WHERE TIMESTAMPDIFF(MINUTE, STR_TO_DATE(u.check_out, '%H:%i:%s'), s.HalfTime) >= l.from_min
+                                        AND (l.to_min IS NULL OR TIMESTAMPDIFF(MINUTE, STR_TO_DATE(u.check_out, '%H:%i:%s'), s.HalfTime) < l.to_min)
+                                        ORDER BY l.from_min ASC
+                                        LIMIT 1
+                                    ), 0) / 60.0, 2
+                                )
+                            -- AM leave (worked afternoon only)
+                            WHEN EXISTS (
+                                SELECT 1 FROM `leave` l
+                                JOIN leaveday ld ON l.leaveday_id = ld.id
+                                WHERE l.employee_id = e.id
+                                AND u.date BETWEEN l.start_date AND l.end_date
+                                AND ld.Name = 'AM'
+                            ) THEN
+                                -- Calculate late arrival after shift start
+                                ROUND(
+                                    COALESCE((
+                                        SELECT l.deduction_min FROM late l
+                                        WHERE TIMESTAMPDIFF(MINUTE, s.StartTime, STR_TO_DATE(u.check_in, '%H:%i:%s')) >= l.from_min
+                                        AND (l.to_min IS NULL OR TIMESTAMPDIFF(MINUTE, s.StartTime, STR_TO_DATE(u.check_in, '%H:%i:%s')) < l.to_min)
+                                        ORDER BY l.from_min ASC
+                                        LIMIT 1
+                                    ), 0) / 60.0, 2
+                                )
+                            ELSE 0
+                        END
+                    ELSE
+                        -- Normal weekday - check both late arrival and early departure
+                        ROUND((
+                            COALESCE((
+                                SELECT l.deduction_min FROM late l
+                                WHERE TIMESTAMPDIFF(MINUTE, s.StartTime, STR_TO_DATE(u.check_in, '%H:%i:%s')) >= l.from_min
+                                AND (l.to_min IS NULL OR TIMESTAMPDIFF(MINUTE, s.StartTime, STR_TO_DATE(u.check_in, '%H:%i:%s')) < l.to_min)
+                                ORDER BY l.from_min ASC
+                                LIMIT 1
+                            ), 0) +
+                            COALESCE((
+                                SELECT l.deduction_min FROM late l
+                                WHERE TIMESTAMPDIFF(MINUTE, STR_TO_DATE(u.check_out, '%H:%i:%s'), s.EndTime) >= l.from_min
+                                AND (l.to_min IS NULL OR TIMESTAMPDIFF(MINUTE, STR_TO_DATE(u.check_out, '%H:%i:%s'), s.EndTime) < l.to_min)
+                                ORDER BY l.from_min ASC
+                                LIMIT 1
+                            ), 0)
+                        ) / 60.0, 2)
+                    END
                 ELSE 0
-            END AS epfCom,
+            END
+        ) AS late_hours,
 
+        -- OT Hours calculation
+        SUM(
             CASE
-                WHEN e.EpfEligible = 1 THEN par.etfCom
+                WHEN u.check_in IS NOT NULL AND u.check_in != '-'
+                     AND u.check_out IS NOT NULL AND u.check_out != '-' THEN
+                    CASE
+                        -- For holidays (count full day as OT)
+                        WHEN EXISTS (
+                            SELECT 1 FROM events ev
+                            WHERE ev.Date = u.date
+                        ) THEN
+                            ROUND(TIMESTAMPDIFF(MINUTE, STR_TO_DATE(u.check_in, '%H:%i:%s'), STR_TO_DATE(u.check_out, '%H:%i:%s')) / 60.0, 2)
+                        -- For non-shift days (count full day as OT)
+                        WHEN s.StartTime IS NULL THEN
+                            ROUND(TIMESTAMPDIFF(MINUTE, STR_TO_DATE(u.check_in, '%H:%i:%s'), STR_TO_DATE(u.check_out, '%H:%i:%s')) / 60.0, 2)
+                        -- For regular days - calculate OT beyond shift time
+                        ELSE
+                            CASE
+                                -- Saturday (half day)
+                                WHEN DAYOFWEEK(u.date) = 7 THEN
+                                    ROUND(
+                                        GREATEST(
+                                            TIMESTAMPDIFF(MINUTE, STR_TO_DATE(u.check_in, '%H:%i:%s'), STR_TO_DATE(u.check_out, '%H:%i:%s')) -
+                                            TIMESTAMPDIFF(MINUTE, s.StartTime, s.HalfTime),
+                                            0
+                                        ) / 60.0,
+                                        2
+                                    )
+                                -- Weekdays (full day)
+                                ELSE
+                                    ROUND(
+                                        GREATEST(
+                                            TIMESTAMPDIFF(MINUTE, STR_TO_DATE(u.check_in, '%H:%i:%s'), STR_TO_DATE(u.check_out, '%H:%i:%s')) -
+                                            TIMESTAMPDIFF(MINUTE, s.StartTime, s.EndTime),
+                                            0
+                                        ) / 60.0,
+                                        2
+                                    )
+                            END
+                    END
                 ELSE 0
-            END AS etfCom
+            END
+        ) AS ot_hours,
 
-        FROM upexcel u
-        JOIN tblemployees e ON u.person_id = e.EmpId
+        IFNULL(a.type, 0) AS allowance_type,
+        IFNULL(a.amount, 0) AS allowance_amount,
 
-        LEFT JOIN allowances a ON e.EmpId = a.emp_id
-        AND MONTH(a.payment_date) = ? AND YEAR(a.payment_date) = ?
-        AND a.is_active = 1
+        IFNULL(d.type, 0) AS deduction_type,
+        IFNULL(d.amount, 0) AS deduction_amount,
 
-        LEFT JOIN deductions d ON e.EmpId = d.emp_id
-        AND MONTH(d.payment_date) = ? AND YEAR(d.payment_date) = ?
-        AND d.is_active = 1
+        (p.basic_salary + p.BRA1 + p.BRA2) AS gross_salary,
 
-        LEFT JOIN (
-            SELECT
-                l.employee_id,
-                ROUND(
-                    SUM(
-                        ld.Value * (DATEDIFF(l.end_date, l.start_date) + 1)
-                    ), 1
-                ) AS leave_days
-            FROM `leave` l
-            JOIN leaveday ld ON l.leaveday_id = ld.id
-            WHERE MONTH(l.start_date) = ? AND YEAR(l.start_date) = ?
-            GROUP BY l.employee_id
-        ) l ON e.id = l.employee_id
+        p.basic_salary,
+        COALESCE(sp.AttendanceIncentive, p.AttendanceIncentive) AS AttendanceIncentive,
+        p.SuperAttendance,
+        p.PerformanceIncentive,
+        p.BRA1,
+        p.BRA2,
+        p.tax,
 
-        LEFT JOIN (
+        (
+            COALESCE(sp.AttendanceIncentive, p.AttendanceIncentive) +
+            p.SuperAttendance +
+            p.PerformanceIncentive +
+            p.BRA1 +
+            p.BRA2 +
+            IFNULL(a.amount, 0) -
+            IFNULL(d.amount, 0)
+        ) AS net_salary,
+
+        (par.work - IFNULL(pa.post_approve_leave, 0)) AS daysForAttendanceIncentive,
+
+        ROUND(
+            COALESCE(sp.AttendanceIncentive, p.AttendanceIncentive) / par.work *
+            (par.work - IFNULL(pa.post_approve_leave, 0)),2
+        ) AS AttendanceIncentive,
+
+        FLOOR(
+            p.PerformanceIncentive -
+            ((p.PerformanceIncentive / par.work) * GREATEST(
+                SUM(
+                    CASE
+                        WHEN (u.check_in IS NULL OR u.check_in = '-' OR u.check_out IS NULL OR u.check_out = '-')
+                            AND DAYOFWEEK(u.date) != 1
+                        THEN
+                            CASE
+                                WHEN DAYOFWEEK(u.date) = 7 THEN 0.5
+                                ELSE 1
+                            END
+                        ELSE 0
+                    END
+                ) - IFNULL(l.leave_days, 0) - IFNULL(h.holiday_count, 0),
+                0
+            ))
+        ) AS PerformanceIncentive,
+
+        (COALESCE(sp.AttendanceIncentive, p.AttendanceIncentive) + p.SuperAttendance + p.PerformanceIncentive + p.BRA1 + p.BRA2 + a.amount ) AS total_allowances,
+
+        (d.amount ) AS total_deductions,
+
+        -- EPF and ETF calculations based on EpfEligible status
+        CASE
+            WHEN e.EpfEligible = 1 THEN par.epfEmp
+            ELSE 0
+        END AS epfEmp,
+
+        CASE
+            WHEN e.EpfEligible = 1 THEN par.epfCom
+            ELSE 0
+        END AS epfCom,
+
+        CASE
+            WHEN e.EpfEligible = 1 THEN par.etfCom
+            ELSE 0
+        END AS etfCom,
+
+        par.ot AS ot_rate,
+        par.specot AS special_ot_rate
+
+    FROM upexcel u
+    JOIN tblemployees e ON u.person_id = e.EmpId
+
+    LEFT JOIN allowances a ON e.EmpId = a.emp_id
+    AND MONTH(a.payment_date) = ? AND YEAR(a.payment_date) = ?
+    AND a.is_active = 1
+
+    LEFT JOIN deductions d ON e.EmpId = d.emp_id
+    AND MONTH(d.payment_date) = ? AND YEAR(d.payment_date) = ?
+    AND d.is_active = 1
+
+    LEFT JOIN (
         SELECT
             l.employee_id,
             ROUND(
                 SUM(
                     ld.Value * (DATEDIFF(l.end_date, l.start_date) + 1)
                 ), 1
-            ) AS ytd_leave_days
+            ) AS leave_days
         FROM `leave` l
         JOIN leaveday ld ON l.leaveday_id = ld.id
-        WHERE YEAR(l.start_date) = ?
+        WHERE MONTH(l.start_date) = ? AND YEAR(l.start_date) = ?
         GROUP BY l.employee_id
-    ) l_ytd ON e.id = l_ytd.employee_id
+    ) l ON e.id = l.employee_id
+
+    LEFT JOIN (
+    SELECT
+        l.employee_id,
+        ROUND(
+            SUM(
+                ld.Value * (DATEDIFF(l.end_date, l.start_date) + 1)
+            ), 1
+        ) AS ytd_leave_days
+    FROM `leave` l
+    JOIN leaveday ld ON l.leaveday_id = ld.id
+    WHERE YEAR(l.start_date) = ?
+    GROUP BY l.employee_id
+) l_ytd ON e.id = l_ytd.employee_id
+
+LEFT JOIN (
+    SELECT
+        employee_id,
+        SUM(IFNULL(leave_count, 0)) AS total_leave_count
+    FROM
+        allocation
+    WHERE
+        year = ?
+    GROUP BY
+        employee_id
+) al ON e.id = al.employee_id
+
+    LEFT JOIN (
+        SELECT employee_id, COUNT(*) AS post_approve_leave
+        FROM `leave`
+        WHERE approve = 1 AND MONTH(start_date) = ? AND YEAR(start_date) = ?
+        GROUP BY employee_id
+    ) pa ON e.id = pa.employee_id
+
+    LEFT JOIN (
+        SELECT employee_id, COUNT(*) AS pre_approve_leave
+        FROM `leave`
+        WHERE approve = 2 AND MONTH(start_date) = ? AND YEAR(start_date) = ?
+        GROUP BY employee_id
+    ) pr ON e.id = pr.employee_id
+
+     LEFT JOIN (
+        SELECT employee_id, COUNT(*) AS un_approve_leave
+        FROM `leave`
+        WHERE approve = 3 AND MONTH(start_date) = ? AND YEAR(start_date) = ?
+        GROUP BY employee_id
+    ) ua ON e.id = ua.employee_id
 
     LEFT JOIN (
         SELECT
-            employee_id,
-            SUM(IFNULL(leave_count, 0)) AS total_leave_count
-        FROM
-            allocation
-        WHERE
-            year = ?
-        GROUP BY
-            employee_id
-    ) al ON e.id = al.employee_id
+            SUM(
+                CASE
+                    WHEN DAYOFWEEK(Date) = 1 THEN 0   -- Sunday (excluded from count)
+                    WHEN DAYOFWEEK(Date) = 7 THEN 0.5 -- Saturday (count as 0.5)
+                    ELSE 1                            -- Other days (count as 1)
+                END
+            ) AS holiday_count
+        FROM events
+        WHERE MONTH(Date) = ? AND YEAR(Date) = ?
+    ) h ON 1 = 1
 
-        LEFT JOIN (
-            SELECT employee_id, COUNT(*) AS post_approve_leave
-            FROM `leave`
-            WHERE approve = 1 AND MONTH(start_date) = ? AND YEAR(start_date) = ?
-            GROUP BY employee_id
-        ) pa ON e.id = pa.employee_id
+    LEFT JOIN payroll p ON e.EmpId = p.emp_id
+    AND p.is_active = 1
 
-        LEFT JOIN (
-            SELECT employee_id, COUNT(*) AS pre_approve_leave
-            FROM `leave`
-            WHERE approve = 2 AND MONTH(start_date) = ? AND YEAR(start_date) = ?
-            GROUP BY employee_id
-        ) pr ON e.id = pr.employee_id
+    LEFT JOIN special sp ON e.EmpId = sp.emp_id -- Join with special table
+    AND MONTH(sp.payment_date) = ? AND YEAR(sp.payment_date) = ?
 
-         LEFT JOIN (
-            SELECT employee_id, COUNT(*) AS un_approve_leave
-            FROM `leave`
-            WHERE approve = 3 AND MONTH(start_date) = ? AND YEAR(start_date) = ?
-            GROUP BY employee_id
-        ) ua ON e.id = ua.employee_id
+    LEFT JOIN empshift es ON e.DefaultShift = es.id
+    LEFT JOIN shiftline s ON s.empshift_id = es.id
+        AND s.Day = (
+            SELECT id FROM week WHERE week.Day = DATE_FORMAT(u.date, '%a.') LIMIT 1
+        )
 
-        LEFT JOIN (
-            SELECT
-                SUM(
-                    CASE
-                        WHEN DAYOFWEEK(Date) = 1 THEN 0   -- Sunday (excluded from count)
-                        WHEN DAYOFWEEK(Date) = 7 THEN 0.5 -- Saturday (count as 0.5)
-                        ELSE 1                            -- Other days (count as 1)
-                    END
-                ) AS holiday_count
-            FROM events
-            WHERE MONTH(Date) = ? AND YEAR(Date) = ?
-        ) h ON 1 = 1
+    LEFT JOIN parameter par ON 1 = 1
 
-        LEFT JOIN payroll p ON e.EmpId = p.emp_id
-        AND p.is_active = 1
+    WHERE MONTH(u.date) = ? AND YEAR(u.date) = ?
 
-        LEFT JOIN special sp ON e.EmpId = sp.emp_id -- Join with special table
-        AND MONTH(sp.payment_date) = ? AND YEAR(sp.payment_date) = ?
+    GROUP BY e.EmpId, e.NameWithInitials, e.PersonalEmail, p.basic_salary, p.AttendanceIncentive,
+            p.SuperAttendance, p.PerformanceIncentive,
+            p.BRA1, p.BRA2, p.tax, l.leave_days, a.type, a.amount, d.type, d.amount,
+            h.holiday_count, pa.post_approve_leave, pr.pre_approve_leave, ua.un_approve_leave, sp.AttendanceIncentive, e.EpfEligible, par.epfEmp, par.epfCom, par.etfCom, par.work, par.leave,
+            al.total_leave_count, l_ytd.ytd_leave_days, par.ot, par.specot;
 
-        LEFT JOIN empshift es ON e.DefaultShift = es.id
-        LEFT JOIN shiftline s ON s.empshift_id = es.id
-            AND s.Day = (
-                SELECT id FROM week WHERE week.Day = DATE_FORMAT(u.date, '%a.') LIMIT 1
-            )
+", [$month, $year, $month, $year, $month, $year, $year, $year, $month, $year, $month, $year, $month, $year, $month, $year, $month, $year, $month, $year]);
 
-        LEFT JOIN parameter par ON 1 = 1
-
-        WHERE MONTH(u.date) = ? AND YEAR(u.date) = ?
-
-        GROUP BY e.EmpId, e.NameWithInitials, e.PersonalEmail, p.basic_salary, p.AttendanceIncentive,
-                p.SuperAttendance, p.PerformanceIncentive,
-                p.BRA1, p.BRA2, p.tax, l.leave_days, a.type, a.amount, d.type, d.amount,
-                h.holiday_count, pa.post_approve_leave, pr.pre_approve_leave, ua.un_approve_leave, sp.AttendanceIncentive, e.EpfEligible, par.epfEmp, par.epfCom, par.etfCom, par.work, par.leave,
-                al.total_leave_count, l_ytd.ytd_leave_days;
-
-    ", [$month, $year, $month, $year, $month, $year, $year, $year, $month, $year, $month, $year, $month, $year, $month, $year, $month, $year, $month, $year]);
-
-    return response()->json(['year' => $year, 'month' => $month, 'data' => $data], 200);
+return response()->json(['year' => $year, 'month' => $month, 'data' => $data], 200);
 }
 }
