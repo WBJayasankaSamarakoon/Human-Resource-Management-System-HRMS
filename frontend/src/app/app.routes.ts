@@ -46,6 +46,7 @@ import { AllocationComponent } from './leave/allocation/allocation.component';
 import { AssetsComponent } from './assetmas/assets/assets.component';
 import { AstallocationComponent } from './assetmas/astallocation/astallocation.component';
 import { SlipmailComponent } from './upload/slipmail/slipmail.component';
+import { YearreportComponent } from './upload/yeareport/yeareport.component';
 
 export const routes: Routes = [
   {
@@ -291,6 +292,11 @@ export const routes: Routes = [
         component: SlipmailComponent,
         canActivate: [AuthGuard],
         data: { title: 'Email' },
+      },
+      {
+        path: 'yeareport',
+        component: YearreportComponent,
+        canActivate: [AuthGuard],
       },
     ],
   },

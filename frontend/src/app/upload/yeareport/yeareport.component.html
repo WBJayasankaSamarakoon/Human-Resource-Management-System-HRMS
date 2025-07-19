@@ -1,0 +1,176 @@
+<div class="container-fluid">
+  <h2 class="mb-4">Manage Yearly Process Report</h2>
+
+  <!-- Alert -->
+  <div id="custom-alert" class="alert-box"></div>
+
+  <!-- Month Filter -->
+  <div class="row mb-3">
+    <div class="col-md-3">
+      <label for="monthFilter">Select Month</label>
+      <select id="monthFilter" class="form-control" [(ngModel)]="selectedMonth" (change)="filterByMonth()">
+        <option value="all">All Months</option>
+        <option *ngFor="let month of months" [value]="month.value">{{ month.name }}</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <label for="yearFilter">Select Year</label>
+      <select id="yearFilter" class="form-control" [(ngModel)]="selectedYear" (change)="filterByMonth()">
+        <option value="all">All Years</option>
+        <option *ngFor="let year of years" [value]="year">{{ year }}</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div id="confirmationModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete Report</h5>
+        <button type="button" class="close" (click)="closeConfirmationModal()">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete report ID {{ currentReport.id }}?</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeConfirmationModal()">Cancel</button>
+        <button class="btn btn-danger" (click)="deleteReport()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+      <!-- <button type="button" class="btn btn-light" (click)="openAddModal()">
+        <i class="fas fa-plus fa-sm"></i> Add
+      </button> -->
+    </div>
+
+    <div class="card-body">
+      <div *ngIf="isLoading" class="text-center">
+        <div class="spinner-border text-primary" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+
+      <div *ngIf="!isLoading">
+        <div *ngIf="filteredReports.length === 0" class="alert alert-info">
+          No reports found for the selected month/year.
+        </div>
+
+        <div *ngFor="let monthData of groupedByMonth" class="mb-5">
+          <h4 class="mb-3">{{ getMonthName(monthData.month) }} {{ monthData.year }}</h4>
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Year</th>
+                  <th>Month</th>
+                  <th>Emp ID</th>
+                  <th>Name</th>
+                  <th>No Pay</th>
+                  <th>Leave</th>
+                  <th>Holidays</th>
+                  <th>Late Hrs</th>
+                  <th>Worked</th>
+                  <th>Post L</th>
+                  <th>Pre L</th>
+                  <th>Basic</th>
+                  <th>BRA1</th>
+                  <th>BRA2</th>
+                  <th>Attend Inc.</th>
+                  <th>Super Attend.</th>
+                  <th>Perf. Inc.</th>
+                  <th>Additional</th>
+                  <th>Advance</th>
+                  <th>Stock</th>
+                  <th>Allowances</th>
+                  <th>Deductions</th>
+                  <th>Gross</th>
+                  <th>Net</th>
+                  <!-- <th>Actions</th> -->
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let report of monthData.reports; trackBy: trackById">
+                  <td>{{ report.id }}</td>
+                  <td>{{ report.year }}</td>
+                  <td>{{ report.month }}</td>
+                  <td>{{ report.emp_id }}</td>
+                  <td>{{ report.name }}</td>
+                  <td>{{ report.no_pay_count }}</td>
+                  <td>{{ report.leave_days }}</td>
+                  <td>{{ report.holidays }}</td>
+                  <td>{{ report.late_hours }}</td>
+                  <td>{{ report.days_worked }}</td>
+                  <td>{{ report.post_approve_leave }}</td>
+                  <td>{{ report.pre_approve_leave }}</td>
+                  <td>{{ report.basic_salary }}</td>
+                  <td>{{ report.bra1 }}</td>
+                  <td>{{ report.bra2 }}</td>
+                  <td>{{ report.attendance_incentive }}</td>
+                  <td>{{ report.super_attendance }}</td>
+                  <td>{{ report.performance_incentive }}</td>
+                  <td>{{ report.additional }}</td>
+                  <td>{{ report.advance }}</td>
+                  <td>{{ report.stock }}</td>
+                  <td>{{ report.total_allowances }}</td>
+                  <td>{{ report.total_deductions }}</td>
+                  <td>{{ report.gross_salary }}</td>
+                  <td>{{ report.net_salary }}</td>
+                  <!-- <td>
+                    <button class="btn btn-success btn-sm" (click)="openEditModal(report)">
+                      <i class="fas fa-edit fa-sm text-white"></i>
+                    </button>
+                    <button class="btn btn-danger btn-sm" (click)="confirmDelete(report)">
+                      <i class="fas fa-trash fa-sm text-white"></i>
+                    </button>
+                  </td> -->
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="modal fade" id="addReportModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ isEdit ? 'Edit' : 'Add' }} Report</h5>
+        <button type="button" class="close" (click)="closeModal()">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="row">
+            <div class="form-group col-md-4" *ngFor="let field of reportFields">
+              <label>{{ field.label }}</label>
+              <input
+                [type]="field.type"
+                class="form-control"
+                [placeholder]="'Enter ' + field.label"
+                [(ngModel)]="currentReport[field.key]"
+                [name]="field.key"
+              />
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+        <button class="btn btn-primary" (click)="save()">
+          {{ isEdit ? 'Update' : 'Add' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

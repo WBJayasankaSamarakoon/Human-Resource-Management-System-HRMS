@@ -44,6 +44,7 @@ use App\Http\Controllers\Api\{
     AssetsController,
     AssetAllocationController,
     MailController,
+    YeareportController,
 };
 use App\Models\Addallowance;
 use App\Models\Adddeduction;
@@ -95,6 +96,7 @@ Route::apiResource('processreport',ProcessReportController::class);
 Route::apiResource('assets', AssetsController::class);
 Route::apiResource('assetallocation', AssetAllocationController::class);
 Route::apiResource('send-mail', MailController::class);
+Route::apiResource('yeareport', YeareportController::class);
 
 
 // Mail Sent Payslip

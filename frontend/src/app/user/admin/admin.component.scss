@@ -1,101 +1,184 @@
-.container-fluid {
+.admin-container {
   margin-top: 2rem;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 
-  h2 {
-    margin-bottom: 1.5rem;
-    font-size: 1.8rem;
-    color: #333;
-    font-weight: 400;
-  }
-
   .card {
     border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    margin-bottom: 1.5rem;
 
     .card-header {
-      font-size: 1.3rem;
-      background-color: #007bff;
-      color: white;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-
-      i {
-        margin-right: 0.5rem;
-      }
-
-      .btn {
-        background-color: #f8f9fa;
-        color: #007bff;
-        border: none;
-        font-size: 1rem;
-        transition: background-color 0.3s;
-
-        &:hover {
-          background-color: #e2e6ea;
-        }
-
-        i {
-          margin-right: 0.25rem;
-        }
-      }
+      font-size: 1.1rem;
+      padding: 0.75rem 1.25rem;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.125);
     }
 
     .card-body {
-      .table {
-        width: 100%;
-        border-collapse: collapse;
+      padding: 1.25rem;
 
-        thead {
-          background-color: #6c757d;
+      .form-group {
+        margin-bottom: 1rem;
 
-          th {
-            color: rgb(0, 0, 0);
-            font-weight: 500;
-            padding: 0.5rem;
-            font-size: 1rem;
-            white-space: nowrap;
-            border: 1px solid #dee2e6;
-          }
-
-          // Center align the Action header
-          th.col-action {
-            text-align: center;
-          }
+        label {
+          font-weight: 500;
+          margin-bottom: 0.5rem;
         }
 
-        tbody {
-          tr {
-            &:hover {
-              background-color: #f2f2f2;
-            }
-          }
+        .input-group-text {
+          background-color: #f8f9fa;
+          border-right: none;
+        }
 
-          td {
-            padding: 0.4rem;
-            font-size: 0.9rem;
-            border: 1px solid #dee2e6;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-
-            &.col-action {
-              max-width: 50px;
-              text-align: center;
-
-              button {
-                padding: 0.1rem 0.25rem;
-                font-size: 0.9rem;
-                margin: 0 0.1rem;
-
-                i {
-                  color: white;
-                }
-              }
-            }
+        .form-control {
+          border-left: none;
+          &:focus {
+            box-shadow: none;
+            border-color: #ced4da;
           }
         }
       }
+    }
+  }
+
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+
+    thead {
+      background-color: #f8f9fa;
+
+      th {
+        font-weight: 500;
+        padding: 0.75rem;
+        border-bottom: 2px solid #dee2e6;
+      }
+
+      .col-action {
+        width: 100px;
+        text-align: center;
+      }
+    }
+
+    tbody {
+      tr {
+        &:hover {
+          background-color: #f8f9fa;
+        }
+      }
+
+      td {
+        padding: 0.75rem;
+        vertical-align: middle;
+        border-top: 1px solid #dee2e6;
+
+        &.col-action {
+          text-align: center;
+
+          .btn {
+            margin: 0 2px;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+          }
+        }
+      }
+    }
+  }
+
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1050;
+    overflow: hidden;
+    outline: 0;
+    display: none;
+
+    &.show {
+      display: block;
+    }
+
+    .modal-dialog {
+      position: relative;
+      width: auto;
+      margin: 0.5rem;
+      pointer-events: none;
+    }
+
+    .modal-content {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      pointer-events: auto;
+      background-color: #fff;
+      background-clip: padding-box;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      border-radius: 0.3rem;
+      outline: 0;
+      margin: 1.75rem auto;
+      max-width: 500px;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding: 1rem;
+      border-bottom: 1px solid #dee2e6;
+      border-top-left-radius: 0.3rem;
+      border-top-right-radius: 0.3rem;
+
+      .close {
+        padding: 1rem;
+        margin: -1rem -1rem -1rem auto;
+        background-color: transparent;
+        border: 0;
+        float: right;
+        font-size: 1.5rem;
+        font-weight: 700;
+        line-height: 1;
+        color: #000;
+        text-shadow: 0 1px 0 #fff;
+        opacity: 0.5;
+      }
+    }
+
+    .modal-body {
+      position: relative;
+      flex: 1 1 auto;
+      padding: 1rem;
+    }
+
+    .modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 1rem;
+      border-top: 1px solid #dee2e6;
+      border-bottom-right-radius: 0.3rem;
+      border-bottom-left-radius: 0.3rem;
+    }
+  }
+
+  .alert {
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
+
+    &-danger {
+      color: #721c24;
+      background-color: #f8d7da;
+      border-color: #f5c6cb;
+    }
+
+    &-success {
+      color: #155724;
+      background-color: #d4edda;
+      border-color: #c3e6cb;
     }
   }
 }

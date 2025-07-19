@@ -37,6 +37,7 @@ import { AllocationComponent } from './leave/allocation/allocation.component';
 import { AssetsComponent } from './assetmas/assets/assets.component';
 import { AstallocationComponent } from './assetmas/astallocation/astallocation.component';
 import { SlipmailComponent } from './upload/slipmail/slipmail.component';
+import { YearreportComponent } from './upload/yeareport/yeareport.component';
 
 import { appConfig } from './app.config';
 import { routes } from './app.routes';
@@ -104,7 +105,8 @@ import { JsonPipe } from '@angular/common';
     AllocationComponent,
     AssetsComponent,
     AstallocationComponent,
-    SlipmailComponent
+    SlipmailComponent,
+    YearreportComponent
   ],
 
   imports: [

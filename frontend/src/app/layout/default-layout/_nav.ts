@@ -29,6 +29,11 @@ export const navItems: INavData[] = [
         url: '/view',
         iconComponent: { name: 'cil-dot' },
       },
+      {
+        name: 'Year Report',
+        url: '/yeareport',
+        iconComponent: { name: 'cil-dot' },
+      },
     ],
   },
   {
