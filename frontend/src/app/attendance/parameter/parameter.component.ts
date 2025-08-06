@@ -22,7 +22,8 @@ export class ParameterComponent {
     epfCom: 0,
     etfCom: 0,
     ot: 0,
-    specot: 0
+    specot: 0,
+    ot_hours: 0
   };
   isLoading: boolean = false;
   showNameError: boolean = false;
@@ -175,7 +176,8 @@ export class ParameterComponent {
       epfCom: 0,
       etfCom: 0,
       ot: 0,
-      specot: 0
+      specot: 0,
+      ot_hours: 0
     };
     this.showNameError = false;
   }

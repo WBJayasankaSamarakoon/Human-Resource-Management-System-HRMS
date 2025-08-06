@@ -58,6 +58,7 @@
               <th>ETF Company (%)</th>
               <th>OT Rate (%)</th>
               <th>Special OT Rate (%)</th>
+              <th>OT Hourse</th>
             </tr>
           </thead>
           <tbody>
@@ -79,6 +80,7 @@
               <td>{{ parameterItem.etfCom }}</td>
               <td>{{ parameterItem.ot }}</td>
               <td>{{ parameterItem.specot}}</td>
+              <td>{{ parameterItem.ot_hours}}</td>
             </tr>
           </tbody>
         </table>
@@ -130,6 +132,10 @@
           <div class="form-group mt-3">
             <label>Special OT Rate (%)</label>
             <input type="number" step="0.01" class="form-control" [(ngModel)]="currentParameter.specot" name="specot" />
+          </div>
+          <div class="form-group mt-3">
+            <label>OT Hours Worked</label>
+            <input type="number" step="0.01" class="form-control" placeholder="Enter OT hours worked" [(ngModel)]="currentParameter.ot_hours" name="ot_hours" />
           </div>
         </form>
       </div>
@@ -183,6 +189,10 @@
         <div class="form-group mt-3">
           <label>Special OT Rate (%)</label>
           <input type="number" step="0.01" class="form-control" [(ngModel)]="currentParameter.specot" name="specot" />
+        </div>
+        <div class="form-group mt-3">
+          <label>OT Hours Worked</label>
+          <input type="number" step="0.01" class="form-control" placeholder="Enter OT hours worked" [(ngModel)]="currentParameter.ot_hours" name="ot_hours" />
         </div>
       </div>
       <div class="modal-footer">

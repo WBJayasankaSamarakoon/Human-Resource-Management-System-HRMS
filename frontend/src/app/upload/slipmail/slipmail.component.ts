@@ -30,7 +30,7 @@ export class SlipmailComponent {
   selectedFile: File | null = null;
   isDragOver = false;
 
-  private readonly MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+  private readonly MAX_FILE_SIZE = 10 * 1024 * 1024;
 
   constructor(private http: HttpClient) {}
 
@@ -70,7 +70,6 @@ Thank you for your continued contributions to ${this.company?.name || 'our compa
 
 Best regards,
 ${this.company?.hr_name || 'HR Department'}
-HR Department
 ${this.company?.name || ''}
 ${this.company?.hr_email || ''} | ${this.company?.phone || ''}`;
   }

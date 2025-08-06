@@ -19,6 +19,7 @@ class Parameter extends Model
         'epfCom',
         'etfCom',
         'ot',
-        'specot'
+        'specot',
+        'ot_hours'
     ];
 }

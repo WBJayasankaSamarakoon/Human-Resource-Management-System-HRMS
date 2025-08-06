@@ -277,7 +277,7 @@ class ViewFileController extends Controller
 }
 
 
-    //Combine data
+//Combine data
 public function getCombinedData($fileId)
 {
     // Fetch the year and month from the uploaded_files table for the given fileId
@@ -439,45 +439,30 @@ public function getCombinedData($fileId)
             END
         ) AS late_hours,
 
-        -- OT Hours calculation
+        -- OT Hours calculation (adjusted for check-out time only)
         SUM(
             CASE
-                WHEN u.check_in IS NOT NULL AND u.check_in != '-'
-                     AND u.check_out IS NOT NULL AND u.check_out != '-' THEN
-                    CASE
-                        -- For holidays (count full day as OT)
-                        WHEN EXISTS (
-                            SELECT 1 FROM events ev
-                            WHERE ev.Date = u.date
-                        ) THEN
-                            ROUND(TIMESTAMPDIFF(MINUTE, STR_TO_DATE(u.check_in, '%H:%i:%s'), STR_TO_DATE(u.check_out, '%H:%i:%s')) / 60.0, 2)
-                        -- For non-shift days (count full day as OT)
-                        WHEN s.StartTime IS NULL THEN
-                            ROUND(TIMESTAMPDIFF(MINUTE, STR_TO_DATE(u.check_in, '%H:%i:%s'), STR_TO_DATE(u.check_out, '%H:%i:%s')) / 60.0, 2)
-                        -- For regular days - calculate OT beyond shift time
-                        ELSE
-                            CASE
-                                -- Saturday (half day)
-                                WHEN DAYOFWEEK(u.date) = 7 THEN
-                                    ROUND(
-                                        GREATEST(
-                                            TIMESTAMPDIFF(MINUTE, STR_TO_DATE(u.check_in, '%H:%i:%s'), STR_TO_DATE(u.check_out, '%H:%i:%s')) -
-                                            TIMESTAMPDIFF(MINUTE, s.StartTime, s.HalfTime),
-                                            0
-                                        ) / 60.0,
-                                        2
-                                    )
-                                -- Weekdays (full day)
-                                ELSE
-                                    ROUND(
-                                        GREATEST(
-                                            TIMESTAMPDIFF(MINUTE, STR_TO_DATE(u.check_in, '%H:%i:%s'), STR_TO_DATE(u.check_out, '%H:%i:%s')) -
-                                            TIMESTAMPDIFF(MINUTE, s.StartTime, s.EndTime),
-                                            0
-                                        ) / 60.0,
-                                        2
-                                    )
-                            END
+                    WHEN u.check_out IS NOT NULL AND u.check_out != '-' THEN
+                    -- Ignore Saturdays
+                    CASE WHEN DAYOFWEEK(u.date) = 7 THEN 0
+
+                    -- Ignore Half-day Leaves
+                    WHEN EXISTS (
+                        SELECT 1 FROM `leave` l
+                        JOIN leaveday ld ON l.leaveday_id = ld.id
+                        WHERE l.employee_id = e.id
+                        AND u.date BETWEEN l.start_date AND l.end_date
+                        AND ld.Value = 0.5
+                    ) THEN 0
+
+                    ELSE
+                        ROUND(
+                            -- Late Check-out (OT after EndTime)
+                            GREATEST(
+                                TIMESTAMPDIFF(MINUTE, s.EndTime, STR_TO_DATE(u.check_out, '%H:%i:%s')) - (par.ot_hours * 60),
+                                0
+                            ) / 60.0, 2
+                        )
                     END
                 ELSE 0
             END
