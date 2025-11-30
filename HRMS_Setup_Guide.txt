@@ -1,0 +1,74 @@
+HRMS PROJECT SETUP GUIDE (Laravel + Angular)
+
+1.  REQUIREMENTS
+
+-   PHP 8.x
+-   Composer
+-   Node.js + NPM
+-   Angular CLI
+-   MySQL / MariaDB
+-   XAMPP or WAMP recommended
+
+  ----------------------------
+  2. BACKEND (LARAVEL) SETUP
+  ----------------------------
+
+1.  Go to backend folder: cd backend
+
+2.  Copy .env.example to .env: cp .env.example .env
+
+3.  Configure database in .env: DB_DATABASE=testlaravel DB_USERNAME=root
+    DB_PASSWORD=
+
+4.  Install dependencies: composer install
+
+5.  Fix missing extensions (if needed): Enable sodium in php.ini:
+    extension=sodium
+
+6.  Generate key: php artisan key:generate
+
+7.  Create database in phpMyAdmin: CREATE DATABASE testlaravel;
+
+8.  Run migrations: php artisan migrate
+
+9.  Start server: php artisan serve
+
+Backend will run on: http://127.0.0.1:8000
+
+  -----------------------------
+  3. FRONTEND (ANGULAR) SETUP
+  -----------------------------
+
+1.  Go to frontend folder: cd frontend
+
+2.  Install node dependencies: npm install
+
+3.  Start Angular dev server: ng serve –open
+
+Frontend usually runs on: http://localhost:4200/
+
+  --------------------------
+  4. COMMON ERRORS & FIXES
+  --------------------------
+
+1.  vendor/autoload.php missing → Run: composer install
+
+2.  Node packages not installed → Run: npm install
+
+3.  MySQL tablespace error → Delete migrations.ibd from: C:
+    Or drop and recreate database.
+
+4.  Cache table missing → Change CACHE_DRIVER=file in .env OR run: php
+    artisan cache:table php artisan migrate
+
+  -------------------------
+  5. BUILD FOR PRODUCTION
+  -------------------------
+
+Backend: php artisan config:cache php artisan route:cache
+
+Frontend: ng build –prod
+
+------------------------------------------------------------------------
+
+END OF DOCUMENT
