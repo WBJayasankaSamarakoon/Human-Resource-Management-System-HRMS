@@ -46,21 +46,31 @@ import {
   ],
 })
 export class LoginComponent {
-  username: string = '';
+  email: string = '';
   password: string = '';
+  errorMessage: string = '';
 
   constructor(private http: HttpClient, private router: Router) {}
 
   login() {
-    const credentials = { username: this.username, password: this.password };
+    this.errorMessage = '';
+    const credentials = { email: this.email, password: this.password };
 
-    this.http.post(`${apiBaseUrl}/api/admin`, credentials).subscribe({
+    this.http.post(`${apiBaseUrl}api/auth/login`, credentials).subscribe({
       next: (response: any) => {
-        localStorage.setItem('token', response.token);
-        alert('Login successful!');
-        this.router.navigate(['/admin-dashboard']);
+        if (response.success && response.data.access_token) {
+          localStorage.setItem('token', response.data.access_token);
+          alert('Login successful!');
+          this.router.navigate(['/dashboard']);
+        } else {
+          this.errorMessage = 'Invalid response from server';
+        }
       },
-      error: () => alert('Login failed, please check your credentials'),
+      error: (error) => {
+        console.error('Login error:', error);
+        this.errorMessage = error.error?.message || 'Login failed, please check your credentials';
+        alert(this.errorMessage);
+      },
     });
   }
 }

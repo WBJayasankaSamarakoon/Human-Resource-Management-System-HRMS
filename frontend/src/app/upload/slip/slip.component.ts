@@ -22,6 +22,8 @@ import { SlipmailComponent } from '../slipmail/slipmail.component';
 export class SlipComponent implements OnInit {
   editOtMode = false;
   hovering = false;
+  editAttendanceIncentiveMode = false;
+  hoveringAttendanceIncentive = false;
   slipData: any = {};
   company: any = {};
   loading = false;
@@ -258,12 +260,11 @@ export class SlipComponent implements OnInit {
   }
 
   recalculateTotalAllowances(): void {
-    const total = this.calculateTotal(
-      this.slipData.attendanceIncentive,
-      this.slipData.performanceIncentive,
-      this.slipData.otAmount,
-      this.slipData.dynamicAllowances
-    );
+    const attendanceIncentiveValue = this.parseCurrency(this.slipData.attendanceIncentive);
+    const performanceIncentiveValue = this.parseCurrency(this.slipData.performanceIncentive);
+    const otAmountValue = this.parseCurrency(this.slipData.otAmount);
+    const total = attendanceIncentiveValue + performanceIncentiveValue + otAmountValue +
+      this.calculateTotal(this.slipData.dynamicAllowances);
     this.slipData.total_allowances = this.formatCurrency(total);
     this.recalculateNetSalary();
   }
@@ -302,9 +303,28 @@ export class SlipComponent implements OnInit {
 
   toggleEditOt(): void {
     if (this.editOtMode) {
+      // Parse and format the OT amount
+      const otValue = this.parseCurrency(this.slipData.otAmount);
+      this.slipData.otAmount = this.formatCurrency(otValue);
       this.recalculateTotalAllowances();
+    } else {
+      // Convert formatted value to numeric for editing
+      this.slipData.otAmount = this.parseCurrency(this.slipData.otAmount);
     }
     this.editOtMode = !this.editOtMode;
+  }
+
+  toggleEditAttendanceIncentive(): void {
+    if (this.editAttendanceIncentiveMode) {
+      // Parse and format the Attendance Incentive amount
+      const attendanceIncentiveValue = this.parseCurrency(this.slipData.attendanceIncentive);
+      this.slipData.attendanceIncentive = this.formatCurrency(attendanceIncentiveValue);
+      this.recalculateTotalAllowances();
+    } else {
+      // Convert formatted value to numeric for editing
+      this.slipData.attendanceIncentive = this.parseCurrency(this.slipData.attendanceIncentive);
+    }
+    this.editAttendanceIncentiveMode = !this.editAttendanceIncentiveMode;
   }
 
 

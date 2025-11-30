@@ -40,13 +40,17 @@
     }
   }
 
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
   .table {
     width: 100%;
     border-collapse: collapse;
+    margin-bottom: 0;
 
     thead {
-      background-color: #f8f9fa;
-
       th {
         font-weight: 500;
         padding: 0.75rem;
@@ -60,12 +64,6 @@
     }
 
     tbody {
-      tr {
-        &:hover {
-          background-color: #f8f9fa;
-        }
-      }
-
       td {
         padding: 0.75rem;
         vertical-align: middle;
@@ -81,6 +79,10 @@
           }
         }
       }
+    }
+
+    &.table-striped tbody tr:nth-of-type(odd) {
+      background-color: rgba(0, 0, 0, 0.02);
     }
   }
 
@@ -100,11 +102,36 @@
       display: block;
     }
 
+    &.fade {
+      opacity: 0;
+      transition: opacity 0.15s linear;
+
+      &.show {
+        opacity: 1;
+      }
+    }
+
     .modal-dialog {
       position: relative;
       width: auto;
       margin: 0.5rem;
       pointer-events: none;
+      transform: translate(0, -50px);
+      transition: transform 0.3s ease-out;
+
+      .show & {
+        transform: translate(0, 0);
+      }
+
+      &.modal-dialog-centered {
+        display: flex;
+        align-items: center;
+        min-height: calc(100% - 1rem);
+      }
+
+      &.modal-lg {
+        max-width: 600px;
+      }
     }
 
     .modal-content {
@@ -120,6 +147,7 @@
       outline: 0;
       margin: 1.75rem auto;
       max-width: 500px;
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
     }
 
     .modal-header {
@@ -131,7 +159,8 @@
       border-top-left-radius: 0.3rem;
       border-top-right-radius: 0.3rem;
 
-      .close {
+      .close,
+      .btn-close {
         padding: 1rem;
         margin: -1rem -1rem -1rem auto;
         background-color: transparent;
@@ -143,6 +172,15 @@
         color: #000;
         text-shadow: 0 1px 0 #fff;
         opacity: 0.5;
+        cursor: pointer;
+
+        &:hover {
+          opacity: 0.75;
+        }
+
+        &.btn-close-white {
+          filter: invert(1) grayscale(100%) brightness(200%);
+        }
       }
     }
 
@@ -180,5 +218,53 @@
       background-color: #d4edda;
       border-color: #c3e6cb;
     }
+
+    &-warning {
+      color: #856404;
+      background-color: #fff3cd;
+      border-color: #ffeaa7;
+    }
+
+    &-dismissible {
+      padding-right: 3rem;
+
+      .btn-close {
+        position: absolute;
+        top: 0;
+        right: 0;
+        z-index: 2;
+        padding: 0.75rem 1.25rem;
+        margin: 0;
+      }
+    }
+  }
+
+  .empty-state {
+    padding: 2rem;
+    color: #6c757d;
+
+    i {
+      display: block;
+      margin-bottom: 1rem;
+    }
+
+    h5 {
+      margin-bottom: 0.5rem;
+    }
+  }
+
+  .spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+    border-width: 0.15em;
+  }
+
+  .table-hover tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+
+  .btn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
   }
 }

@@ -37,6 +37,7 @@ import { WidgetsBrandComponent } from '../widgets/widgets-brand/widgets-brand.co
 import { WidgetsDropdownComponent } from '../widgets/widgets-dropdown/widgets-dropdown.component';
 import { DashboardChartsData, IChartProps } from './dashboard-charts-data';
 import { HttpClient } from '@angular/common/http';
+import { apiBaseUrl } from '../../app.config';
 
 
 interface IUser {
@@ -92,11 +93,21 @@ export class DashboardComponent implements OnInit {
   // Variables for API counts
   totalAdmins: number = 0;
   totalEmployees: number = 0;
+  activeEmployees: number = 0;
+  inactiveEmployees: number = 0;
   totalEvents: number = 0;
   totalLeaves: number = 0;
+  pendingLeavesCount: number = 0;
 
-    // Loading state
-    loading: boolean = false;
+  // Additional data
+  recentEmployees: any[] = [];
+  upcomingAnniversaries: any[] = [];
+  pendingLeaves: any[] = [];
+  employeesByDepartment: any[] = [];
+  upcomingEvents: any[] = [];
+
+  // Loading state
+  loading: boolean = false;
 
   public users: IUser[] = [
     {
@@ -245,12 +256,20 @@ export class DashboardComponent implements OnInit {
   // New method to fetch counts
   fetchCounts() {
     this.loading = true; // Start loading
-    this.http.get<any>('https://laravel.ueshr.ultimate.lk/api/dashboard/counts').subscribe({
+    this.http.get<any>(`${apiBaseUrl}api/dashboard/counts`).subscribe({
       next: (response) => {
-        this.totalAdmins = response.totalAdmins;
-        this.totalEmployees = response.totalEmployees;
-        this.totalEvents = response.totalEvents;
-        this.totalLeaves = response.totalLeaves;
+        this.totalAdmins = response.totalAdmins || 0;
+        this.totalEmployees = response.totalEmployees || 0;
+        this.activeEmployees = response.activeEmployees || 0;
+        this.inactiveEmployees = response.inactiveEmployees || 0;
+        this.totalEvents = response.totalEvents || 0;
+        this.totalLeaves = response.totalLeaves || 0;
+        this.pendingLeavesCount = response.pendingLeavesCount || 0;
+        this.recentEmployees = response.recentEmployees || [];
+        this.upcomingAnniversaries = response.upcomingAnniversaries || [];
+        this.pendingLeaves = response.pendingLeaves || [];
+        this.employeesByDepartment = response.employeesByDepartment || [];
+        this.upcomingEvents = response.upcomingEvents || [];
         this.loading = false; // Stop loading
       },
       error: (err) => {
@@ -258,5 +277,11 @@ export class DashboardComponent implements OnInit {
         this.loading = false; // Stop loading on error
       },
     });
+  }
+
+  formatDate(dateString: string): string {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
   }
 }
