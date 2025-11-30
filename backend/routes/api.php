@@ -59,6 +59,8 @@ Route::group([
     Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:api');
     Route::post('/refresh', [AuthController::class, 'refresh'])->middleware('auth:api');
     Route::post('/profile', [AuthController::class, 'profile'])->middleware('auth:api');
+    Route::get('/users', [AuthController::class, 'getAllUsers'])->middleware('auth:api');
+    Route::delete('/users/{id}', [AuthController::class, 'deleteUser'])->middleware('auth:api');
 });
 
 // API Resource Routes

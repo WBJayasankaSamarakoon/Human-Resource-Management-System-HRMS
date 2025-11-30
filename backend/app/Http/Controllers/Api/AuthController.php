@@ -94,6 +94,48 @@ class AuthController extends BaseController
     }
 
     /**
+     * Get all users.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getAllUsers()
+    {
+        $users = User::select('id', 'name', 'email', 'email_verified_at', 'created_at')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return $this->sendResponse($users, 'Users retrieved successfully.');
+    }
+
+    /**
+     * Delete a user.
+     *
+     * @param  int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function deleteUser($id)
+    {
+        try {
+            $user = User::find($id);
+
+            if (!$user) {
+                return $this->sendError('User not found.', [], 404);
+            }
+
+            // Prevent deleting the currently authenticated user
+            if (auth()->id() == $user->id) {
+                return $this->sendError('You cannot delete your own account.', [], 403);
+            }
+
+            $user->delete();
+
+            return $this->sendResponse([], 'User deleted successfully.');
+        } catch (\Exception $e) {
+            return $this->sendError('Error deleting user.', $e->getMessage(), 500);
+        }
+    }
+
+    /**
      * Get the token array structure.
      *
      * @param  string $token

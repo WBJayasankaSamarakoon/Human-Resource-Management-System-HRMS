@@ -78,9 +78,35 @@
 
         <!-- Additions Section -->
         <h5 class="section-title">Additions</h5>
-        <tr>
-          <td>Attendance Incentive</td>
-          <td>{{ slipData.attendanceIncentive }}</td>
+        <tr (mouseleave)="hoveringAttendanceIncentive = false">
+          <td
+            (mouseenter)="hoveringAttendanceIncentive = true"
+            style="position: relative;"
+          >
+            Attendance Incentive
+
+            <button
+              *ngIf="hoveringAttendanceIncentive"
+              class="btn btn-sm btn-outline-primary"
+              (click)="toggleEditAttendanceIncentive()"
+              style="position: absolute; right: 5px; top: 5px;"
+            >
+              <i class="fas" [ngClass]="editAttendanceIncentiveMode ? 'fa-save' : 'fa-edit'"></i>
+            </button>
+          </td>
+          <td>
+            <ng-container *ngIf="editAttendanceIncentiveMode; else viewAttendanceIncentiveMode">
+              <input
+                type="number"
+                [(ngModel)]="slipData.attendanceIncentive"
+                class="form-control form-control-sm"
+                step="0.01"
+              />
+            </ng-container>
+            <ng-template #viewAttendanceIncentiveMode>
+              {{ slipData.attendanceIncentive || '0.00' }}
+            </ng-template>
+          </td>
           <td class="text-end"></td>
         </tr>
         <tr>

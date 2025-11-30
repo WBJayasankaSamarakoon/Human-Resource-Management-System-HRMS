@@ -6,97 +6,262 @@
     </div>
   </div>
 
-  <div class="row">
-
-      <!-- Dashboard Content -->
-  <div *ngIf="!loading" class="row">
-
-    <!-- Total Admins -->
-    <div class="col-xl-3 col-md-6 mb-4">
-      <div class="card border-left-primary shadow-sm h-100 py-2 hover-card">
-        <div class="card-body">
-          <div class="row no-gutters align-items-center">
-            <div class="col mr-2">
-              <div
-                class="text-xs font-weight-bold text-primary text-uppercase mb-1"
-              >
-                Total Admins
+  <!-- Dashboard Content -->
+  <div *ngIf="!loading">
+    <!-- Statistics Cards Row -->
+    <div class="row mb-4">
+      <!-- Total Admins -->
+      <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow-sm h-100 py-2 hover-card">
+          <div class="card-body">
+            <div class="row no-gutters align-items-center">
+              <div class="col mr-2">
+                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                  Total Admins
+                </div>
+                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                  {{ totalAdmins }}
+                </div>
               </div>
-              <div class="h5 mb-0 font-weight-bold text-gray-800">
-                {{ totalAdmins }}
+              <div class="col-auto">
+                <i class="fas fa-user-shield fa-2x text-gray-300"></i>
               </div>
             </div>
-            <div class="col-auto">
-              <i class="fas fa-user-shield fa-2x text-gray-300"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Total Employees -->
+      <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow-sm h-100 py-2 hover-card">
+          <div class="card-body">
+            <div class="row no-gutters align-items-center">
+              <div class="col mr-2">
+                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                  Total Employees
+                </div>
+                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                  {{ totalEmployees }}
+                </div>
+                <small class="text-muted">Active: {{ activeEmployees }} | Inactive: {{ inactiveEmployees }}</small>
+              </div>
+              <div class="col-auto">
+                <i class="fas fa-users fa-2x text-gray-300"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Total Events -->
+      <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow-sm h-100 py-2 hover-card">
+          <div class="card-body">
+            <div class="row no-gutters align-items-center">
+              <div class="col mr-2">
+                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                  Total Events
+                </div>
+                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                  {{ totalEvents }}
+                </div>
+              </div>
+              <div class="col-auto">
+                <i class="fas fa-calendar-alt fa-2x text-gray-300"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pending Leaves -->
+      <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow-sm h-100 py-2 hover-card">
+          <div class="card-body">
+            <div class="row no-gutters align-items-center">
+              <div class="col mr-2">
+                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                  Pending Leaves
+                </div>
+                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                  {{ pendingLeavesCount }}
+                </div>
+                <small class="text-muted">Total Leave Types: {{ totalLeaves }}</small>
+              </div>
+              <div class="col-auto">
+                <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Total Employees -->
-    <div class="col-xl-3 col-md-6 mb-4">
-      <div class="card border-left-success shadow-sm h-100 py-2 hover-card">
-        <div class="card-body">
-          <div class="row no-gutters align-items-center">
-            <div class="col mr-2">
-              <div
-                class="text-xs font-weight-bold text-success text-uppercase mb-1"
-              >
-                Total Employees
-              </div>
-              <div class="h5 mb-0 font-weight-bold text-gray-800">
-                {{ totalEmployees }}
-              </div>
+    <!-- Second Row - Recent Data -->
+    <div class="row mb-4">
+      <!-- Recent Employees -->
+      <div class="col-xl-6 col-md-6 mb-4">
+        <div class="card shadow-sm h-100">
+          <div class="card-header bg-primary text-white">
+            <h6 class="mb-0"><i class="fas fa-user-plus me-2"></i>Recent Employees</h6>
+          </div>
+          <div class="card-body">
+            <div *ngIf="recentEmployees.length === 0" class="text-center text-muted py-3">
+              No recent employees
             </div>
-            <div class="col-auto">
-              <i class="fas fa-users fa-2x text-gray-300"></i>
+            <div *ngIf="recentEmployees.length > 0" class="table-responsive">
+              <table class="table table-sm table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Designation</th>
+                    <th>Department</th>
+                    <th>Joined</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let emp of recentEmployees">
+                    <td>{{ emp.name }}</td>
+                    <td>{{ emp.designation || 'N/A' }}</td>
+                    <td>{{ emp.department || 'N/A' }}</td>
+                    <td>{{ formatDate(emp.dateOfJoining) }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upcoming Work Anniversaries -->
+      <div class="col-xl-6 col-md-6 mb-4">
+        <div class="card shadow-sm h-100">
+          <div class="card-header bg-success text-white">
+            <h6 class="mb-0"><i class="fas fa-birthday-cake me-2"></i>Upcoming Work Anniversaries</h6>
+          </div>
+          <div class="card-body">
+            <div *ngIf="upcomingAnniversaries.length === 0" class="text-center text-muted py-3">
+              No upcoming anniversaries
+            </div>
+            <div *ngIf="upcomingAnniversaries.length > 0" class="table-responsive">
+              <table class="table table-sm table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Designation</th>
+                    <th>Years</th>
+                    <th>Days Until</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let ann of upcomingAnniversaries">
+                    <td>{{ ann.name }}</td>
+                    <td>{{ ann.designation || 'N/A' }}</td>
+                    <td><span class="badge bg-info">{{ ann.yearsOfService }} years</span></td>
+                    <td>{{ ann.daysUntil }} days</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Total Events -->
-    <div class="col-xl-3 col-md-6 mb-4">
-      <div class="card border-left-info shadow-sm h-100 py-2 hover-card">
-        <div class="card-body">
-          <div class="row no-gutters align-items-center">
-            <div class="col mr-2">
-              <div
-                class="text-xs font-weight-bold text-info text-uppercase mb-1"
-              >
-                Total Events
-              </div>
-              <div class="h5 mb-0 font-weight-bold text-gray-800">
-                {{ totalEvents }}
-              </div>
+    <!-- Third Row - Leaves and Events -->
+    <div class="row mb-4">
+      <!-- Pending Leaves -->
+      <div class="col-xl-6 col-md-6 mb-4">
+        <div class="card shadow-sm h-100">
+          <div class="card-header bg-warning text-white">
+            <h6 class="mb-0"><i class="fas fa-exclamation-circle me-2"></i>Pending Leave Requests</h6>
+          </div>
+          <div class="card-body">
+            <div *ngIf="pendingLeaves.length === 0" class="text-center text-muted py-3">
+              No pending leave requests
             </div>
-            <div class="col-auto">
-              <i class="fas fa-calendar-alt fa-2x text-gray-300"></i>
+            <div *ngIf="pendingLeaves.length > 0" class="table-responsive">
+              <table class="table table-sm table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th>Employee</th>
+                    <th>Leave Type</th>
+                    <th>Start Date</th>
+                    <th>Days</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let leave of pendingLeaves">
+                    <td>{{ leave.employeeName }}</td>
+                    <td>{{ leave.leaveType }}</td>
+                    <td>{{ formatDate(leave.startDate) }}</td>
+                    <td><span class="badge bg-secondary">{{ leave.days }} days</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upcoming Events -->
+      <div class="col-xl-6 col-md-6 mb-4">
+        <div class="card shadow-sm h-100">
+          <div class="card-header bg-info text-white">
+            <h6 class="mb-0"><i class="fas fa-calendar-check me-2"></i>Upcoming Events</h6>
+          </div>
+          <div class="card-body">
+            <div *ngIf="upcomingEvents.length === 0" class="text-center text-muted py-3">
+              No upcoming events
+            </div>
+            <div *ngIf="upcomingEvents.length > 0" class="table-responsive">
+              <table class="table table-sm table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th>Event Name</th>
+                    <th>Date</th>
+                    <th>Type</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let event of upcomingEvents">
+                    <td>{{ event.name }}</td>
+                    <td>{{ formatDate(event.date) }}</td>
+                    <td><span class="badge bg-primary">{{ event.type }}</span></td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Total Leaves -->
-    <div class="col-xl-3 col-md-6 mb-4">
-      <div class="card border-left-warning shadow-sm h-100 py-2 hover-card">
-        <div class="card-body">
-          <div class="row no-gutters align-items-center">
-            <div class="col mr-2">
-              <div
-                class="text-xs font-weight-bold text-warning text-uppercase mb-1"
-              >
-                Total Leaves
-              </div>
-              <div class="h5 mb-0 font-weight-bold text-gray-800">
-                {{ totalLeaves }}
-              </div>
+    <!-- Fourth Row - Employees by Department -->
+    <div class="row">
+      <div class="col-xl-12 mb-4">
+        <div class="card shadow-sm">
+          <div class="card-header bg-dark text-white">
+            <h6 class="mb-0"><i class="fas fa-building me-2"></i>Employees by Department</h6>
+          </div>
+          <div class="card-body">
+            <div *ngIf="employeesByDepartment.length === 0" class="text-center text-muted py-3">
+              No department data available
             </div>
-            <div class="col-auto">
-              <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+            <div *ngIf="employeesByDepartment.length > 0" class="row">
+              <div class="col-md-3 mb-3" *ngFor="let dept of employeesByDepartment">
+                <div class="card border-left-secondary shadow-sm">
+                  <div class="card-body">
+                    <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">
+                      {{ dept.Department }}
+                    </div>
+                    <div class="h4 mb-0 font-weight-bold text-gray-800">
+                      {{ dept.count }}
+                    </div>
+                    <small class="text-muted">employees</small>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

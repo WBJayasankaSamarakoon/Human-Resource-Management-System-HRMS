@@ -10,18 +10,22 @@
               <form (ngSubmit)="login()" cForm>
                 <h1>Login</h1>
                 <p class="text-body-secondary">Sign In to your account</p>
+                <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+                  {{ errorMessage }}
+                </div>
 
                 <c-input-group class="mb-3">
                   <span cInputGroupText>
                     <svg cIcon name="cilUser"></svg>
                   </span>
                   <input
-                    [(ngModel)]="username"
-                    name="username"
-                    placeholder="Username"
+                    [(ngModel)]="email"
+                    name="email"
+                    type="email"
+                    placeholder="Email"
                     cFormControl
                     required
-                    autocomplete="username"
+                    autocomplete="email"
                   />
                 </c-input-group>
 

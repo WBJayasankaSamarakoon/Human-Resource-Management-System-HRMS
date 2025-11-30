@@ -1,177 +1,227 @@
 <div class="container-fluid admin-container">
-  <div class="row">
-    <!-- Registration Form Column -->
-    <div class="col-md-6">
-      <div class="card">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-          <h5 class="mb-0">Register New Admin</h5>
-        </div>
-        <div class="card-body">
-          <form (ngSubmit)="register()">
-            <!-- Name Field -->
-            <div class="form-group mb-3">
-              <label for="name" class="form-label">Name</label>
-              <div class="input-group">
-                <span class="input-group-text">
-                  <i class="fas fa-user"></i>
-                </span>
-                <input
-                  type="text"
-                  id="name"
-                  [(ngModel)]="user.name"
-                  name="name"
-                  class="form-control"
-                  placeholder="Enter your name"
-                  required
-                />
-              </div>
-            </div>
-
-            <!-- Email Field -->
-            <div class="form-group mb-3">
-              <label for="email" class="form-label">Email</label>
-              <div class="input-group">
-                <span class="input-group-text">
-                  <i class="fas fa-envelope"></i>
-                </span>
-                <input
-                  type="email"
-                  id="email"
-                  [(ngModel)]="user.email"
-                  name="email"
-                  class="form-control"
-                  placeholder="Enter your email"
-                  required
-                />
-              </div>
-            </div>
-
-            <!-- Password Field -->
-            <div class="form-group mb-3">
-              <label for="password" class="form-label">Password</label>
-              <div class="input-group">
-                <span class="input-group-text">
-                  <i class="fas fa-lock"></i>
-                </span>
-                <input
-                  type="password"
-                  id="password"
-                  [(ngModel)]="user.password"
-                  name="password"
-                  class="form-control"
-                  placeholder="Enter your password"
-                  required
-                />
-              </div>
-            </div>
-
-            <!-- Confirm Password Field -->
-            <div class="form-group mb-3">
-              <label for="c_password" class="form-label">Confirm Password</label>
-              <div class="input-group">
-                <span class="input-group-text">
-                  <i class="fas fa-lock"></i>
-                </span>
-                <input
-                  type="password"
-                  id="c_password"
-                  [(ngModel)]="user.c_password"
-                  name="c_password"
-                  class="form-control"
-                  placeholder="Confirm your password"
-                  required
-                />
-              </div>
-            </div>
-
-            <!-- Messages -->
-            <div *ngIf="errorMessage" class="alert alert-danger">
-              {{ errorMessage }}
-            </div>
-            <div *ngIf="successMessage" class="alert alert-success">
-              {{ successMessage }}
-            </div>
-
-            <!-- Buttons -->
-            <div class="d-flex justify-content-between">
-              <button type="submit" class="btn btn-primary">
-                <i class="fas fa-user-plus me-1"></i> Register
-              </button>
-              <button type="button" class="btn btn-outline-secondary" (click)="resetForm()">
-                <i class="fas fa-undo me-1"></i> Reset
-              </button>
-            </div>
-          </form>
+  <div class="card">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+      <button
+        type="button"
+        class="btn btn-light"
+        (click)="openAddUserModal()"
+        aria-label="Add User"
+      >
+        <i class="fas fa-plus fa-sm"></i> Add
+      </button>
+    </div>
+    <div class="card-body">
+      <!-- Loading Spinner -->
+      <div *ngIf="isLoading" class="text-center">
+        <div class="spinner-border text-primary" role="status">
+          <span class="sr-only">Loading...</span>
         </div>
       </div>
-    </div>
 
-    <!-- Admin Table Column -->
-    <div class="col-md-6">
-      <div class="card">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-          <h5 class="mb-0">Admin Users</h5>
-          <button type="button" class="btn btn-light btn-sm" (click)="refreshAdmins()">
-            <i class="fas fa-sync-alt"></i> Refresh
+      <!-- Error Message -->
+      <div *ngIf="errorMessage && !isLoading && !showAddUserModal" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error:</strong> {{ errorMessage }}
+        <button type="button" class="btn-close" (click)="clearMessages()" aria-label="Close"></button>
+      </div>
+
+      <!-- Success Message -->
+      <div *ngIf="successMessage && !isLoading && !showAddUserModal" class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Success:</strong> {{ successMessage }}
+        <button type="button" class="btn-close" (click)="clearMessages()" aria-label="Close"></button>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!isLoading && admins.length === 0 && !errorMessage" class="text-center py-5">
+        <div class="empty-state">
+          <i class="fas fa-users fa-3x text-muted mb-3"></i>
+          <h5 class="text-muted">No Users Found</h5>
+          <p class="text-muted mb-3">No users have been registered yet.</p>
+          <button type="button" class="btn btn-primary" (click)="openAddUserModal()">
+            <i class="fas fa-plus me-1"></i> Add
           </button>
         </div>
-        <div class="card-body">
-          <!-- Loading Spinner -->
-          <div *ngIf="isLoading" class="text-center">
-            <div class="spinner-border text-primary" role="status">
-              <span class="sr-only">Loading...</span>
+      </div>
+
+      <!-- Users Table -->
+      <div class="table-responsive" *ngIf="!isLoading && admins.length > 0">
+        <table id="usersTable" class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th class="col-action">Actions</th>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Email</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let admin of admins">
+              <td class="col-action">
+                <button
+                  type="button"
+                  class="btn btn-danger btn-sm"
+                  (click)="confirmDelete(admin)"
+                >
+                  <i class="fas fa-trash fa-sm text-white"></i>
+                </button>
+              </td>
+              <td>{{ admin.id }}</td>
+              <td>{{ admin.name }}</td>
+              <td>{{ admin.email }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add User Modal -->
+<div 
+  class="modal fade" 
+  [class.show]="showAddUserModal" 
+  [style.display]="showAddUserModal ? 'block' : 'none'"
+  tabindex="-1"
+  role="dialog"
+  [attr.aria-hidden]="!showAddUserModal">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title">
+          <i class="fas fa-user-plus me-2"></i>Add New User
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeAddUserModal()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Error Message in Modal -->
+        <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+          <strong>Error:</strong> {{ errorMessage }}
+          <button type="button" class="btn-close" (click)="clearMessages()" aria-label="Close"></button>
+        </div>
+
+        <form (ngSubmit)="register()" id="addUserForm">
+          <!-- Name Field -->
+          <div class="form-group mb-3">
+            <label for="modal-name" class="form-label">Name <span class="text-danger">*</span></label>
+            <div class="input-group">
+              <span class="input-group-text">
+                <i class="fas fa-user"></i>
+              </span>
+              <input
+                type="text"
+                id="modal-name"
+                [(ngModel)]="user.name"
+                name="modal-name"
+                class="form-control"
+                placeholder="Enter full name"
+                required
+              />
             </div>
           </div>
 
-          <div class="table-responsive" *ngIf="!isLoading">
-            <table class="table table-bordered table-striped">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th class="col-action">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let admin of admins">
-                  <td>{{ admin.id }}</td>
-                  <td>{{ admin.name }}</td>
-                  <td>{{ admin.email }}</td>
-                  <td class="col-action">
-                    <button type="button" class="btn btn-danger btn-sm" (click)="confirmDelete(admin)">
-                      <i class="fas fa-trash"></i>
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <!-- Email Field -->
+          <div class="form-group mb-3">
+            <label for="modal-email" class="form-label">Email <span class="text-danger">*</span></label>
+            <div class="input-group">
+              <span class="input-group-text">
+                <i class="fas fa-envelope"></i>
+              </span>
+              <input
+                type="email"
+                id="modal-email"
+                [(ngModel)]="user.email"
+                name="modal-email"
+                class="form-control"
+                placeholder="Enter email address"
+                required
+              />
+            </div>
           </div>
-        </div>
+
+          <!-- Password Field -->
+          <div class="form-group mb-3">
+            <label for="modal-password" class="form-label">Password <span class="text-danger">*</span></label>
+            <div class="input-group">
+              <span class="input-group-text">
+                <i class="fas fa-lock"></i>
+              </span>
+              <input
+                type="password"
+                id="modal-password"
+                [(ngModel)]="user.password"
+                name="modal-password"
+                class="form-control"
+                placeholder="Enter password (min. 6 characters)"
+                required
+                minlength="6"
+              />
+            </div>
+            <small class="form-text text-muted">Password must be at least 6 characters long.</small>
+          </div>
+
+          <!-- Confirm Password Field -->
+          <div class="form-group mb-3">
+            <label for="modal-c_password" class="form-label">Confirm Password <span class="text-danger">*</span></label>
+            <div class="input-group">
+              <span class="input-group-text">
+                <i class="fas fa-lock"></i>
+              </span>
+              <input
+                type="password"
+                id="modal-c_password"
+                [(ngModel)]="user.c_password"
+                name="modal-c_password"
+                class="form-control"
+                placeholder="Confirm password"
+                required
+              />
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeAddUserModal()" [disabled]="isSubmitting">
+          <i class="fas fa-times me-1"></i>Cancel
+        </button>
+        <button type="submit" form="addUserForm" class="btn btn-success" [disabled]="isSubmitting">
+          <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+          <i *ngIf="!isSubmitting" class="fas fa-user-plus me-1"></i>
+          {{ isSubmitting ? 'Adding...' : 'Add User' }}
+        </button>
       </div>
     </div>
   </div>
 </div>
 
 <!-- Delete Confirmation Modal -->
-<div class="modal" [class.show]="showConfirmationModal" [style.display]="showConfirmationModal ? 'block' : 'none'">
-  <div class="modal-dialog" role="document">
+<div 
+  class="modal fade" 
+  [class.show]="showConfirmationModal" 
+  [style.display]="showConfirmationModal ? 'block' : 'none'"
+  tabindex="-1"
+  role="dialog"
+  [attr.aria-hidden]="!showConfirmationModal">
+  <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Delete Admin</h5>
-        <button type="button" class="close" (click)="closeConfirmationModal()">
-          <span>&times;</span>
-        </button>
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">
+          <i class="fas fa-exclamation-triangle me-2"></i>Confirm Deletion
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeConfirmationModal()" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <p>Are you sure you want to delete admin user {{ currentAdmin?.name }}?</p>
+        <p>Are you sure you want to delete user <strong>{{ currentAdmin?.name }}</strong>?</p>
+        <p class="text-muted small mb-0">Email: {{ currentAdmin?.email }}</p>
+        <div class="alert alert-warning mt-3 mb-0">
+          <i class="fas fa-exclamation-circle me-2"></i>
+          <strong>Warning:</strong> This action cannot be undone.
+        </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="closeConfirmationModal()">
-          Cancel
+          <i class="fas fa-times me-1"></i>Cancel
         </button>
         <button type="button" class="btn btn-danger" (click)="deleteAdmin()">
-          Delete
+          <i class="fas fa-trash me-1"></i>Delete User
         </button>
       </div>
     </div>
