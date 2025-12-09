@@ -273,208 +273,86 @@ ng version
 The `.env` file in the `backend/` directory contains all environment variables. Create this file in the `backend/` directory. Here's a comprehensive template with all required settings (Lines 1-80+):
 
 ```env
-# ============================================
-# APPLICATION CONFIGURATION
-# ============================================
-APP_NAME=HRMS
+APP_NAME=Laravel
 APP_ENV=local
-APP_KEY=
+APP_KEY=base64:+AHx3Ae+1We+U+Y7DUvyq7jQVKfQLb1sUmhYoErulP0=
 APP_DEBUG=true
 APP_TIMEZONE=UTC
 APP_URL=http://localhost:8000
+
 APP_LOCALE=en
 APP_FALLBACK_LOCALE=en
 APP_FAKER_LOCALE=en_US
-APP_PREVIOUS_KEYS=
 
-# Maintenance Mode Configuration
 APP_MAINTENANCE_DRIVER=file
 APP_MAINTENANCE_STORE=database
 
-# ============================================
-# LOGGING CONFIGURATION
-# ============================================
-LOG_CHANNEL=stack
-LOG_LEVEL=debug
-LOG_DEPRECATIONS_CHANNEL=null
-LOG_DEPRECATIONS_TRACE=false
-LOG_STACK=single
-LOG_SLACK_WEBHOOK_URL=
-LOG_SLACK_USERNAME=Laravel Log
-LOG_SLACK_EMOJI=:boom:
-LOG_PAPERTRAIL_URL=
-LOG_PAPERTRAIL_PORT=
-LOG_STDERR_FORMATTER=
-LOG_SYSLOG_FACILITY=LOG_USER
+PHP_CLI_SERVER_WORKERS=4
 
-# ============================================
-# DATABASE CONFIGURATION
-# ============================================
+BCRYPT_ROUNDS=12
+
+LOG_CHANNEL=stack
+LOG_STACK=single
+LOG_DEPRECATIONS_CHANNEL=null
+LOG_LEVEL=debug
+
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=hrms_db
+DB_DATABASE=testlaravel
 DB_USERNAME=root
-DB_PASSWORD=
-DB_URL=
-DB_SOCKET=
-DB_CHARSET=utf8mb4
-DB_COLLATION=utf8mb4_unicode_ci
-DB_FOREIGN_KEYS=true
-MYSQL_ATTR_SSL_CA=
+DB_PASSWORD=     # Add the password if needed
 
-# For SQLite Database (Alternative to MySQL)
-# Uncomment and configure if using SQLite:
-# DB_CONNECTION=sqlite
-# DB_DATABASE=C:\Users\HP\Documents\GitHub\Human-Resource-Management-System-HRMS\backend\database\database.sqlite
-
-# ============================================
-# SESSION CONFIGURATION
-# ============================================
 SESSION_DRIVER=database
 SESSION_LIFETIME=120
-SESSION_EXPIRE_ON_CLOSE=false
 SESSION_ENCRYPT=false
 SESSION_PATH=/
 SESSION_DOMAIN=null
-SESSION_SECURE_COOKIE=
-SESSION_HTTP_ONLY=true
-SESSION_SAME_SITE=lax
-SESSION_PARTITIONED_COOKIE=false
-SESSION_CONNECTION=
-SESSION_TABLE=sessions
-SESSION_STORE=
 
-# ============================================
-# CACHE CONFIGURATION
-# ============================================
+BROADCAST_CONNECTION=log
+FILESYSTEM_DISK=local
+QUEUE_CONNECTION=database
+
 CACHE_STORE=database
 CACHE_PREFIX=
-DB_CACHE_CONNECTION=
-DB_CACHE_TABLE=cache
-DB_CACHE_LOCK_CONNECTION=
-DB_CACHE_LOCK_TABLE=
-MEMCACHED_PERSISTENT_ID=
-MEMCACHED_USERNAME=
-MEMCACHED_PASSWORD=
+
 MEMCACHED_HOST=127.0.0.1
-MEMCACHED_PORT=11211
-REDIS_CACHE_CONNECTION=cache
-REDIS_CACHE_LOCK_CONNECTION=default
-DYNAMODB_CACHE_TABLE=cache
-DYNAMODB_ENDPOINT=
 
-# ============================================
-# QUEUE CONFIGURATION
-# ============================================
-QUEUE_CONNECTION=database
-DB_QUEUE_CONNECTION=
-DB_QUEUE_TABLE=jobs
-DB_QUEUE=default
-DB_QUEUE_RETRY_AFTER=90
-BEANSTALKD_QUEUE_HOST=localhost
-BEANSTALKD_QUEUE=default
-BEANSTALKD_QUEUE_RETRY_AFTER=90
-SQS_PREFIX=https://sqs.us-east-1.amazonaws.com/your-account-id
-SQS_QUEUE=default
-SQS_SUFFIX=
-REDIS_QUEUE_CONNECTION=default
-REDIS_QUEUE=default
-REDIS_QUEUE_RETRY_AFTER=90
-QUEUE_FAILED_DRIVER=database-uuids
-
-# ============================================
-# BROADCASTING CONFIGURATION
-# ============================================
-BROADCAST_CONNECTION=log
-BROADCAST_DRIVER=log
-
-# ============================================
-# FILESYSTEM CONFIGURATION
-# ============================================
-FILESYSTEM_DISK=local
-
-# ============================================
-# MAIL CONFIGURATION
-# ============================================
-MAIL_MAILER=smtp
-MAIL_HOST=mail.ultimate.lk
-MAIL_PORT=465
-MAIL_USERNAME=
-MAIL_PASSWORD=
-MAIL_ENCRYPTION=ssl
-MAIL_FROM_ADDRESS=hello@example.com
-MAIL_FROM_NAME="${APP_NAME}"
-MAIL_LOG_CHANNEL=
-POSTMARK_TOKEN=
-POSTMARK_MESSAGE_STREAM_ID=
-
-# ============================================
-# JWT AUTHENTICATION CONFIGURATION
-# ============================================
-JWT_SECRET=
-JWT_PUBLIC_KEY=
-JWT_PRIVATE_KEY=
-JWT_PASSPHRASE=
-JWT_TTL=60
-JWT_REFRESH_TTL=20160
-JWT_ALGO=HS256
-JWT_LEEWAY=0
-JWT_BLACKLIST_ENABLED=true
-JWT_BLACKLIST_GRACE_PERIOD=0
-JWT_SHOW_BLACKLIST_EXCEPTION=true
-
-# ============================================
-# REDIS CONFIGURATION (Optional)
-# ============================================
 REDIS_CLIENT=phpredis
-REDIS_CLUSTER=redis
-REDIS_PREFIX=
-REDIS_URL=
 REDIS_HOST=127.0.0.1
-REDIS_USERNAME=
-REDIS_PASSWORD=
+REDIS_PASSWORD=null
 REDIS_PORT=6379
-REDIS_DB=0
-REDIS_CACHE_DB=1
 
-# ============================================
-# AWS CONFIGURATION (Optional - for S3 storage)
-# ============================================
+MAIL_MAILER=log
+MAIL_HOST=127.0.0.1
+MAIL_PORT=2525
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+MAIL_ENCRYPTION=null
+MAIL_FROM_ADDRESS="hello@example.com"
+MAIL_FROM_NAME="${APP_NAME}"
+
+# MAIL_MAILER=smtp
+# MAIL_HOST=smtp.gmail.com
+# MAIL_PORT=587
+# MAIL_USERNAME=buddhika@ultimate.lk
+# MAIL_PASSWORD=Ultimate@1234
+# MAIL_ENCRYPTION=tls
+# MAIL_FROM_ADDRESS=buddhika@ultimate.lk
+# MAIL_FROM_NAME="${APP_NAME}"
+
 AWS_ACCESS_KEY_ID=
 AWS_SECRET_ACCESS_KEY=
 AWS_DEFAULT_REGION=us-east-1
 AWS_BUCKET=
 AWS_USE_PATH_STYLE_ENDPOINT=false
-AWS_ENDPOINT=
-AWS_URL=
 
-# ============================================
-# SANCTUM CONFIGURATION (API Authentication)
-# ============================================
-SANCTUM_STATEFUL_DOMAINS=localhost:4200
-SANCTUM_TOKEN_PREFIX=
-
-# ============================================
-# AUTHENTICATION CONFIGURATION
-# ============================================
-AUTH_MODEL=App\Models\User
-AUTH_PASSWORD_RESET_TOKEN_TABLE=password_reset_tokens
-AUTH_PASSWORD_TIMEOUT=10800
-
-# ============================================
-# VITE CONFIGURATION (Frontend Build)
-# ============================================
 VITE_APP_NAME="${APP_NAME}"
-VITE_PUSHER_APP_KEY="${PUSHER_APP_KEY}"
-VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
 
-# ============================================
-# THIRD-PARTY SERVICES (Optional)
-# ============================================
-RESEND_KEY=
-SLACK_BOT_USER_OAUTH_TOKEN=
-SLACK_BOT_USER_DEFAULT_CHANNEL=
+JWT_SECRET=336oPKPdLahib1T0dabSLnT0wOFm7S891j2huuO3uIjZ0xOs6JikBgZMLyW5UgrE
+
+JWT_ALGO=HS256
+
 ```
 
 ### Important Environment Variables to Configure:
