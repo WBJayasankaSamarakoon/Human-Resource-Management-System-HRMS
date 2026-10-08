@@ -23,9 +23,9 @@ HRMS PROJECT SETUP GUIDE (Laravel + Angular)
 4.  Install dependencies: composer install
 
 5.  Fix missing extensions (if needed): Enable sodium in php.ini:
-    extension=sodium
+    extension=sodium, extension=gd
 
-6.  Generate key: php artisan key:generate
+6.  Generate key: php artisan key:generate, php artisan jwt:secret
 
 7.  Create database in phpMyAdmin: CREATE DATABASE testlaravel;
 
